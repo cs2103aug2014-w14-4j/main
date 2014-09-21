@@ -1,6 +1,8 @@
 package todothis;
 
-public interface ITDTStorage {
+import java.util.Iterator;
+
+public interface ITDTStorage{
 	/**
 	 * Read from data file and initialise TDT
 	 * @throws Exception
@@ -12,4 +14,7 @@ public interface ITDTStorage {
 	 * @throws Exception
 	 */
 	public void write() throws Exception;
+	
+	public Iterator<Task> getTaskIterator();
+	
 }

@@ -1,32 +1,69 @@
 package todothis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class TodoThis {
-	public static ArrayList<Task> allTask;
-	public static HashMap<String, Integer> labelMap;
+	public static final String FILENAME = "todothis.txt";
 	private static Scanner sc;
+	private String fileName;
+	private TDTStorage storage;
+	private TDTParser parser;
+	private TDTLogic logic;
+	
+	public TodoThis(String fileName) {
+		this.setFileName(fileName);
+		sc = new Scanner(System.in);
+	}
 	
 	//Initialise
-	private static String doInit() {
-		TDTStorage storage = new TDTStorage();
+	private String doInit() {
+		
+		storage = new TDTStorage(FILENAME);
+		parser = new TDTParser();
+		logic = new TDTLogic(storage);
 		try {
 			storage.readInitialise();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return "";
+		return "Todo-This ready!";
 	}
 	
 	//Display all task under labels nicely
-	public static void displayTextUI() {
+	private void displayTextUI() {
 		
 	}
 	
-	public static void main(String[] Args) {
-		
+	private void run(){
+		while(true) {
+			System.out.print("Adding task to: " + storage.getCurrLabel());
+			System.out.print("I want to: ");
+			String userCommand = sc.nextLine();
+			Command command = parser.parse(userCommand);
+			String feedback = logic.executeCommand(command);
+			this.displayTextUI();
+			show(feedback);
+		}
+	}
+	
+	public static void main(String[] Args) throws Exception {
+		TodoThis tdt = new TodoThis(FILENAME);
+		show(tdt.doInit());
+		tdt.displayTextUI();
+		tdt.run();
+	}
+	
+	public static void show(String message) {
+		System.out.println(message);
+	}
+	
+	//------------------------GETTER & SETTER---------------------------------
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }

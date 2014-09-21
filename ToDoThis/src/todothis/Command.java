@@ -3,6 +3,7 @@ package todothis;
 import todothis.ITDTParser.COMMANDTYPE;
 
 public class Command {
+	private int taskID;
 	private COMMANDTYPE commandType;
 	private String labelName;
 	private String commandDetails;
@@ -11,8 +12,10 @@ public class Command {
 	private boolean isHighPriority;
 	
 	//---------------------CONSTRUCTOR-------------------------------------
-	public Command(COMMANDTYPE commandType, String labelName, String commandDetails, 
-			String dueDate, String dueTime, boolean isHighPriority) {
+	public Command(COMMANDTYPE commandType, String labelName, int taskID,
+			String commandDetails, String dueDate, String dueTime, 
+			boolean isHighPriority) {
+		this.setTaskID(taskID);
 		this.setCommandType(commandType);
 		this.setDueDate(dueDate);
 		this.setDueTime(dueTime);
@@ -59,5 +62,15 @@ public class Command {
 	}
 	public void setDueTime(String dueTime) {
 		this.dueTime = dueTime;
+	}
+
+
+	public int getTaskID() {
+		return taskID;
+	}
+
+
+	public void setTaskID(int taskID) {
+		this.taskID = taskID;
 	}
 }

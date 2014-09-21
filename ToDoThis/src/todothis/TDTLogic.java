@@ -2,7 +2,12 @@ package todothis;
 
 
 public class TDTLogic implements ITDTLogic {
-
+	private TDTStorage storage;
+	
+	public TDTLogic(TDTStorage storage) {
+		this.storage = storage;
+	}
+	
 	@Override
 	public String executeCommand(Command command) {
 		// TODO Auto-generated method stub
@@ -15,19 +20,13 @@ public class TDTLogic implements ITDTLogic {
 	 */
 	@Override
 	public String doADD(Command command) {
-		String labelName = command.getLabelName();
+		String labelName = storage.getCurrLabel();
 		int labelId = 1;
 		
-		if(TodoThis.labelMap.containsKey(labelName)) {
-			TodoThis.labelMap.put(labelName, TodoThis.labelMap.get(labelName) + 1);
-			labelId = TodoThis.labelMap.get(labelName);
-		} else {
-			TodoThis.labelMap.put(labelName, labelId);
-		}
 		
 		Task task = new Task(labelId, labelName, command.getCommandDetails(),
 				command.getDueDate(), command.getDueTime(), command.isHighPriority());
-		TodoThis.allTask.add(task);
+		
 		return null;
 	}
 	
@@ -56,11 +55,6 @@ public class TDTLogic implements ITDTLogic {
 		return null;
 	}
 
-	@Override
-	public String doHide(Command command) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public String doUndo(Command command) {
@@ -68,10 +62,24 @@ public class TDTLogic implements ITDTLogic {
 		return null;
 	}
 
+	
+
 	@Override
-	public String doDone(Command command) {
+	public void doShow(Command command) {
 		// TODO Auto-generated method stub
-		return null;
+		
+	}
+
+	@Override
+	public void doHide(Command command) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void doDone(Command command) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
