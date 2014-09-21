@@ -28,34 +28,27 @@ public class TDTStorage implements ITDTStorage {
 	
 	@Override
 	public void readInitialise() throws Exception {
-		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		try {
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			while(br.ready()) {
 				String line = br.readLine();
 				String[] params = line.split("\t");
 				Task task = new Task(0, params[0], params[1] , params[2], params[3],
 						false);
-				if(labelMap.containsKey(params[0])) {
-					task.setTaskID(this.getLabelSize(params[0]) + 1);
-					if(params[4].equals("true")) {
-						task.setHighPriority(true);
-					}
-					this.addTask(task);
-				} else {
+				if(!labelMap.containsKey(params[0])) {
 					labelMap.put(params[0], new ArrayList<Task>());
-					task.setTaskID(this.getLabelSize(params[0]) + 1);
-					if(params[4].equals("true")) {
-						task.setHighPriority(true);
-					}
-					this.addTask(task);
 				}
+				task.setTaskID(this.getLabelSize(params[0]) + 1);
+				if(params[4].equals("true")) {
+					task.setHighPriority(true);
+				}
+				this.addTask(task);	
 			}
 			br.close();
 		} catch(Exception e) {
-			System.out.println("Error. " + fileName + " not found.");
-			br.close();
-			System.exit(0);
+			bw = new BufferedWriter(new FileWriter(fileName));
 		}
+		
 	}
 
 	@Override
@@ -102,8 +95,11 @@ public class TDTStorage implements ITDTStorage {
 		storage.addTask(new Task(3, "Today", "Buy rice", "19092014", "", false));
 		storage.write();*/
 		
-		TDTStorage storage = new TDTStorage("TestStorage.txt");
+		TDTStorage storage = new TDTStorage("tdt.txt");
 		storage.readInitialise();
+		storage.getLabelMap().get("Today").add(new Task(1, "Today", "Buy egg", "20092014", "1400", true));
+		storage.write();
+		/*
 		Iterator<Task> iter = storage.getTaskIterator();
 		while(iter.hasNext()) {
 			Task task = iter.next();
@@ -111,7 +107,7 @@ public class TDTStorage implements ITDTStorage {
 					"\t" + task.getDetails() + "\t" +task.getDueDate() + 
 					"\t" +task.getDueTime() +"\t" +task.isHighPriority());
 			System.out.println();
-		}
+		}*/
 	}
 	
 	//-----------------------------GETTERS & SETTERS----------------------------------------------
