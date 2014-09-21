@@ -4,7 +4,7 @@ package todothis;
 public interface ITDTParser {
 	
 	public enum COMMANDTYPE {
-		ADD, DELETE, HIDE, SEARCH, SORT, EDIT, DONE, UNDO, LABEL, SHOW, INVALID;
+		ADD, DELETE, HIDE, SEARCH, SORT, EDIT, DONE, UNDO, LABEL, DISPLAY, INVALID;
 	}
 	
 	/**

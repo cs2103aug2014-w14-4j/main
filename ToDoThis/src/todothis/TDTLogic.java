@@ -65,7 +65,7 @@ public class TDTLogic implements ITDTLogic {
 	
 
 	@Override
-	public void doShow(Command command) {
+	public void doDisplay(Command command) {
 		// TODO Auto-generated method stub
 		
 	}

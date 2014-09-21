@@ -13,5 +13,5 @@ public interface ITDTLogic {
 	public void doHide(Command command);
 	public String doUndo(Command command);
 	public void doDone(Command command);
-	public void doShow(Command command);
+	public void doDisplay(Command command);
 }
