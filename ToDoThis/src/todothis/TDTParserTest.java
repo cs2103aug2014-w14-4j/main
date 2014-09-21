@@ -91,24 +91,24 @@ public class TDTParserTest {
 			assertEquals(3,command.getTaskID());
 	}
 	
-	//Test for HIDE command
-		@Test
-		public void parserTestDISPLAY() {
-			TDTParser parser = new TDTParser();
-			String testString = "display someday";
-			Command command = parser.parse(testString);
-			
-			assertEquals(COMMANDTYPE.DISPLAY,command.getCommandType());
-			assertEquals("someday",command.getLabelName());
-			
-			String testString1 = "display";
-			Command command1 = parser.parse(testString1);
-			
-			assertEquals(COMMANDTYPE.DISPLAY,command1.getCommandType());
-			assertEquals("",command1.getLabelName());
-			assertEquals(-1,command1.getTaskID());
-			
-		}
+	//Test for DISPLAY command
+	@Test
+	public void parserTestDISPLAY() {
+		TDTParser parser = new TDTParser();
+		String testString = "display someday";
+		Command command = parser.parse(testString);
+		
+		assertEquals(COMMANDTYPE.DISPLAY,command.getCommandType());
+		assertEquals("someday",command.getLabelName());
+		
+		String testString1 = "display";
+		Command command1 = parser.parse(testString1);
+		
+		assertEquals(COMMANDTYPE.DISPLAY,command1.getCommandType());
+		assertEquals("",command1.getLabelName());
+		assertEquals(-1,command1.getTaskID());
+		
+	}
 	
 	//ADD OTHER TEST BELOW
 

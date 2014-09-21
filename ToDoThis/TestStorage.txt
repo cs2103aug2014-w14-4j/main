@@ -1,0 +1,4 @@
+Today	Buy egg	20092014	1400	true
+Today	Buy rice	20092014	1500	false
+Today	Buy rice	19092014		false
+Ytd	Buy nothing	12122012	0600	true
