@@ -94,9 +94,50 @@ public class TDTLogic implements ITDTLogic {
 	}
 
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public String doUndo(Command command) {
-		// TODO Auto-generated method stub
+		storage.setLabelMap(storage.getUndoStack().pop());
 		return null;
 	}
 
@@ -182,7 +223,7 @@ public class TDTLogic implements ITDTLogic {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public String doLabel(Command command) {
 		// TODO Auto-generated method stub
