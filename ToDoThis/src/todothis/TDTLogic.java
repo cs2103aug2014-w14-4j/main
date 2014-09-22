@@ -138,11 +138,15 @@ public class TDTLogic implements ITDTLogic {
 
 	@Override
 	public String doUndo(Command command) {
-		if(!storage.getUndoStack().isEmpty()) {
-			storage.setLabelMap(storage.getUndoStack().pop());
-			return "Undo success!";
+		if(command.getCommandType() != COMMANDTYPE.SEARCH) {
+			if(!storage.getUndoStack().isEmpty()) {
+				storage.setLabelMap(storage.getUndoStack().pop());
+				return "Undo success!";
+			} else {
+				return "No command to undo.";
+			}
 		} else {
-			return "No command to undo.";
+			return "";
 		}
 	}
 
@@ -177,7 +181,6 @@ public class TDTLogic implements ITDTLogic {
 
 	@Override
 	public String doHide(Command command) {
-		// TODO Auto-generated method stub
 		Iterator <Task> i;
 		String labelName = command.getLabelName();
 
@@ -202,8 +205,6 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String doDone(Command command) {
-		// TODO Auto-generated method stub
-		//storage.getUndoStack().push(storage.copyLabelMap());
 		String labelName = command.getLabelName();
 		int taskID = command.getTaskID() - 1;
 		Iterator <Task> i;
@@ -232,8 +233,12 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String doLabel(Command command) {
-		// TODO Auto-generated method stub
-		return null;
+		if(storage.getLabelMap().containsKey(command.getLabelName())) {
+			storage.setCurrLabel(command.getLabelName());
+		} else {
+			storage.getLabelMap().put(command.getLabelName(), new ArrayList<Task>());
+		}
+		return "";
 	}
 
 }
