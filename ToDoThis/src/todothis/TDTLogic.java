@@ -138,8 +138,12 @@ public class TDTLogic implements ITDTLogic {
 
 	@Override
 	public String doUndo(Command command) {
-		storage.setLabelMap(storage.getUndoStack().pop());
-		return null;
+		if(!storage.getUndoStack().isEmpty()) {
+			storage.setLabelMap(storage.getUndoStack().pop());
+			return "Undo success!";
+		} else {
+			return "No command to undo.";
+		}
 	}
 
 	
