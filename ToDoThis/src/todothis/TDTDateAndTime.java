@@ -48,6 +48,55 @@ public class TDTDateAndTime {
 				}else{
 					startDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
 				}
+			}else if(checkTime(parts[a])){
+				String [] timeParts = new String[2];
+				if ((parts[a].substring(parts[a].length()-2, parts[a].length()).equals("am")) || 
+						(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm"))) {
+					if(parts[a].charAt(parts[a].length()-5) == ':' || 
+							parts[a].charAt(parts[a].length()-5) == '.'){
+						if(parts[a].length() == 6){
+							timeParts[0] = parts[a].substring(0, 1);
+							timeParts[1] = parts[a].substring(2, 4);
+						}else{
+							timeParts[0] = parts[a].substring(0, 2);
+							timeParts[1] = parts[a].substring(3, 5);
+						}
+					}else{
+						if(parts[a].substring(0, parts[a].length()-2).matches("\\d+")){
+							if(parts[a].length() == 3 || parts[a].length() == 4){
+								timeParts[0] = parts[a].substring(0, parts[a].length()-2);
+								timeParts[1] = "00";
+							}else{
+								timeParts[0] = parts[a].substring(0,parts[a].length()-4);
+								timeParts[1] = parts[a].substring(parts[a].length()-4, parts[a].length()-2);
+							}
+						}
+					}
+					
+					if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm")){
+						int temp;
+						temp = Integer.parseInt(timeParts[0]);
+						if(temp != 12){
+							temp = temp + 12;  //convert to 24hrs format
+						}
+						timeParts[0] = Integer.toString(temp);
+					}
+				}else{
+					if(parts[a].charAt(parts[a].length()-3) == ':' || 
+							parts[a].charAt(parts[a].length()-3) == '.'){
+						timeParts[0] = parts[a].substring(0,parts[a].length()-3);
+						timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
+					}else{
+						timeParts[0] = parts[a].substring(0,parts[a].length()-2);
+						timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
+					}
+				}
+				if(endTimeDate == true){
+					endTime = timeParts[0] + ":" + timeParts[1];				
+				}else{
+					startTime = timeParts[0] + ":" + timeParts[1];	
+				}
+			}else if(checkDay(parts[a]) != 0){
 				
 			}
 		}
@@ -59,12 +108,12 @@ public class TDTDateAndTime {
 		// 2:00 12:15 2.00 --
 		// 2:00pm 12:15pm 2.00pm 12.15pm --
 		// 2359 230
-		// 2359pm 230pm --
+		// 2359pm 230pm -- 
 		
 		// shortest 2am || longest 12:15pm 
 		if (nextWord.length() > 2 || nextWord.length() <= 7) {
-			if ((nextWord.substring(nextWord.length()-2, nextWord.length()-1).equals("am")) || 
-					(nextWord.substring(nextWord.length()-2, nextWord.length()-1).equals("pm"))) {
+			if ((nextWord.substring(nextWord.length()-2, nextWord.length()).equals("am")) || 
+					(nextWord.substring(nextWord.length()-2, nextWord.length()).equals("pm"))) {
 
 				// eg 2:00pm 12:15pm 2.00pm 12.15pm
 				if ((nextWord.charAt(nextWord.length()-6) == ':') || (nextWord.charAt(nextWord.length()-6) == '.')) {
