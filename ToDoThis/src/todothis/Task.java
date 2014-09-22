@@ -22,8 +22,23 @@ public class Task implements Comparable<Task> {
 		this.setDone(false);
 		this.setHighPriority(p);
 	}
-//-------------------------------------------------------------------------------
+
 	
+	public Task(int taskID, String labelName, String details,
+			String dueDate, String dueTime, boolean p,
+			boolean done, boolean hide) {
+		this.setDetails(details);
+		this.setTaskID(taskID);
+		this.setLabelName(labelName);
+		this.setDueDate(dueDate);
+		this.setDueTime(dueTime);
+		this.setHide(hide);
+		this.setDone(done);
+		this.setHighPriority(p);
+	}
+	
+	//-------------------------------------------------------------------------------
+
 
 
 
