@@ -68,7 +68,8 @@ public class TDTParser implements ITDTParser {
 			case DISPLAY :
 				String checkDisplay[] = remainingWords.split(" ");
 				if (checkDisplay.length > 1) {
-					commandType = COMMANDTYPE.INVALID;
+					commandType = COMMANDTYPE.DISPLAY;
+					labelName = checkDisplay[0];
 					break;
 				}
 				commandType = COMMANDTYPE.DISPLAY;
@@ -77,7 +78,8 @@ public class TDTParser implements ITDTParser {
 			case HIDE :
 				String checkHide[] = remainingWords.split(" ");
 				if (checkHide.length > 1) {
-					commandType = COMMANDTYPE.INVALID;
+					commandType = COMMANDTYPE.HIDE;
+					labelName = checkHide[0];
 					break;
 				}
 				commandType = COMMANDTYPE.HIDE;
