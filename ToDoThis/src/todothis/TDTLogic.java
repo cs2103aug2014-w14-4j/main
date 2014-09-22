@@ -95,7 +95,7 @@ public class TDTLogic implements ITDTLogic {
 		
 		
 		
-		//testing
+		
 		
 		
 		
@@ -170,7 +170,7 @@ public class TDTLogic implements ITDTLogic {
 				}
 			}
 		}else{
-			System.out.println("Display command invalid!");
+			return "Display command invalid!";
 		}
 		return null;
 	}
@@ -193,7 +193,7 @@ public class TDTLogic implements ITDTLogic {
 					i.next().setHide(true);
 				}
 			}else{
-				System.out.println("Label name cannot be found!");
+				return "Label name cannot be found!";
 			}
 		}
 		return null;
@@ -210,10 +210,10 @@ public class TDTLogic implements ITDTLogic {
 		int counter = 0;
 		
 		if(!storage.getLabelMap().containsKey(labelName)){
-			System.out.println("Label Name cannot be found!");
+			return "Label Name cannot be found!";
 		}else if(storage.getLabelMap().get(labelName).size() < taskID ||
 				taskID <=0){
-			System.out.println("TaskID to be marked done cannot be found! OUT OF RANGE!");
+			return "TaskID to be marked done cannot be found! OUT OF RANGE!";
 			
 		}else{
 			i = storage.getLabelMap().get(labelName).iterator();
@@ -228,6 +228,7 @@ public class TDTLogic implements ITDTLogic {
 		}
 		return null;
 	}
+	
 	
 	@Override
 	public String doLabel(Command command) {
