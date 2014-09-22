@@ -2,7 +2,7 @@ package todothis;
 // JUSTIN
 
 public class TDTParser implements ITDTParser {
-
+	private static final int longestString = 100;
 	@Override
 	public Command parse(String userCommand) {
 		COMMANDTYPE commandType = COMMANDTYPE.INVALID;
@@ -17,7 +17,20 @@ public class TDTParser implements ITDTParser {
 		String remainingWords = removeFirstWord(userCommand);
 		switch(commandType) {
 			case ADD :
-				commandDetails = userCommand;
+				labelName = getFirstWord(remainingWords);
+				commandDetails = removeFirstWord(remainingWords);
+				if (commandDetails.contains("!")) {
+					isHighPriority = true;
+				}
+				String[] words = new String[longestString];
+				words = commandDetails.split(" ");
+				for (int i = 0; i < words.length; i++) {
+					if (words[i].contains("/")) {
+						dueDate = words[i];
+						dueTime = words[i+1];
+						break;
+					}
+				}
 				break;
 			case DELETE :
 				break;
