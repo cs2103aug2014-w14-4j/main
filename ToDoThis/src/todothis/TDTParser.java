@@ -30,10 +30,25 @@ public class TDTParser implements ITDTParser {
 			case UNDO :
 				break;
 			case SEARCH :
+				
 				break;
 			case DISPLAY :
+				String checkDisplay[] = remainingWords.split(" ");
+				if (checkDisplay.length > 1) {
+					commandType = COMMANDTYPE.INVALID;
+					break;
+				}
+				commandType = COMMANDTYPE.DISPLAY;
+				labelName = remainingWords;
 				break;
 			case HIDE :
+				String checkHide[] = remainingWords.split(" ");
+				if (checkHide.length > 1) {
+					commandType = COMMANDTYPE.INVALID;
+					break;
+				}
+				commandType = COMMANDTYPE.HIDE;
+				labelName = remainingWords;
 				break;
 			case DONE :
 				commandType = COMMANDTYPE.DONE;
@@ -53,6 +68,7 @@ public class TDTParser implements ITDTParser {
 				}
 				break;
 			case INVALID :
+				commandType = COMMANDTYPE.INVALID;
 				break;
 			default:
 				//Will not reach here
