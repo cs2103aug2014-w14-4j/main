@@ -9,19 +9,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.Stack;
 
 public class TDTStorage implements ITDTStorage {
 	private String fileName;
 	private HashMap<String, ArrayList<Task>> labelMap;
 	private String currLabel = "Today";
-	private Stack<Command> undoStack;
+	private Stack<HashMap<String, ArrayList<Task>>> undoStack;
 	private BufferedWriter bw;
 	
 	public TDTStorage(String fileName) {
 		this.setFileName(fileName);
 		setLabelMap(new HashMap<String, ArrayList<Task>>());
-		setUndoStack(new Stack<Command>());
+		setUndoStack(new Stack<HashMap<String, ArrayList<Task>>>());
 		labelMap.put(currLabel, new ArrayList<Task>());
 	}
 	
@@ -52,7 +53,7 @@ public class TDTStorage implements ITDTStorage {
 	}
 
 	@Override
-	public void write() throws Exception {
+	public void write(){
 		try {
 			bw = new BufferedWriter(new FileWriter(fileName));
 			Iterator<Task> iter = this.getTaskIterator();
@@ -83,6 +84,22 @@ public class TDTStorage implements ITDTStorage {
 		this.getLabelMap().get(task.getLabelName()).add(task);
 	}
 	
+	public HashMap<String, ArrayList<Task>> copyLabelMap() {
+		HashMap<String, ArrayList<Task>> hmap = new HashMap<String, ArrayList<Task>>();
+		
+		Iterator<Task> taskIter = this.getTaskIterator();
+		while(taskIter.hasNext()) {
+			Task task =  taskIter.next();
+			if(!hmap.containsKey(task.getLabelName())) {
+				hmap.put(task.getLabelName(), new ArrayList<Task>());
+			}
+			hmap.get(task.getLabelName()).add(new Task(task.getTaskID(), task.getLabelName(),
+					 task.getDetails(), task.getDueDate(), task.getDueTime(), task.isHighPriority(), 
+					 task.isDone(), task.isHide()));
+		}
+		return hmap;
+	}
+	
 	//public Task(int taskID, String labelName, String details, String dueDate,
 	//		String dueTime, boolean p) {
 	public static void main(String[] arg) throws Exception {
@@ -93,13 +110,13 @@ public class TDTStorage implements ITDTStorage {
 		storage.addTask(new Task(2, "Today", "Buy rice", "20092014", "1500", false));
 		storage.write();
 		storage.addTask(new Task(3, "Today", "Buy rice", "19092014", "", false));
-		storage.write();*/
+		storage.write();
 		
 		TDTStorage storage = new TDTStorage("tdt.txt");
 		storage.readInitialise();
 		storage.getLabelMap().get("Today").add(new Task(1, "Today", "Buy egg", "20092014", "1400", true));
 		storage.write();
-		/*
+		
 		Iterator<Task> iter = storage.getTaskIterator();
 		while(iter.hasNext()) {
 			Task task = iter.next();
@@ -108,6 +125,11 @@ public class TDTStorage implements ITDTStorage {
 					"\t" +task.getDueTime() +"\t" +task.isHighPriority());
 			System.out.println();
 		}*/
+		TDTStorage storage = new TDTStorage("TestStorage.txt");
+		storage.readInitialise();
+		HashMap<String, ArrayList<Task>> map = storage.copyLabelMap();
+		System.out.println(map.get("Today").get(0).getDetails());
+		
 	}
 	
 	//-----------------------------GETTERS & SETTERS----------------------------------------------
@@ -134,13 +156,14 @@ public class TDTStorage implements ITDTStorage {
 		this.currLabel = currLabel;
 	}
 
-	public Stack<Command> getUndoStack() {
+	public Stack<HashMap<String, ArrayList<Task>>> getUndoStack() {
 		return undoStack;
 	}
 
-	public void setUndoStack(Stack<Command> undoStack) {
+	public void setUndoStack(Stack<HashMap<String, ArrayList<Task>>> undoStack) {
 		this.undoStack = undoStack;
 	}
+
 	//-------------------------------------------------------------------------------
 	private class TaskIterator implements Iterator<Task>{
 		private LinkedList<Task> iterQ;
