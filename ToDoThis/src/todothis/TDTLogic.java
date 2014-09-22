@@ -91,13 +91,16 @@ public class TDTLogic implements ITDTLogic {
 		} else {
 			//Deleting a label
 			if(label.equals(TodoThis.DEFAULT_LABEL)) {
-				return "Unable to delete default label";
+				storage.getLabelMap().put(TodoThis.DEFAULT_LABEL, new ArrayList<Task>());
+				storage.write();
+				return "Label deleted";
 			}
 			if(storage.getLabelMap().containsKey(label)) {
 				if(command.getLabelName().equals(storage.getCurrLabel())) {
 					storage.setCurrLabel(TodoThis.DEFAULT_LABEL);
 				}
 				storage.getLabelMap().remove(label);
+				storage.write();
 				return "Label Deleted";
 			} else {
 				return "error. Label does not exist";

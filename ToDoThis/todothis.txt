@@ -1,5 +1,0 @@
-TODAY	buy eat			false
-TODAY	eat rice			false
-TODAY	buy nothing			false
-TMR	sell egg			false
-TMR	buy rice later			false
