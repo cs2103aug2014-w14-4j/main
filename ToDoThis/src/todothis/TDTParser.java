@@ -73,10 +73,8 @@ public class TDTParser implements ITDTParser {
 				commandDetails = remainingWords.trim();
 				break;
 			case LABEL :
-				// label name must be one word ( no spaces )
-				String checkLabel[] = remainingWords.split(" ");
 				commandType = COMMANDTYPE.LABEL;
-				labelName = checkLabel[0];
+				labelName = remainingWords;
 				break;
 			case SORT :
 				commandType = COMMANDTYPE.SORT;
@@ -103,18 +101,12 @@ public class TDTParser implements ITDTParser {
 			case DONE :
 				commandType = COMMANDTYPE.DONE;
 				String[] tempWords = remainingWords.split(" ");
-				String word1 = tempWords[0];
-				String word2 = tempWords[1];
-				// [label][taskID]
-				if (word1.matches("\\d+")) {
-					taskID = Integer.parseInt(word1);
-					labelName = tempWords[1];
-					// [taskID][label]
-				} else if (word2.matches("\\d+")) {
-					taskID = Integer.parseInt(word2);
-					labelName = tempWords[0];
+				String lastWord1 = tempWords[tempWords.length -1];
+				if (lastWord1.matches("\\d+")) {
+					taskID = Integer.parseInt(lastWord1);
+					labelName = remainingWords.substring(0, remainingWords.lastIndexOf(" "));
 				} else {
-					commandType = COMMANDTYPE.INVALID;
+					labelName = remainingWords;
 				}
 				break;
 			case INVALID :

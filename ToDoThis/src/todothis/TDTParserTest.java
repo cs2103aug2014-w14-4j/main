@@ -18,7 +18,7 @@ public class TDTParserTest {
 		assertEquals(COMMANDTYPE.ADD,command.getCommandType());
 		assertEquals(testString,command.getCommandDetails());
 		
-		String testString1 = "tmr undo homework";
+		String testString1 = "tmr undo homework 12.34pm 22/9/2014";
 		Command command1 = parser.parse(testString1);
 		
 		assertEquals(COMMANDTYPE.ADD,command1.getCommandType());
@@ -36,6 +36,7 @@ public class TDTParserTest {
 		assertEquals(COMMANDTYPE.DELETE,command.getCommandType());
 		assertEquals("today",command.getLabelName());
 		assertEquals(3,command.getTaskID());
+		
 	}
 	
 	//Test for EDIT command
@@ -61,14 +62,6 @@ public class TDTParserTest {
 		assertEquals(COMMANDTYPE.DONE,command.getCommandType());
 		assertEquals("someday",command.getLabelName());
 		assertEquals(3,command.getTaskID());
-		
-		String testString1 = "DONE 3 someday";
-		Command command1 = parser.parse(testString1);
-		
-		assertEquals(COMMANDTYPE.DONE,command1.getCommandType());
-		assertEquals("someday",command1.getLabelName());
-		assertEquals(3,command.getTaskID());
-		
 		
 	}
 	
@@ -103,7 +96,7 @@ public class TDTParserTest {
 		Command command1 = parser.parse(testString1);
 		
 		assertEquals(COMMANDTYPE.LABEL,command1.getCommandType());
-		assertEquals("tmrthe",command1.getLabelName());
+		assertEquals("tmrthe tmrdetmr",command1.getLabelName());
 		
 	}
 	
