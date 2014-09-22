@@ -31,7 +31,10 @@ public class TDTLogic implements ITDTLogic {
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doSort(command);
 			case SEARCH :
-				return doSearch(command);
+				ArrayList<Task> searched = doSearch(command);
+				TodoThis.clearScreen();
+				this.printSearch(searched);
+				return "";
 			case HIDE :
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doHide(command);
@@ -46,7 +49,7 @@ public class TDTLogic implements ITDTLogic {
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doDone(command);	
 			default:
-				return null;
+				return "";
 		}
 	}
 	
@@ -73,10 +76,11 @@ public class TDTLogic implements ITDTLogic {
 
 	@Override
 	public String doDelete(Command command) {
+		String label = command.getLabelName().toUpperCase();
 		if(command.getTaskID() != -1) {
 			//Deleting a task
-			if(storage.getLabelMap().containsKey(command.getLabelName())) {
-				ArrayList<Task> array = storage.getLabelMap().get(command.getLabelName());
+			if(storage.getLabelMap().containsKey(label)) {
+				ArrayList<Task> array = storage.getLabelMap().get(label);
 				if(command.getTaskID() <= array.size() && command.getTaskID() > 0) {
 					array.remove(command.getTaskID() - 1);
 					renumberTaskID(array);
@@ -89,14 +93,17 @@ public class TDTLogic implements ITDTLogic {
 			}
 		} else {
 			//Deleting a label
-			if(command.getLabelName().equals(TodoThis.DEFAULT_LABEL)) {
-				return "Unable to delete default label";
+			if(label.equals(TodoThis.DEFAULT_LABEL)) {
+				storage.getLabelMap().put(TodoThis.DEFAULT_LABEL, new ArrayList<Task>());
+				storage.write();
+				return "Label deleted";
 			}
-			if(storage.getLabelMap().containsKey(command.getLabelName())) {
+			if(storage.getLabelMap().containsKey(label)) {
 				if(command.getLabelName().equals(storage.getCurrLabel())) {
 					storage.setCurrLabel(TodoThis.DEFAULT_LABEL);
 				}
-				storage.getLabelMap().remove(command.getLabelName());
+				storage.getLabelMap().remove(label);
+				storage.write();
 				return "Label Deleted";
 			} else {
 				return "error. Label does not exist";
@@ -111,11 +118,49 @@ public class TDTLogic implements ITDTLogic {
 			task.setTaskID(i + 1);
 		}
 	}
+	
+	private void printSearch(ArrayList<Task> tasks) {
+		System.out.println(tasks.size() + " results found.");
+		System.out.println("--------------------------------------------------");
+		for(int i = 0; i < tasks.size(); i++) {
+			Task task = tasks.get(i);
+			System.out.println(i + 1 + ") Label: " + task.getLabelName() + "\t" +
+			"TaskID: " + task.getTaskID());
+			System.out.println("Details: " + task.getDetails());
+			System.out.println("--------------------------------------------------");
+		}
+	}
 
 	@Override
-	public String doSearch(Command command) {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Task> doSearch(Command command) {
+		boolean found = false;
+		ArrayList<Task> searchedTask = new ArrayList<Task>();
+		String[] params = command.getCommandDetails().replaceAll("[\\W]", " ").split(" ");
+		Iterator<Task> iter = storage.getTaskIterator();
+		
+		while(iter.hasNext()) {
+			Task task = iter.next();
+			String[] words = task.getDetails().replaceAll("[\\W]", " ").split(" ");
+			for(int j = 0; j < params.length; j++) {
+				for(int k = 0; k < words.length; k++) {
+					if(words[k].equalsIgnoreCase(params[j])) {
+						found = true;
+						break;
+					} else {
+						found = false;
+					}
+				}
+				if(!found) {
+					break;
+				}
+			}
+			if(found) {
+				searchedTask.add(task);
+			} 
+			found = false;
+		}
+		
+		return searchedTask;
 	}
 
 	@Override
@@ -128,8 +173,8 @@ public class TDTLogic implements ITDTLogic {
 	public String doEdit(Command command) {
 		// TODO Auto-generated method stub
 		
-		String labelName = command.getLabelName();
-		int taskID = command.getTaskID() - 1;
+		String labelName = command.getLabelName().toUpperCase();
+		int taskID = command.getTaskID();
 		String commandDetails = command.getCommandDetails();
 		String dueDate = command.getDueDate();
 		String dueTime = command.getDueTime();
@@ -139,7 +184,7 @@ public class TDTLogic implements ITDTLogic {
 			return "Label Name cannot be found!";
 		}else if(storage.getLabelMap().get(labelName).size() < taskID ||
 				taskID <=0){
-			return "TaskID to be marked done cannot be found! OUT OF RANGE!";
+			return "TaskID to be edit cannot be found! OUT OF RANGE!";
 			
 		}else{
 			storage.getLabelMap().get(labelName).get(taskID - 1).setDetails(commandDetails);
@@ -147,7 +192,7 @@ public class TDTLogic implements ITDTLogic {
 			storage.getLabelMap().get(labelName).get(taskID - 1).setDueTime(dueTime);
 			storage.getLabelMap().get(labelName).get(taskID - 1).setHighPriority(isHighPriority);
 		}
-		return null;
+		return "";
 	}
 
 	@Override
@@ -169,7 +214,7 @@ public class TDTLogic implements ITDTLogic {
 	@Override
 	public String doDisplay(Command command) {
 		// TODO Auto-generated method stub
-		String labelName = command.getLabelName();
+		String labelName = command.getLabelName().toUpperCase();
 		Iterator<Task> i;
 		if(labelName.equals("")){
 			i = storage.getTaskIterator();
@@ -190,13 +235,13 @@ public class TDTLogic implements ITDTLogic {
 		}else{
 			return "Display command invalid!";
 		}
-		return null;
+		return "";
 	}
 
 	@Override
 	public String doHide(Command command) {
 		Iterator <Task> i;
-		String labelName = command.getLabelName();
+		String labelName = command.getLabelName().toUpperCase();
 
 		if(labelName.equals("")){
 			i = storage.getTaskIterator();
@@ -213,13 +258,13 @@ public class TDTLogic implements ITDTLogic {
 				return "Label name cannot be found!";
 			}
 		}
-		return null;
+		return "";
 	}
 	
 	
 	@Override
 	public String doDone(Command command) {
-		String labelName = command.getLabelName();
+		String labelName = command.getLabelName().toUpperCase();
 		int taskID = command.getTaskID();
 		Iterator <Task> i;
 	
@@ -237,17 +282,18 @@ public class TDTLogic implements ITDTLogic {
 		}else{
 			storage.getLabelMap().get(labelName).get(taskID - 1).setDone(true);
 		}
-		return null;
+		return "";
 	}
 	
 	
 	@Override
 	public String doLabel(Command command) {
-		if(storage.getLabelMap().containsKey(command.getLabelName())) {
-			storage.setCurrLabel(command.getLabelName());
+		String label = command.getLabelName().toUpperCase();
+		if(storage.getLabelMap().containsKey(label)) {
+			storage.setCurrLabel(label);
 		} else {
-			storage.getLabelMap().put(command.getLabelName(), new ArrayList<Task>());
-			storage.setCurrLabel(command.getLabelName());
+			storage.getLabelMap().put(label, new ArrayList<Task>());
+			storage.setCurrLabel(label);
 		}
 		return "";
 	}

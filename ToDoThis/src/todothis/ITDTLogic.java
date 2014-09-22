@@ -1,5 +1,7 @@
 package todothis;
 
+import java.util.ArrayList;
+
 //Interface for Logic
 public interface ITDTLogic {
 	public String executeCommand(Command command);
@@ -7,7 +9,7 @@ public interface ITDTLogic {
 	//Public????
 	public String doADD(Command command);
 	public String doDelete(Command command);
-	public String doSearch(Command command);
+	public ArrayList<Task> doSearch(Command command);
 	public String doSort(Command command);
 	public String doEdit(Command command);
 	public String doHide(Command command);
