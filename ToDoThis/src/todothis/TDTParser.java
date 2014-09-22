@@ -59,6 +59,7 @@ public class TDTParser implements ITDTParser {
 					dueTime = parts[i];
 					remainingWords = remainingWords.replace(parts[i], "");
 				}
+<<<<<<< HEAD
 				if (parts[i].matches("\\d+") && located == false) {
 					taskID = Integer.parseInt(parts[i]);
 					for (int j = 0; j < i; j++) {
@@ -105,6 +106,36 @@ public class TDTParser implements ITDTParser {
 			String checkHide[] = remainingWords.split(" ");
 			if (checkHide.length > 1) {
 				commandType = COMMANDTYPE.INVALID;
+=======
+				break;
+			case EDIT :
+				break;
+			case LABEL :
+				// label name must be one word ( no spaces )
+				String checkLabel[] = remainingWords.split(" ");
+				commandType = COMMANDTYPE.LABEL;
+				labelName = checkLabel[0];
+				break;
+			case SORT :
+				commandType = COMMANDTYPE.SORT;
+				break;
+			case UNDO :
+				commandType = COMMANDTYPE.UNDO;
+				break;
+			case SEARCH :
+				commandType = COMMANDTYPE.SEARCH;
+				commandDetails = remainingWords;
+				break;
+			case DISPLAY :
+				String checkDisplay[] = remainingWords.split(" ");
+				commandType = COMMANDTYPE.DISPLAY;
+				labelName = checkDisplay[0];
+				break;
+			case HIDE :
+				String checkHide[] = remainingWords.split(" ");
+				commandType = COMMANDTYPE.HIDE;
+				labelName = checkHide[0];
+>>>>>>> origin/master
 				break;
 			}
 			commandType = COMMANDTYPE.HIDE;
