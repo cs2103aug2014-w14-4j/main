@@ -3,6 +3,8 @@ package todothis;
 import java.util.Iterator;
 import java.util.Scanner;
 
+import todothis.ITDTParser.COMMANDTYPE;
+
 public class TodoThis {
 	public static final String FILENAME = "todothis.txt";
 	public static final String DEFAULT_LABEL = "TODAY";
@@ -29,6 +31,7 @@ public class TodoThis {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		clearScreen();
 		return "Todo-This ready!";
 	}
 	
@@ -66,8 +69,17 @@ public class TodoThis {
 			String userCommand = sc.nextLine();
 			Command command = parser.parse(userCommand);
 			String feedback = logic.executeCommand(command);
-			this.displayTextUI();
-			show(feedback);
+			if(command.getCommandType() != COMMANDTYPE.SEARCH) {
+				clearScreen();
+				this.displayTextUI();
+				show(feedback);
+			} 
+		}
+	}
+	
+	public static void clearScreen() {
+		for(int i = 0; i < 100; i++) {
+			System.out.println();
 		}
 	}
 	

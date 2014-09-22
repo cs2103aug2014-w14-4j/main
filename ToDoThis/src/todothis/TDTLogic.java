@@ -31,7 +31,10 @@ public class TDTLogic implements ITDTLogic {
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doSort(command);
 			case SEARCH :
-				return doSearch(command);
+				ArrayList<Task> searched = doSearch(command);
+				TodoThis.clearScreen();
+				this.printSearch(searched);
+				return "";
 			case HIDE :
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doHide(command);
@@ -115,11 +118,49 @@ public class TDTLogic implements ITDTLogic {
 			task.setTaskID(i + 1);
 		}
 	}
+	
+	private void printSearch(ArrayList<Task> tasks) {
+		System.out.println(tasks.size() + " results found.");
+		System.out.println("--------------------------------------------------");
+		for(int i = 0; i < tasks.size(); i++) {
+			Task task = tasks.get(i);
+			System.out.println(i + 1 + ") Label: " + task.getLabelName() + "\t" +
+			"TaskID: " + task.getTaskID());
+			System.out.println("Details: " + task.getDetails());
+			System.out.println("--------------------------------------------------");
+		}
+	}
 
 	@Override
-	public String doSearch(Command command) {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Task> doSearch(Command command) {
+		boolean found = false;
+		ArrayList<Task> searchedTask = new ArrayList<Task>();
+		String[] params = command.getCommandDetails().replaceAll("[\\W]", " ").split(" ");
+		Iterator<Task> iter = storage.getTaskIterator();
+		
+		while(iter.hasNext()) {
+			Task task = iter.next();
+			String[] words = task.getDetails().replaceAll("[\\W]", " ").split(" ");
+			for(int j = 0; j < params.length; j++) {
+				for(int k = 0; k < words.length; k++) {
+					if(words[k].equalsIgnoreCase(params[j])) {
+						found = true;
+						break;
+					} else {
+						found = false;
+					}
+				}
+				if(!found) {
+					break;
+				}
+			}
+			if(found) {
+				searchedTask.add(task);
+			} 
+			found = false;
+		}
+		
+		return searchedTask;
 	}
 
 	@Override
