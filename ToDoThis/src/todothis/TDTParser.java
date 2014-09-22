@@ -62,11 +62,13 @@ public class TDTParser implements ITDTParser {
 				commandDetails = remainingWords;
 				break;
 			case DISPLAY :
+				// the word after the command will be the labelName
 				String checkDisplay[] = remainingWords.split(" ");
 				commandType = COMMANDTYPE.DISPLAY;
 				labelName = checkDisplay[0];
 				break;
 			case HIDE :
+				// the word after the command will be the labelName
 				String checkHide[] = remainingWords.split(" ");
 				commandType = COMMANDTYPE.HIDE;
 				labelName = checkHide[0];
@@ -77,11 +79,11 @@ public class TDTParser implements ITDTParser {
 				String word1 = tempWords[0];
 				String word2 = tempWords[1];
 				// [label][taskID]
-				if (Character.isDigit(word1.charAt(0))) {
+				if (word1.matches("\\d+")) {
 					taskID = Integer.parseInt(word1);
 					labelName = tempWords[1];
 				// [taskID][label]
-				} else if (Character.isDigit(word2.charAt(0))) {
+				} else if (word2.matches("\\d+")) {
 					taskID = Integer.parseInt(word2);
 					labelName = tempWords[0];
 				} else {
