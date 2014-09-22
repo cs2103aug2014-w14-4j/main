@@ -42,7 +42,8 @@ public class TDTParser implements ITDTParser {
 			case UNDO :
 				break;
 			case SEARCH :
-				
+				commandType = COMMANDTYPE.SEARCH;
+				commandDetails = remainingWords;
 				break;
 			case DISPLAY :
 				String checkDisplay[] = remainingWords.split(" ");

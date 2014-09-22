@@ -108,6 +108,13 @@ public class TDTParserTest {
 		assertEquals("",command1.getLabelName());
 		assertEquals(-1,command1.getTaskID());
 		
+		String testString2 = "display someday 2";
+		Command command2 = parser.parse(testString2);
+		
+		assertEquals(COMMANDTYPE.INVALID,command2.getCommandType());
+		assertEquals("",command2.getLabelName());
+		assertEquals(-1,command2.getTaskID());
+		
 	}
 	
 	//ADD OTHER TEST BELOW
