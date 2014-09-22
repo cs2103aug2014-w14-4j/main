@@ -9,13 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.Stack;
 
 public class TDTStorage implements ITDTStorage {
 	private String fileName;
 	private HashMap<String, ArrayList<Task>> labelMap;
-	private String currLabel = "Today";
+	private String currLabel = TodoThis.DEFAULT_LABEL;
 	private Stack<HashMap<String, ArrayList<Task>>> undoStack;
 	private BufferedWriter bw;
 	

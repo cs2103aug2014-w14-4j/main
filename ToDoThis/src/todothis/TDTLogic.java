@@ -15,8 +15,39 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String executeCommand(Command command) {
-		// TODO Auto-generated method stub
-		return null;
+		switch(command.getCommandType()) {
+			case ADD :
+				storage.getUndoStack().push(storage.copyLabelMap());
+				return doADD(command);
+			case DELETE :
+				storage.getUndoStack().push(storage.copyLabelMap());
+				return doDelete(command);
+			case EDIT :
+				return doEdit(command);
+			case LABEL :
+				storage.getUndoStack().push(storage.copyLabelMap());
+				return doLabel(command);
+			case SORT :
+				storage.getUndoStack().push(storage.copyLabelMap());
+				return doSort(command);
+			case SEARCH :
+				return doSearch(command);
+			case HIDE :
+				storage.getUndoStack().push(storage.copyLabelMap());
+				return doHide(command);
+			case UNDO :
+				String feedback = doUndo(command);
+				storage.write();
+				return feedback;	
+			case DISPLAY :
+				storage.getUndoStack().push(storage.copyLabelMap());
+				return doDisplay(command);
+			case DONE :
+				storage.getUndoStack().push(storage.copyLabelMap());
+				return doDone(command);	
+			default:
+				return null;
+		}
 	}
 	
 	// public Task(int taskID, String labelName, String details, String dueDate,
@@ -51,18 +82,24 @@ public class TDTLogic implements ITDTLogic {
 					renumberTaskID(array);
 					return "Task deleted";
 				} else {
-					return "error";
+					return "error. Invalid task number.";
 				} 
 			} else {
-				return "error";
+				return "error. Label does not exist";
 			}
 		} else {
 			//Deleting a label
+			if(command.getLabelName().equals(TodoThis.DEFAULT_LABEL)) {
+				return "Unable to delete default label";
+			}
 			if(storage.getLabelMap().containsKey(command.getLabelName())) {
+				if(command.getLabelName().equals(storage.getCurrLabel())) {
+					storage.setCurrLabel(TodoThis.DEFAULT_LABEL);
+				}
 				storage.getLabelMap().remove(command.getLabelName());
 				return "Label Deleted";
 			} else {
-				return "Label does not exist";
+				return "error. Label does not exist";
 			}
 		}
 		
@@ -113,16 +150,6 @@ public class TDTLogic implements ITDTLogic {
 		return null;
 	}
 
-
-
-	
-	
-	
-	
-	
-	
-	
-	
 	@Override
 	public String doUndo(Command command) {
 		if(command.getCommandType() != COMMANDTYPE.SEARCH) {
@@ -220,6 +247,7 @@ public class TDTLogic implements ITDTLogic {
 			storage.setCurrLabel(command.getLabelName());
 		} else {
 			storage.getLabelMap().put(command.getLabelName(), new ArrayList<Task>());
+			storage.setCurrLabel(command.getLabelName());
 		}
 		return "";
 	}

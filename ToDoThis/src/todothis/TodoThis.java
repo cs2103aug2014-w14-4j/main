@@ -4,6 +4,8 @@ import java.util.Scanner;
 
 public class TodoThis {
 	public static final String FILENAME = "todothis.txt";
+	public static final String DEFAULT_LABEL = "Today";
+	
 	private static Scanner sc;
 	private String fileName;
 	private TDTStorage storage;
