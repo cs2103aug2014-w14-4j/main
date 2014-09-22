@@ -33,26 +33,24 @@ public class TDTParser implements ITDTParser {
 					isHighPriority = true;
 				}
 				parts = commandDetails.split(" ");
-				for (int i = 0; i < parts.length; i++) {
+				for (int i = 0; i < parts.length-1; i++) {
 					if (prepositionWords.contains(parts[i])) {
-						// check date
-						if ((parts[i+1].split("/").length == 3) || (parts[i+1].split("/").length == 2)) {
-							// pass parts[i+1] to dateandtime class
-						} else if ((parts[i+1].split("-").length == 3) || (parts[i+1].split("-").length == 2)) {
-							// pass parts[i+1] to dateandtime class
-						} else if ((parts[i+1].split(".").length == 3) || (parts[i+1].split(".").length == 2)) {
-							// pass parts[i+1] to dateandtime class
-						} else if ((parts[i+1].split(" ").length == 3) || (parts[i+1].split(" ").length == 2)) {
-							// pass parts[i+1] to dateandtime class
-						} else if ((parts[i+1].length() == 6) || (parts[i+1].length() == 8)) {
-							if (parts[i+1].matches("\\d+")) {
-								// pass to dateandtime class
-							}
-						}
-						// check time
-						// 2am 2:00am 2:00(pm) 2359 2359pm 12:15am 12:15pm 12:15(pm) 12.15 0200am 
+						String nextWord = parts[i+1];
+						if (checkDate(nextWord)) {
+							// set date
+							commandDetails = commandDetails.replaceAll(nextWord, "");
+							break;
+						} else if (checkTime(nextWord)) {
+							//set time
+							commandDetails = commandDetails.replaceAll(nextWord, "");
+							break;
+						} else if (checkDay(nextWord) != 0) {
+							//set day
+							commandDetails = commandDetails.replaceAll(nextWord, "");
+							break;
 						}
 					}
+				}
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
@@ -138,6 +136,62 @@ public class TDTParser implements ITDTParser {
 
 		return new Command(commandType, labelName, taskID, commandDetails, dueDate, dueTime,
 				isHighPriority);
+	}
+
+
+	private boolean checkTime(String nextWord) {
+		// check time possible cases
+		// 2am 11pm --
+		// 2:00 12:15 2.00 --
+		// 2:00pm 12:15pm 2.00pm 12.15pm --
+		// 2359 230
+		// 2359pm 230pm --
+		
+		// shortest 2am || longest 12:15pm 
+		if (nextWord.length() > 2 || nextWord.length() <= 7) {
+			if ((nextWord.substring(nextWord.length()-2, nextWord.length()-1).equals("am")) || 
+					(nextWord.substring(nextWord.length()-2, nextWord.length()-1).equals("pm"))) {
+
+				// eg 2:00pm 12:15pm 2.00pm 12.15pm
+				if ((nextWord.charAt(nextWord.length()-6) == ':') || (nextWord.charAt(nextWord.length()-6) == '.')) {
+					return true;
+
+					// eg 2359pm 230pm 2am 11pm 
+					// only digits. 2:345pm , 12344pm invalid.
+				} else if (nextWord.matches("\\d+")) {
+					if ((nextWord.length() > 2) || (nextWord.length() < 7)){
+						return true;
+					}
+				}
+
+				// eg 2:00 12:15 2.00
+			} else if (((nextWord.charAt(nextWord.length()-4)) == ':') ||((nextWord.charAt(nextWord.length()-4)) == '.')) {
+				return true;
+
+				// eg 2359 230
+			} else if ( (nextWord.length() == 3) || (nextWord.length() == 4)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	private boolean checkDate(String nextWord) {
+		if ((nextWord.split("/").length == 3) || (nextWord.split("/").length == 2)) {
+			return true;
+		} else if ((nextWord.split("-").length == 3) || (nextWord.split("-").length == 2)) {
+			return true;
+		} else if ((nextWord.split(".").length == 3) || (nextWord.split(".").length == 2)) {
+			return true;
+		} else if ((nextWord.split(" ").length == 3) || (nextWord.split(" ").length == 2)) {
+			return true;
+		} else if ((nextWord.length() == 6) || (nextWord.length() == 8)) {
+			if (nextWord.matches("\\d+")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 
