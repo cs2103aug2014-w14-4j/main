@@ -91,51 +91,38 @@ public class TDTLogic implements ITDTLogic {
 	public String doEdit(Command command) {
 		// TODO Auto-generated method stub
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		String labelName = command.getLabelName();
+		int taskID = command.getTaskID() - 1;
+		String commandDetails = command.getCommandDetails();
+		String dueDate = command.getDueDate();
+		String dueTime = command.getDueTime();
+		boolean isHighPriority = command.isHighPriority();
+	
+		if(!storage.getLabelMap().containsKey(labelName)){
+			return "Label Name cannot be found!";
+		}else if(storage.getLabelMap().get(labelName).size() < taskID ||
+				taskID <=0){
+			return "TaskID to be marked done cannot be found! OUT OF RANGE!";
+			
+		}else{
+			storage.getLabelMap().get(labelName).get(taskID - 1).setDetails(commandDetails);
+			storage.getLabelMap().get(labelName).get(taskID - 1).setDueDate(dueDate);
+			storage.getLabelMap().get(labelName).get(taskID - 1).setDueTime(dueTime);
+			storage.getLabelMap().get(labelName).get(taskID - 1).setHighPriority(isHighPriority);
+		}
 		return null;
 	}
 
 
+
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public String doUndo(Command command) {
 		if(command.getCommandType() != COMMANDTYPE.SEARCH) {
@@ -206,26 +193,22 @@ public class TDTLogic implements ITDTLogic {
 	@Override
 	public String doDone(Command command) {
 		String labelName = command.getLabelName();
-		int taskID = command.getTaskID() - 1;
+		int taskID = command.getTaskID();
 		Iterator <Task> i;
-		int counter = 0;
-		
+	
 		if(!storage.getLabelMap().containsKey(labelName)){
 			return "Label Name cannot be found!";
-		}else if(storage.getLabelMap().get(labelName).size() < taskID ||
-				taskID <=0){
-			return "TaskID to be marked done cannot be found! OUT OF RANGE!";
-			
-		}else{
+		}else if(taskID == -1 ){
 			i = storage.getLabelMap().get(labelName).iterator();
 			while(i.hasNext()){
 				Task temp = i.next();
-				if(counter == taskID){
-					temp.setDone(true);
-					break;
-				}
-				counter++;
+				temp.setDone(true);
 			}
+		}else if(storage.getLabelMap().get(labelName).size() < taskID ||
+				taskID <=0){
+			return "TaskID to be marked done cannot be found! OUT OF RANGE!";
+		}else{
+			storage.getLabelMap().get(labelName).get(taskID - 1).setDone(true);
 		}
 		return null;
 	}
