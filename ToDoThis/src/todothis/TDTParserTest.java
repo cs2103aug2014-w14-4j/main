@@ -12,7 +12,7 @@ public class TDTParserTest {
 	@Test
 	public void parserTestADD() {
 		TDTParser parser = new TDTParser();
-		String testString = "eat rice later";
+		String testString = "add eat rice later";
 		Command command = parser.parse(testString);
 		
 		assertEquals(COMMANDTYPE.ADD,command.getCommandType());
@@ -83,12 +83,18 @@ public class TDTParserTest {
 	@Test
 	public void parserTestLABEL() {
 		TDTParser parser = new TDTParser();
-		String testString = "Label tmr the tmr de tmr";
+		String testString = "Label tmrthetmrdetmr";
 		Command command = parser.parse(testString);
 		
 		assertEquals(COMMANDTYPE.LABEL,command.getCommandType());
-		assertEquals("tmr the tmr de tmr",command.getLabelName());
-			assertEquals(3,command.getTaskID());
+		assertEquals("tmrthetmrdetmr",command.getLabelName());
+			
+		String testString1 = "Label tmrthe tmrdetmr";
+		Command command1 = parser.parse(testString1);
+		
+		assertEquals(COMMANDTYPE.LABEL,command1.getCommandType());
+		assertEquals("tmrthe",command1.getLabelName());
+		
 	}
 	
 	//Test for DISPLAY command
@@ -107,6 +113,13 @@ public class TDTParserTest {
 		assertEquals(COMMANDTYPE.DISPLAY,command1.getCommandType());
 		assertEquals("",command1.getLabelName());
 		assertEquals(-1,command1.getTaskID());
+		
+		String testString2 = "display someday 2";
+		Command command2 = parser.parse(testString2);
+		
+		assertEquals(COMMANDTYPE.DISPLAY,command2.getCommandType());
+		assertEquals("someday",command2.getLabelName());
+		assertEquals(-1,command2.getTaskID());
 		
 	}
 	

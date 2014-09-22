@@ -1,5 +1,6 @@
 package todothis;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import todothis.ITDTParser.COMMANDTYPE;
@@ -18,27 +19,60 @@ public class TDTLogic implements ITDTLogic {
 		return null;
 	}
 	
+	// public Task(int taskID, String labelName, String details, String dueDate,
+	//			String dueTime, boolean p) {
+	//public Command(COMMANDTYPE commandType, String labelName, int taskID,
+	//		String commandDetails, String dueDate, String dueTime, 
+	//		boolean isHighPriority) {
 	/**
-	 * public Task(int taskID, String labelName, String details, String dueDate,
-			String dueTime, boolean p) {
+	 *
+	 * @throws Exception 
 	 */
 	@Override
-	public String doADD(Command command) {
+	public String doADD(Command command){
 		String labelName = storage.getCurrLabel();
-		int labelId = 1;
-		
-		
-		Task task = new Task(labelId, labelName, command.getCommandDetails(),
+		int taskId = storage.getLabelSize(labelName) + 1;
+		Task task = new Task(taskId, labelName, command.getCommandDetails(),
 				command.getDueDate(), command.getDueTime(), command.isHighPriority());
-		
-		return null;
+		storage.addTask(task);
+		storage.write();
+		return "Add success";
 	}
 	
 
 	@Override
 	public String doDelete(Command command) {
-		// TODO Auto-generated method stub
-		return null;
+		if(command.getTaskID() != -1) {
+			//Deleting a task
+			if(storage.getLabelMap().containsKey(command.getLabelName())) {
+				ArrayList<Task> array = storage.getLabelMap().get(command.getLabelName());
+				if(command.getTaskID() <= array.size() && command.getTaskID() > 0) {
+					array.remove(command.getTaskID() - 1);
+					renumberTaskID(array);
+					return "Task deleted";
+				} else {
+					return "error";
+				} 
+			} else {
+				return "error";
+			}
+		} else {
+			//Deleting a label
+			if(storage.getLabelMap().containsKey(command.getLabelName())) {
+				storage.getLabelMap().remove(command.getLabelName());
+				return "Label Deleted";
+			} else {
+				return "Label does not exist";
+			}
+		}
+		
+	}
+
+	private void renumberTaskID(ArrayList<Task> array) {
+		for(int i = 0; i < array.size(); i++) {
+			Task task = array.get(i);
+			task.setTaskID(i + 1);
+		}
 	}
 
 	@Override
@@ -56,9 +90,6 @@ public class TDTLogic implements ITDTLogic {
 	@Override
 	public String doEdit(Command command) {
 		// TODO Auto-generated method stub
-		String labelName = command.getLabelName();
-		int taskID = command.getTaskID() - 1;
-		
 		return null;
 	}
 
@@ -72,7 +103,7 @@ public class TDTLogic implements ITDTLogic {
 	
 
 	@Override
-	public void doDisplay(Command command) {
+	public String doDisplay(Command command) {
 		// TODO Auto-generated method stub
 		String labelName = command.getLabelName();
 		Iterator<Task> i;
@@ -95,11 +126,11 @@ public class TDTLogic implements ITDTLogic {
 		}else{
 			System.out.println("Display command invalid!");
 		}
-		
+		return null;
 	}
 
 	@Override
-	public void doHide(Command command) {
+	public String doHide(Command command) {
 		// TODO Auto-generated method stub
 		Iterator <Task> i;
 		String labelName = command.getLabelName();
@@ -119,12 +150,12 @@ public class TDTLogic implements ITDTLogic {
 				System.out.println("Label name cannot be found!");
 			}
 		}
-		
+		return null;
 	}
 	
 	
 	@Override
-	public void doDone(Command command) {
+	public String doDone(Command command) {
 		// TODO Auto-generated method stub
 		//storage.getUndoStack().push(storage.copyLabelMap());
 		String labelName = command.getLabelName();
@@ -149,6 +180,13 @@ public class TDTLogic implements ITDTLogic {
 				counter++;
 			}
 		}
+		return null;
+	}
+
+	@Override
+	public String doLabel(Command command) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

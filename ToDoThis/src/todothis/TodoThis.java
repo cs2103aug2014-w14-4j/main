@@ -31,7 +31,6 @@ public class TodoThis {
 	
 	//Display all task under labels nicely
 	private void displayTextUI() {
-		
 	}
 	
 	private void run(){

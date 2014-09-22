@@ -10,8 +10,9 @@ public interface ITDTLogic {
 	public String doSearch(Command command);
 	public String doSort(Command command);
 	public String doEdit(Command command);
-	public void doHide(Command command);
+	public String doHide(Command command);
 	public String doUndo(Command command);
-	public void doDone(Command command);
-	public void doDisplay(Command command);
+	public String doDone(Command command);
+	public String doDisplay(Command command);
+	public String doLabel(Command command);
 }
