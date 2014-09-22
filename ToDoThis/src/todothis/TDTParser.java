@@ -3,6 +3,7 @@ package todothis;
 
 public class TDTParser implements ITDTParser {
 	private static final int longestString = 100;
+	private String[] parts;
 	@Override
 	public Command parse(String userCommand) {
 		COMMANDTYPE commandType = COMMANDTYPE.INVALID;
@@ -21,17 +22,26 @@ public class TDTParser implements ITDTParser {
 				if (commandDetails.contains("!")) {
 					isHighPriority = true;
 				}
-				String[] words = new String[longestString];
-				words = commandDetails.split(" ");
-				for (int i = 0; i < words.length; i++) {
-					if (words[i].contains("/")) {
-						dueDate = words[i];
-						dueTime = words[i+1];
+				parts = new String[longestString];
+				parts = commandDetails.split(" ");
+				for (int i = 0; i < parts.length; i++) {
+					if (parts[i].contains("/")) {
+						dueDate = parts[i];
+						dueTime = parts[i+1];
 						break;
 					}
 				}
 				break;
 			case DELETE :
+				String[] parts = remainingWords.split(" ");
+				String lastWord = parts[parts.length - 1];
+				if (lastWord.matches("\\d+")) {
+					taskID = Integer.parseInt(lastWord);
+					labelName = remainingWords.substring(0, remainingWords.lastIndexOf(" "));
+				}
+				else {
+					labelName = remainingWords;
+				}
 				break;
 			case EDIT :
 				break;
