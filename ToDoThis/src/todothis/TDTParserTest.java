@@ -92,8 +92,8 @@ public class TDTParserTest {
 		String testString1 = "Label tmrthe tmrdetmr";
 		Command command1 = parser.parse(testString1);
 		
-		assertEquals(COMMANDTYPE.INVALID,command1.getCommandType());
-		assertEquals("",command1.getLabelName());
+		assertEquals(COMMANDTYPE.LABEL,command1.getCommandType());
+		assertEquals("tmrthe",command1.getLabelName());
 		
 	}
 	

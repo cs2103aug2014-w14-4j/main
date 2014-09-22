@@ -48,12 +48,8 @@ public class TDTParser implements ITDTParser {
 			case LABEL :
 				// label name must be one word ( no spaces )
 				String checkLabel[] = remainingWords.split(" ");
-				if (checkLabel.length > 1) {
-					commandType = COMMANDTYPE.INVALID;
-					break;
-				}
 				commandType = COMMANDTYPE.LABEL;
-				labelName = remainingWords;
+				labelName = checkLabel[0];
 				break;
 			case SORT :
 				commandType = COMMANDTYPE.SORT;
@@ -67,23 +63,13 @@ public class TDTParser implements ITDTParser {
 				break;
 			case DISPLAY :
 				String checkDisplay[] = remainingWords.split(" ");
-				if (checkDisplay.length > 1) {
-					commandType = COMMANDTYPE.DISPLAY;
-					labelName = checkDisplay[0];
-					break;
-				}
 				commandType = COMMANDTYPE.DISPLAY;
-				labelName = remainingWords;
+				labelName = checkDisplay[0];
 				break;
 			case HIDE :
 				String checkHide[] = remainingWords.split(" ");
-				if (checkHide.length > 1) {
-					commandType = COMMANDTYPE.HIDE;
-					labelName = checkHide[0];
-					break;
-				}
 				commandType = COMMANDTYPE.HIDE;
-				labelName = remainingWords;
+				labelName = checkHide[0];
 				break;
 			case DONE :
 				commandType = COMMANDTYPE.DONE;
