@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class TodoThis {
 	public static final String FILENAME = "todothis.txt";
-	public static final String DEFAULT_LABEL = "Today";
+	public static final String DEFAULT_LABEL = "TODAY";
 	
 	private static Scanner sc;
 	private String fileName;
@@ -39,21 +39,27 @@ public class TodoThis {
 		Iterator<Task> iterator = storage.getTaskIterator();
 		while(iterator.hasNext()) {
 			Task task = iterator.next();
-			if(label.equals("") || !task.getLabelName().equals(label)) {
-				label = task.getLabelName();
-				System.out.println("---------------------------" +"\n");
-				System.out.println(task.getLabelName() + ": ");
+			if(!task.isHide()){
+				if(label.equals("") || !task.getLabelName().equals(label)) {
+					label = task.getLabelName();
+					System.out.println("---------------------------");
+					System.out.println(task.getLabelName() + ": ");
+				}
+				System.out.print("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDueDate() + 
+						"\t" + task.getDueTime());
+				if(task.isDone()) {
+					System.out.println("\t" + "(DONE)");
+				} else {
+					System.out.println();
+				}
 			}
-			System.out.println("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDueDate() + 
-					"\t" + task.getDueTime());
 		}
 		System.out.println("---------------------------" +"\n");
-
 	}
 	
 	private void run(){
 		while(true) {
-			System.out.print("Adding task to: " + storage.getCurrLabel());
+			System.out.println("Adding task to: " + storage.getCurrLabel());
 			System.out.print("I want to: ");
 			String userCommand = sc.nextLine();
 			Command command = parser.parse(userCommand);
