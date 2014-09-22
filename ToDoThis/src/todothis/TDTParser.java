@@ -36,10 +36,20 @@ public class TDTParser implements ITDTParser {
 			case EDIT :
 				break;
 			case LABEL :
+				// label name must be one word ( no spaces )
+				String checkLabel[] = remainingWords.split(" ");
+				if (checkLabel.length > 1) {
+					commandType = COMMANDTYPE.INVALID;
+					break;
+				}
+				commandType = COMMANDTYPE.LABEL;
+				labelName = remainingWords;
 				break;
 			case SORT :
+				commandType = COMMANDTYPE.SORT;
 				break;
 			case UNDO :
+				commandType = COMMANDTYPE.UNDO;
 				break;
 			case SEARCH :
 				commandType = COMMANDTYPE.SEARCH;
