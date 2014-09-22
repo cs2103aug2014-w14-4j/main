@@ -1,5 +1,6 @@
 package todothis;
 
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class TodoThis {
@@ -33,6 +34,21 @@ public class TodoThis {
 	
 	//Display all task under labels nicely
 	private void displayTextUI() {
+		String label = "";
+		// Label
+		Iterator<Task> iterator = storage.getTaskIterator();
+		while(iterator.hasNext()) {
+			Task task = iterator.next();
+			if(label.equals("") || !task.getLabelName().equals(label)) {
+				label = task.getLabelName();
+				System.out.println("---------------------------" +"\n");
+				System.out.println(task.getLabelName() + ": ");
+			}
+			System.out.println("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDueDate() + 
+					"\t" + task.getDueTime());
+		}
+		System.out.println("---------------------------" +"\n");
+
 	}
 	
 	private void run(){
