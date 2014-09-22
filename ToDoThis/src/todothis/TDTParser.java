@@ -17,8 +17,7 @@ public class TDTParser implements ITDTParser {
 		String remainingWords = removeFirstWord(userCommand);
 		switch(commandType) {
 			case ADD :
-				labelName = getFirstWord(remainingWords);
-				commandDetails = removeFirstWord(remainingWords);
+				commandDetails = userCommand;
 				if (commandDetails.contains("!")) {
 					isHighPriority = true;
 				}
