@@ -23,7 +23,6 @@ public class TDTParserTest {
 		
 		assertEquals(COMMANDTYPE.ADD,command1.getCommandType());
 		assertEquals(testString1,command1.getCommandDetails());
-	
 	}
 	
 	//Test for DELETE command
@@ -61,15 +60,6 @@ public class TDTParserTest {
 		assertEquals(COMMANDTYPE.DONE,command.getCommandType());
 		assertEquals("someday",command.getLabelName());
 		assertEquals(3,command.getTaskID());
-		
-		String testString1 = "DONE 3 someday";
-		Command command1 = parser.parse(testString1);
-		
-		assertEquals(COMMANDTYPE.DONE,command1.getCommandType());
-		assertEquals("someday",command1.getLabelName());
-		assertEquals(3,command.getTaskID());
-		
-		
 	}
 	
 	//Test for HIDE command
@@ -130,46 +120,8 @@ public class TDTParserTest {
 		assertEquals(COMMANDTYPE.DISPLAY,command2.getCommandType());
 		assertEquals("someday",command2.getLabelName());
 		assertEquals(-1,command2.getTaskID());
-
-	}
-	
-	//Test for SORT command
-	@Test
-	public void parserTestSORT() {
-		TDTParser parser = new TDTParser();
-		String testString = "Sort";
-		Command command = parser.parse(testString);
-		
-		assertEquals(COMMANDTYPE.SORT,command.getCommandType());
-		assertEquals("",command.getLabelName());
-		
-		String testString1 = "Sort this";
-		Command command1 = parser.parse(testString1);
-	
-		assertEquals(COMMANDTYPE.SORT,command1.getCommandType());
-		assertEquals("",command1.getLabelName());
 		
 	}
-	
-	//Test for SEARCH command
-	@Test
-	public void parserTestSEARCH() {
-		TDTParser parser = new TDTParser();
-		String testString = "Search";
-		Command command = parser.parse(testString);
-		
-		assertEquals(COMMANDTYPE.SEARCH,command.getCommandType());
-		assertEquals("",command.getLabelName());
-		
-		String testString1 = "Search this this this";
-		Command command1 = parser.parse(testString1);
-		
-		assertEquals(COMMANDTYPE.SEARCH,command1.getCommandType());
-		assertEquals("",command1.getLabelName());
-		assertEquals("this this this", command1.getCommandDetails());
-		
-	}
-	
 	
 	//ADD OTHER TEST BELOW
 
