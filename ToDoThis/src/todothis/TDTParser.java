@@ -1,4 +1,6 @@
 package todothis;
+
+import java.util.ArrayList;
 // JUSTIN
 
 public class TDTParser implements ITDTParser {
@@ -13,6 +15,14 @@ public class TDTParser implements ITDTParser {
 		boolean isHighPriority = false;
 		String commandDetails = "";
 		int taskID = -1;
+		ArrayList<String> prepositionWords = new ArrayList<String>();
+		prepositionWords.add("on");
+		prepositionWords.add("at");
+		prepositionWords.add("by");
+		prepositionWords.add("from");
+		prepositionWords.add("about");
+		prepositionWords.add("to");
+		prepositionWords.add("later");
 
 		commandType = determineCommandType(getFirstWord(userCommand));
 		String remainingWords = removeFirstWord(userCommand);
@@ -24,13 +34,25 @@ public class TDTParser implements ITDTParser {
 				}
 				parts = commandDetails.split(" ");
 				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].contains("/")) {
-						dueDate = parts[i];
+					if (prepositionWords.contains(parts[i])) {
+						// check date
+						if ((parts[i+1].split("/").length == 3) || (parts[i+1].split("/").length == 2)) {
+							// pass parts[i+1] to dateandtime class
+						} else if ((parts[i+1].split("-").length == 3) || (parts[i+1].split("-").length == 2)) {
+							// pass parts[i+1] to dateandtime class
+						} else if ((parts[i+1].split(".").length == 3) || (parts[i+1].split(".").length == 2)) {
+							// pass parts[i+1] to dateandtime class
+						} else if ((parts[i+1].split(" ").length == 3) || (parts[i+1].split(" ").length == 2)) {
+							// pass parts[i+1] to dateandtime class
+						} else if ((parts[i+1].length() == 6) || (parts[i+1].length() == 8)) {
+							if (parts[i+1].matches("\\d+")) {
+								// pass to dateandtime class
+							}
+						}
+						// check time
+						// 2am 2:00am 2:00(pm) 2359 2359pm 12:15am 12:15pm 12:15(pm) 12.15 0200am 
+						}
 					}
-					if (parts[i].contains(".")) {
-						dueTime = parts[i];
-					}
-				}
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
@@ -112,10 +134,34 @@ public class TDTParser implements ITDTParser {
 			default:
 				//Will not reach here
 				break;
-			}
+		}
 
 		return new Command(commandType, labelName, taskID, commandDetails, dueDate, dueTime,
 				isHighPriority);
+	}
+
+
+	private int checkDay(String day) {
+		if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
+			return 1;
+		} else if ((day.equalsIgnoreCase("Tuesday")) || (day.equalsIgnoreCase("Tue")) 
+				|| (day.equalsIgnoreCase("Tues"))) {
+			return 2;	
+		} else if ((day.equalsIgnoreCase("Wednesday")) || (day.equalsIgnoreCase("Wed"))) {
+			return 3;
+		} else if ((day.equalsIgnoreCase("Thursday")) || (day.equalsIgnoreCase("Thur"))
+				|| (day.equalsIgnoreCase("Thurs"))) {
+			return 4;
+		} else if ((day.equalsIgnoreCase("Friday")) || (day.equalsIgnoreCase("Fri"))) {
+			return 5;
+		} else if ((day.equalsIgnoreCase("Saturday")) || (day.equalsIgnoreCase("Sat"))) {
+			return 6;
+		} else if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
+			return 7;
+		} else {
+			return 0;
+		}
+
 	}
 
 
