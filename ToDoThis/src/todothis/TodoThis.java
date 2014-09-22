@@ -47,11 +47,13 @@ public class TodoThis {
 				}
 				System.out.print("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDueDate() + 
 						"\t" + task.getDueTime());
+				if(task.isHighPriority()) {
+					System.out.print("\t" + "(!!!!)");
+				} 
 				if(task.isDone()) {
-					System.out.println("\t" + "(DONE)");
-				} else {
-					System.out.println();
+					System.out.print("\t" + "(DONE)");
 				}
+				System.out.println();
 			}
 		}
 		System.out.println("---------------------------" +"\n");

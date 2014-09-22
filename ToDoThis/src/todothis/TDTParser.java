@@ -26,9 +26,12 @@ public class TDTParser implements ITDTParser {
 				for (int i = 0; i < parts.length; i++) {
 					if (parts[i].contains("/")) {
 						dueDate = parts[i];
+						commandDetails = commandDetails.replaceAll(parts[i], "");
+						
 					}
 					if (parts[i].contains(".")) {
 						dueTime = parts[i];
+						commandDetails = commandDetails.replaceAll(parts[i], "");
 					}
 				}
 				break;
@@ -121,7 +124,7 @@ public class TDTParser implements ITDTParser {
 
 	//By default command is assume to be ADD.
 	private static COMMANDTYPE determineCommandType(String commandTypeString) {
-		if (commandTypeString == null) {
+		if (commandTypeString.equals("")) {
 			return COMMANDTYPE.INVALID;
 		} else if (commandTypeString.equalsIgnoreCase("hide")) {
 			return COMMANDTYPE.HIDE;

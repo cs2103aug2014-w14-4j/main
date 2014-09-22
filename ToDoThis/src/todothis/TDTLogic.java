@@ -46,7 +46,7 @@ public class TDTLogic implements ITDTLogic {
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doDone(command);	
 			default:
-				return null;
+				return "";
 		}
 	}
 	
