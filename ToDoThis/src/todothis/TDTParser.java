@@ -36,6 +36,21 @@ public class TDTParser implements ITDTParser {
 			case HIDE :
 				break;
 			case DONE :
+				commandType = COMMANDTYPE.DONE;
+				String[] tempWords = remainingWords.split(" ");
+				String word1 = tempWords[0];
+				String word2 = tempWords[1];
+				// [label][taskID]
+				if (Character.isDigit(word1.charAt(0))) {
+					taskID = Integer.parseInt(word1);
+					labelName = tempWords[1];
+				// [taskID][label]
+				} else if (Character.isDigit(word2.charAt(0))) {
+					taskID = Integer.parseInt(word2);
+					labelName = tempWords[0];
+				} else {
+					commandType = COMMANDTYPE.INVALID;
+				}
 				break;
 			case INVALID :
 				break;

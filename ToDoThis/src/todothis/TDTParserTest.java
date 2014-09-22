@@ -12,7 +12,7 @@ public class TDTParserTest {
 	@Test
 	public void parserTestADD() {
 		TDTParser parser = new TDTParser();
-		String testString = "eat rice later";
+		String testString = "add eat rice later";
 		Command command = parser.parse(testString);
 		
 		assertEquals(COMMANDTYPE.ADD,command.getCommandType());
