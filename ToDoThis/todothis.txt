@@ -1,5 +1,5 @@
-TODAY	this is a little boy			false
-TODAY	isis a good program			false
-TODAY	 is a good teacher		mr.tan	false
-TODAY	mr-tan is a good teacher			false
-TODAY	hello!			true
+2
+TODAY
+THERE
+TODAY	add buy ehh			false	false
+TODAY	okdowkd			false	false

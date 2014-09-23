@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.Stack;
 
 public class TDTStorage implements ITDTStorage {
@@ -30,6 +31,11 @@ public class TDTStorage implements ITDTStorage {
 	public void readInitialise() throws Exception {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
+			int totalLabel = Integer.parseInt(br.readLine());
+			for(int i = 0; i < totalLabel; i ++) {
+				String label = br.readLine();
+				labelMap.put(label, new ArrayList<Task>());
+			}
 			while(br.ready()) {
 				String line = br.readLine();
 				String[] params = line.split("\t");
@@ -41,6 +47,9 @@ public class TDTStorage implements ITDTStorage {
 				task.setTaskID(this.getLabelSize(params[0]) + 1);
 				if(params[4].equals("true")) {
 					task.setHighPriority(true);
+				}
+				if(params[5].equals("true")) {
+					task.setDone(true);
 				}
 				this.addTask(task);	
 			}
@@ -55,11 +64,21 @@ public class TDTStorage implements ITDTStorage {
 	public void write(){
 		try {
 			bw = new BufferedWriter(new FileWriter(fileName));
+			bw.write(this.getLabelMap().size()+ "");
+			bw.newLine();
+			Set<String> labels = this.getLabelMap().keySet();
+			Iterator<String> labelIter = labels.iterator();
+			while(labelIter.hasNext()) {
+				bw.write(labelIter.next());
+				bw.newLine();
+			}
+			
 			Iterator<Task> iter = this.getTaskIterator();
 			while(iter.hasNext()) {
 				Task task = iter.next();
 				bw.write(task.getLabelName() + "\t" + task.getDetails() + "\t" + 
-				task.getDueDate() + "\t" + task.getDueTime() + "\t" + task.isHighPriority());
+				task.getDueDate() + "\t" + task.getDueTime() + "\t" +
+						task.isHighPriority() + "\t" + task.isDone());
 				bw.newLine();
 			}
 			bw.close();

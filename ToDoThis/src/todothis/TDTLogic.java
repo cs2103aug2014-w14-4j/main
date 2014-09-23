@@ -294,6 +294,7 @@ public class TDTLogic implements ITDTLogic {
 		} else {
 			storage.getLabelMap().put(label, new ArrayList<Task>());
 			storage.setCurrLabel(label);
+			storage.write();
 		}
 		return "";
 	}
