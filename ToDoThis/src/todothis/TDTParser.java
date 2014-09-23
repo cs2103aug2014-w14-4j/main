@@ -1,11 +1,11 @@
 package todothis;
 
 import java.util.ArrayList;
-// JUSTIN
 
 public class TDTParser implements ITDTParser {
 	private String[] parts;
-	private boolean located;
+	private boolean valid;
+	
 	@Override
 	public Command parse(String userCommand) {
 		COMMANDTYPE commandType = COMMANDTYPE.INVALID;
@@ -22,8 +22,14 @@ public class TDTParser implements ITDTParser {
 		prepositionWords.add("from");
 		prepositionWords.add("about");
 		prepositionWords.add("to");
+		/*
+		 * should include this in the checkDay? 
 		prepositionWords.add("later");
-
+		prepositionWords.add("tmr");
+		prepositionWords.add("tomorrow");
+		prepositionWords.add("next week...?");
+		
+		*/
 		commandType = determineCommandType(getFirstWord(userCommand));
 		String remainingWords = removeFirstWord(userCommand);
 		switch(commandType) {
@@ -37,15 +43,15 @@ public class TDTParser implements ITDTParser {
 					if (prepositionWords.contains(parts[i])) {
 						String nextWord = parts[i+1];
 						if (checkDate(nextWord)) {
-							// set date
+							new TDTDateAndTime(nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
 							break;
 						} else if (checkTime(nextWord)) {
-							//set time
+							new TDTDateAndTime(nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
 							break;
 						} else if (checkDay(nextWord) != 0) {
-							//set day
+							new TDTDateAndTime(nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
 							break;
 						}
@@ -63,33 +69,49 @@ public class TDTParser implements ITDTParser {
 				}
 				break;
 			case EDIT :
-				located = false;
+				valid = false;
 				if (remainingWords.contains("!")) {
 					isHighPriority = true;
 					remainingWords = remainingWords.replace("!", "");
 				}
 				parts = remainingWords.split(" ");
+
+				// gets [labelName][taskID]  
 				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].contains("/")) {
-						dueDate = parts[i];
-						remainingWords = remainingWords.replace(parts[i], "");
-					}
-					if (parts[i].contains(".")) {
-						dueTime = parts[i];
-						remainingWords = remainingWords.replace(parts[i], "");
-					}
-					if (parts[i].matches("\\d+") && located == false) {
+					if (parts[i].matches("\\d+")) {
 						taskID = Integer.parseInt(parts[i]);
 						for (int j = 0; j < i; j++) {
 							labelName += parts[j];
 						}
-						located = true;
+						valid = true;
 						remainingWords = remainingWords.replace(parts[i], "");
 						remainingWords = remainingWords.replace(labelName, "");
 						break;
 					}
 				}
-				commandDetails = remainingWords.trim();
+				if (valid) {
+					commandDetails = remainingWords.trim();
+					// gets [remainingWords]
+					for (int k = 0; k < parts.length-1; k++) {
+						if (prepositionWords.contains(parts[k])) {
+							String nextWord = parts[k+1];
+							if (checkDate(nextWord)) {
+								new TDTDateAndTime(nextWord);
+								commandDetails = commandDetails.replaceAll(nextWord, "");
+								break;
+							} else if (checkTime(nextWord)) {
+								new TDTDateAndTime(nextWord);
+								commandDetails = commandDetails.replaceAll(nextWord, "");
+								break;
+							} else if (checkDay(nextWord) != 0) {
+								new TDTDateAndTime(nextWord);
+								commandDetails = commandDetails.replaceAll(nextWord, "");
+								break;
+							}
+						}
+					}
+					commandDetails = remainingWords.trim();
+				}
 				break;
 			case LABEL :
 				commandType = COMMANDTYPE.LABEL;
@@ -184,8 +206,6 @@ public class TDTParser implements ITDTParser {
 			return true;
 		} else if ((nextWord.split(".").length == 3) || (nextWord.split(".").length == 2)) {
 			return true;
-		} else if ((nextWord.split(" ").length == 3) || (nextWord.split(" ").length == 2)) {
-			return true;
 		} else if ((nextWord.length() == 6) || (nextWord.length() == 8)) {
 			if (nextWord.matches("\\d+")) {
 				return true;
@@ -194,24 +214,23 @@ public class TDTParser implements ITDTParser {
 		return false;
 	}
 
-	//return 1 for Sunday and so on NEED CHANGE gt reason one
 	private int checkDay(String day) {
 		if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
-			return 1;
+			return 2;
 		} else if ((day.equalsIgnoreCase("Tuesday")) || (day.equalsIgnoreCase("Tue")) 
 				|| (day.equalsIgnoreCase("Tues"))) {
-			return 2;	
+			return 3;	
 		} else if ((day.equalsIgnoreCase("Wednesday")) || (day.equalsIgnoreCase("Wed"))) {
-			return 3;
+			return 4;
 		} else if ((day.equalsIgnoreCase("Thursday")) || (day.equalsIgnoreCase("Thur"))
 				|| (day.equalsIgnoreCase("Thurs"))) {
-			return 4;
-		} else if ((day.equalsIgnoreCase("Friday")) || (day.equalsIgnoreCase("Fri"))) {
 			return 5;
-		} else if ((day.equalsIgnoreCase("Saturday")) || (day.equalsIgnoreCase("Sat"))) {
+		} else if ((day.equalsIgnoreCase("Friday")) || (day.equalsIgnoreCase("Fri"))) {
 			return 6;
-		} else if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
+		} else if ((day.equalsIgnoreCase("Saturday")) || (day.equalsIgnoreCase("Sat"))) {
 			return 7;
+		} else if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
+			return 1;
 		} else {
 			return 0;
 		}
