@@ -194,7 +194,7 @@ public class TDTParser implements ITDTParser {
 		return false;
 	}
 
-
+	//return 1 for Sunday and so on NEED CHANGE gt reason one
 	private int checkDay(String day) {
 		if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
 			return 1;

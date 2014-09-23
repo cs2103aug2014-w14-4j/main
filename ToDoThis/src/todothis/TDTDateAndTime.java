@@ -1,6 +1,8 @@
 package todothis;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class TDTDateAndTime {
 	//store converted date format dd/mm/yyyy
@@ -11,13 +13,18 @@ public class TDTDateAndTime {
 	private String endTime = "";
 	
 	private String details = "";
+	
+	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 	//constructor
 	public TDTDateAndTime(String dateAndTime_details){
 		details = dateAndTime_details;
+		decodeDetails(dateAndTime_details);
 		
 	}
 	
 	public void decodeDetails(String details){
+		//String [] days = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+		
 		String [] parts = details.toLowerCase().split(" ");
 		
 		boolean endTimeDate = false;
@@ -97,9 +104,82 @@ public class TDTDateAndTime {
 					startTime = timeParts[0] + ":" + timeParts[1];	
 				}
 			}else if(checkDay(parts[a]) != 0){
+				int currentDay = cal.get(Calendar.DATE);
+				int currentMonth = cal.get(Calendar.MONTH) + 1;
+				int currentYear = cal.get(Calendar.YEAR);
+				int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+				//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+				//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+				int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
 				
+				
+				int numOfDaysToAdd = 0;
+				if(checkDay(parts[a]) <= currentDayOfWeek){
+					numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
+				}else{
+					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+				}
+				
+				if((currentDay + numOfDaysToAdd) > numOfDaysCurrentMonth){
+					currentMonth++;
+					currentDay = (currentDay + numOfDaysToAdd) - numOfDaysCurrentMonth;
+				}else{
+					currentDay = currentDay + numOfDaysToAdd;
+				}
+				if(currentMonth > 12){
+					currentMonth = 1; //set to Jan
+					currentYear++;
+				}
+				
+				startDate = Integer.toString(currentDay) + "/" + 
+							Integer.toString(currentMonth) + "/" +
+							Integer.toString(currentYear);
 			}
 		}
+	}
+	//-----------------------GETTER & SETTER-------------------------------
+	
+	
+	
+	
+	//----------------------CHECK FUNCTIONS--------------------------------
+	private int getNumOfDaysFromMonth(int month, int year) {
+		int days = 0;
+		boolean isLeapYear = false;
+		switch (month) {
+		case 1:
+		case 3:
+		case 5:
+		case 7:
+		case 8:
+		case 10:
+		case 12:
+			days = 31;
+			break;
+		case 4:
+		case 6:
+		case 9:
+		case 11:
+			days = 30;
+			break;
+		case 2:
+			if (year % 400 == 0)
+				isLeapYear = true;
+			else if (year % 100 == 0)
+				isLeapYear = false;
+			else if (year % 4 == 0)
+				isLeapYear = true;
+			else
+				isLeapYear = false;
+			if (isLeapYear) {
+				days = 29;
+				break;
+			} else {
+				days = 28;
+				break;
+			}
+		}
+		return days;
 	}
 	
 	private boolean checkTime(String nextWord) {
