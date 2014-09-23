@@ -137,10 +137,22 @@ public class TDTDateAndTime {
 			}
 		}
 	}
-	//-----------------------GETTER & SETTER-------------------------------
-	
-	
-	
+	//-----------------------GETTER-------------------------------
+	public String getStartDate(){
+		return startDate;
+	}
+	public String getEndDate(){
+		return endDate;
+	}
+	public String getStartTime(){
+		return startTime;
+	}
+	public String getEndTime(){
+		return endTime;
+	}
+	public String getDetails(){
+		return details;
+	}
 	
 	//----------------------CHECK FUNCTIONS--------------------------------
 	private int getNumOfDaysFromMonth(int month, int year) {
