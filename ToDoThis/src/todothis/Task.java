@@ -3,21 +3,17 @@ package todothis;
 public class Task implements Comparable<Task> {
 	private int taskID;
 	private String labelName;
-	private String dueDate;
-	private String dueTime;
+	private TDTDateAndTime dateAndTime;
 	private String details;
 	private boolean isHighPriority;
 	private boolean hide;
 	private boolean isDone;
 	
 //---------------------Task constructor---------------------------------------
-	public Task(int taskID, String labelName, String details, String dueDate,
-			String dueTime, boolean p) {
+	public Task(int taskID, String labelName, String details, TDTDateAndTime dateAndTime, boolean p) {
 		this.setDetails(details);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName);
-		this.setDueDate(dueDate);
-		this.setDueTime(dueTime);
 		this.setHide(p);
 		this.setDone(false);
 		this.setHighPriority(false);
@@ -25,13 +21,11 @@ public class Task implements Comparable<Task> {
 
 	
 	public Task(int taskID, String labelName, String details,
-			String dueDate, String dueTime, boolean p,
+			TDTDateAndTime dateAndTime, boolean p,
 			boolean done, boolean hide) {
 		this.setDetails(details);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName);
-		this.setDueDate(dueDate);
-		this.setDueTime(dueTime);
 		this.setHide(hide);
 		this.setDone(done);
 		this.setHighPriority(p);
@@ -62,18 +56,6 @@ public class Task implements Comparable<Task> {
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
-	public String getDueDate() {
-		return dueDate;
-	}
-	public void setDueDate(String dueDate) {
-		this.dueDate = dueDate;
-	}
-	public String getDueTime() {
-		return dueTime;
-	}
-	public void setDueTime(String dueTime) {
-		this.dueTime = dueTime;
-	}
 	public String getDetails() {
 		return details;
 	}
@@ -97,5 +79,15 @@ public class Task implements Comparable<Task> {
 	}
 	public void setDone(boolean isDone) {
 		this.isDone = isDone;
+	}
+
+
+	public TDTDateAndTime getDateAndTime() {
+		return dateAndTime;
+	}
+
+
+	public void setDateAndTime(TDTDateAndTime dateAndTime) {
+		this.dateAndTime = dateAndTime;
 	}
 }

@@ -7,21 +7,19 @@ public class Command {
 	private COMMANDTYPE commandType;
 	private String labelName;
 	private String commandDetails;
-	private String dueDate;
-	private String dueTime;
+	private TDTDateAndTime dateAndTime;
 	private boolean isHighPriority;
 	
 	//---------------------CONSTRUCTOR-------------------------------------
 	public Command(COMMANDTYPE commandType, String labelName, int taskID,
-			String commandDetails, String dueDate, String dueTime, 
+			String commandDetails, TDTDateAndTime dateAndTime, 
 			boolean isHighPriority) {
 		this.setTaskID(taskID);
 		this.setCommandType(commandType);
-		this.setDueDate(dueDate);
-		this.setDueTime(dueTime);
 		this.setHighPriority(isHighPriority);
 		this.setLabelName(labelName);
 		this.setCommandDetails(commandDetails);
+		this.setDateAndTime(dateAndTime);
 	}
 	//---------------------------------------------------------------------
 	
@@ -45,25 +43,13 @@ public class Command {
 	public void setCommandDetails(String commandDetails) {
 		this.commandDetails = commandDetails;
 	}
-	public String getDueDate() {
-		return dueDate;
-	}
-	public void setDueDate(String dueDate) {
-		this.dueDate = dueDate;
-	}
+
 	public boolean isHighPriority() {
 		return isHighPriority;
 	}
 	public void setHighPriority(boolean isHighPriority) {
 		this.isHighPriority = isHighPriority;
 	}
-	public String getDueTime() {
-		return dueTime;
-	}
-	public void setDueTime(String dueTime) {
-		this.dueTime = dueTime;
-	}
-
 
 	public int getTaskID() {
 		return taskID;
@@ -72,5 +58,15 @@ public class Command {
 
 	public void setTaskID(int taskID) {
 		this.taskID = taskID;
+	}
+
+
+	public TDTDateAndTime getDateAndTime() {
+		return dateAndTime;
+	}
+
+
+	public void setDateAndTime(TDTDateAndTime dateAndTime) {
+		this.dateAndTime = dateAndTime;
 	}
 }
