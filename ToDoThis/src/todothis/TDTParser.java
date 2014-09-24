@@ -48,7 +48,6 @@ public class TDTParser implements ITDTParser {
 							}
 							remainingWords = remainingWordsTemp;
 							commandDetails = commandDetailsTemp.trim();
-							System.out.println(commandDetails + "date");
 							dateAndTime = new TDTDateAndTime(remainingWords);
 							break;
 						} else if (TDTDateAndTime.checkTime(nextWord)) {
@@ -61,7 +60,6 @@ public class TDTParser implements ITDTParser {
 							}
 							remainingWords = remainingWordsTemp;
 							commandDetails = commandDetailsTemp.trim();
-							System.out.println(commandDetails + "date");
 							dateAndTime = new TDTDateAndTime(remainingWords);
 							break;
 						} else if (TDTDateAndTime.checkDay(nextWord) != 0) {
@@ -74,7 +72,6 @@ public class TDTParser implements ITDTParser {
 							}
 							remainingWords = remainingWordsTemp;
 							commandDetails = commandDetailsTemp.trim();
-							System.out.println(commandDetails + "date");
 							dateAndTime = new TDTDateAndTime(remainingWords);
 							break;
 						}

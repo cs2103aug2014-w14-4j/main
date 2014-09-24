@@ -35,14 +35,15 @@ public class TDTDateAndTime {
 	/*
 	public static void main(String args[]){
 	
-		decodeDetails("from 2pm on 12-12-2014 to 12am on 13-12-2014");
-		System.out.println(startDate);
-		System.out.println(endDate);
-		System.out.println(startTime);
-		System.out.println(endTime);
+		TDTDateAndTime test = new TDTDateAndTime();
+		test.decodeDetails("to 12/12/2014");
+		System.out.println(test.startDate);
+		System.out.println(test.endDate);
+		System.out.println(test.startTime);
+		System.out.println(test.endTime);
 		
-	}*/
-	
+	}
+	*/
 	public void decodeDetails(String details){
 		//String [] days = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 		
