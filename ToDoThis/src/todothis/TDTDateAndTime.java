@@ -36,7 +36,7 @@ public class TDTDateAndTime {
 	public static void main(String args[]){
 	
 		TDTDateAndTime test = new TDTDateAndTime();
-		test.decodeDetails("to 12/12/2014");
+		test.decodeDetails("12/12/2013 1.20am to 12/1");
 		System.out.println(test.startDate);
 		System.out.println(test.endDate);
 		System.out.println(test.startTime);
@@ -45,35 +45,57 @@ public class TDTDateAndTime {
 	}
 	*/
 	public void decodeDetails(String details){
-		//String [] days = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 		
 		String [] parts = details.toLowerCase().split(" ");
 		
 		boolean endTimeDate = false;
 		
+		int currentDay = cal.get(Calendar.DATE);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentYear = cal.get(Calendar.YEAR);
+		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
+		
 		for(int a = 0; a < parts.length;a++){
-			if(parts[a].equals("to")){
+			if(parts[a].equals("to") || parts[a].equals("till") || 
+					parts[a].equals("by") || parts[a].equals("until") ||
+					parts[a].equals("-") ){
 				endTimeDate = true;
 			}
 			if(checkDate(parts[a])){
 				String [] dateParts = new String[3];
+	 			String [] datePartsTemp = null;
+				// 9/12, 9/12/2014, 8-11, 8-11-2015
 				if ((parts[a].split("/").length == 3) || (parts[a].split("/").length == 2)) {
-					dateParts = parts[a].split("/");
+					datePartsTemp = parts[a].split("/");
 				} else if ((parts[a].split("-").length == 3) || (parts[a].split("-").length == 2)) {
-					dateParts = parts[a].split("-");
-				} else if ((parts[a].split(".").length == 3) || (parts[a].split(".").length == 2)) {
+					datePartsTemp = parts[a].split("-");
+				} 
+				/*else if ((parts[a].split(".").length == 3) || (parts[a].split(".").length == 2)) {
 					dateParts = parts[a].split(".");
-				}else{
+				}*/
+				else{
 					dateParts[0] = parts[a].substring(0, 2);
 					dateParts[1] = parts[a].substring(2, 4);
 					if(parts[a].length() == 6){
-						dateParts[2] = parts[a].substring(4, 6);
+						dateParts[2] = "20" + parts[a].substring(4, 6); //valid year 2014-2099
 					}else{
 						dateParts[2] = parts[a].substring(4, 8);
 					}
 				}
+				//if 9/12 entered, add on to 9/12/2014
+				if(datePartsTemp.length == 2){
+					dateParts[0] = datePartsTemp[0];
+					dateParts[1] = datePartsTemp[1];
+					dateParts[2] = Integer.toString(currentYear);
+				}else{
+					dateParts = datePartsTemp;
+				}
+		
 				if(endTimeDate == true){
-					endDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];				
+					endDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
 				}else{
 					startDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
 				}
@@ -90,19 +112,20 @@ public class TDTDateAndTime {
 							}else{
 								timeParts[0] = parts[a].substring(0, 2);
 								timeParts[1] = parts[a].substring(3, 5);
-							}
-						}
-					}else{
-						if(parts[a].substring(0, parts[a].length()-2).matches("\\d+")){
-							if(parts[a].length() == 3 || parts[a].length() == 4){
-								timeParts[0] = parts[a].substring(0, parts[a].length()-2);
-								timeParts[1] = "00";
-							}else{
-								timeParts[0] = parts[a].substring(0,parts[a].length()-4);
-								timeParts[1] = parts[a].substring(parts[a].length()-4, parts[a].length()-2);
+								
 							}
 						}
 					}
+					if(parts[a].substring(0, parts[a].length()-2).matches("\\d+")){
+						if(parts[a].length() == 3 || parts[a].length() == 4){
+							timeParts[0] = parts[a].substring(0, parts[a].length()-2);
+							timeParts[1] = "00";
+						}else{
+							timeParts[0] = parts[a].substring(0,parts[a].length()-4);
+							timeParts[1] = parts[a].substring(parts[a].length()-4, parts[a].length()-2);
+						}
+					}
+				
 					int temp;
 					temp = Integer.parseInt(timeParts[0]);
 					if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm")){
@@ -134,15 +157,6 @@ public class TDTDateAndTime {
 					startTime = timeParts[0] + ":" + timeParts[1];	
 				}
 			}else if(checkDay(parts[a]) != 0){
-				int currentDay = cal.get(Calendar.DATE);
-				int currentMonth = cal.get(Calendar.MONTH) + 1;
-				int currentYear = cal.get(Calendar.YEAR);
-				int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-				//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-				//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-				int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
-				
-				
 				int numOfDaysToAdd = 0;
 				if(checkDay(parts[a]) <= currentDayOfWeek){
 					numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
@@ -160,10 +174,16 @@ public class TDTDateAndTime {
 					currentMonth = 1; //set to Jan
 					currentYear++;
 				}
-				
-				startDate = Integer.toString(currentDay) + "/" + 
+				if(endTimeDate == true){
+					endDate = Integer.toString(currentDay) + "/" + 
+								Integer.toString(currentMonth) + "/" +
+								Integer.toString(currentYear);
+					
+				}else{
+					startDate = Integer.toString(currentDay) + "/" + 
 							Integer.toString(currentMonth) + "/" +
 							Integer.toString(currentYear);
+				}
 			}
 		}
 	}
@@ -240,7 +260,7 @@ public class TDTDateAndTime {
 				// eg 2:00pm 12:15pm 2.00pm 12.15pm
 				if(nextWord.length() >4){
 					if ((nextWord.charAt(nextWord.length()-5) == ':') || (nextWord.charAt(nextWord.length()-5) == '.')) {
-						temp = nextWord.replace(".", "");
+						temp = nextWord.replace(nextWord.charAt(nextWord.length()-5) + "", "");
 						temp = temp.substring(0, temp.length()-2);
 						if(temp.matches("\\d+")){
 							return true;
@@ -249,7 +269,8 @@ public class TDTDateAndTime {
 						// eg 2359pm 230pm 2am 11pm 
 						// only digits. 2:345pm , 12344pm invalid.
 					} 
-				}else if (nextWord.substring(0, nextWord.length()-2).matches("\\d+")) {
+				}
+				if (nextWord.substring(0, nextWord.length()-2).matches("\\d+")) {
 					return true;
 				}
 
