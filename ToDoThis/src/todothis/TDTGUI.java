@@ -41,6 +41,7 @@ public class TDTGUI extends JFrame {
 					TDTGUI frame = new TDTGUI();
 					frame.feedbackArea.setText(frame.doInit());
 					frame.setVisible(true);
+					frame.taskPane.setText(frame.displayTask());
 			
 					frame.taskLabel.setText("Adding task to: " + frame.storage.getCurrLabel());
 					
@@ -66,15 +67,33 @@ public class TDTGUI extends JFrame {
 					sb.append("---------------------------\n");
 					sb.append(task.getLabelName() + ": \n");
 				}
-				sb.append("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDateAndTime().getStartDate() + 
-						"\t" + task.getDateAndTime().getStartTime()+"\n");
+				String startDate = "";
+				String endDate = "";
+				String startTime = "";
+				String endTime = "";
+				if(!task.getDateAndTime().getStartDate().equals("null")) {
+					startDate = task.getDateAndTime().getStartDate();
+				}
+				if(!task.getDateAndTime().getEndDate().equals("null")) {
+					endDate = task.getDateAndTime().getEndDate();
+				}
+				if(!task.getDateAndTime().getStartTime().equals("null")) {
+					startTime = task.getDateAndTime().getStartTime();
+				}
+				if(!task.getDateAndTime().getEndDate().equals("null")) {
+					endDate = task.getDateAndTime().getEndDate();
+				}
+				sb.append("\t" + "Start Date: " + startDate + "\t" + "End Date: "
+				+ endDate + "\t" + "Start Time: " + "\t" + startTime + "\t"
+				+ "End Time: " + "\t" + endTime + "\n");
+				sb.append("\t" + task.getTaskID() + ") " + task.getDetails());
 				if(task.isHighPriority()) {
 					sb.append("\t" + "(!!!!)\n");
 				} 
 				if(task.isDone()) {
 					sb.append("\t" + "(DONE)\n");
 				}
-				sb.append("\n");
+				sb.append("\n\n");
 			}
 		}
 		sb.append("---------------------------\n");
@@ -130,7 +149,7 @@ public class TDTGUI extends JFrame {
 					taskLabel.setText("Adding task to: " + storage.getCurrLabel());
 					feedbackArea.setText(feedback);
 					if(command.getCommandType() != COMMANDTYPE.SEARCH) {
-						//taskPane.setText(displayTask());
+						taskPane.setText(displayTask());
 					} else {
 						taskPane.setText("");
 					}
