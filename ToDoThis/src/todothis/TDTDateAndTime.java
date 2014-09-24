@@ -21,6 +21,13 @@ public class TDTDateAndTime {
 		decodeDetails(dateAndTime_details);
 		
 	}
+	public TDTDateAndTime(String startDate, String endDate, String startTime, String endTime){
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		
+	}
 	
 	public void decodeDetails(String details){
 		//String [] days = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
@@ -194,7 +201,7 @@ public class TDTDateAndTime {
 		return days;
 	}
 	
-	private boolean checkTime(String nextWord) {
+	public static boolean checkTime(String nextWord) {
 		// check time possible cases
 		// 2am 11pm --
 		// 2:00 12:15 2.00 --
@@ -232,7 +239,7 @@ public class TDTDateAndTime {
 	}
 
 
-	private boolean checkDate(String nextWord) {
+	public static boolean checkDate(String nextWord) {
 		if ((nextWord.split("/").length == 3) || (nextWord.split("/").length == 2)) {
 			return true;
 		} else if ((nextWord.split("-").length == 3) || (nextWord.split("-").length == 2)) {
@@ -247,27 +254,27 @@ public class TDTDateAndTime {
 		return false;
 	}
 
-
-	private int checkDay(String day) {
+	public static int checkDay(String day) {
 		if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
-			return 1;
+			return 2;
 		} else if ((day.equalsIgnoreCase("Tuesday")) || (day.equalsIgnoreCase("Tue")) 
 				|| (day.equalsIgnoreCase("Tues"))) {
-			return 2;	
+			return 3;	
 		} else if ((day.equalsIgnoreCase("Wednesday")) || (day.equalsIgnoreCase("Wed"))) {
-			return 3;
+			return 4;
 		} else if ((day.equalsIgnoreCase("Thursday")) || (day.equalsIgnoreCase("Thur"))
 				|| (day.equalsIgnoreCase("Thurs"))) {
-			return 4;
-		} else if ((day.equalsIgnoreCase("Friday")) || (day.equalsIgnoreCase("Fri"))) {
 			return 5;
-		} else if ((day.equalsIgnoreCase("Saturday")) || (day.equalsIgnoreCase("Sat"))) {
+		} else if ((day.equalsIgnoreCase("Friday")) || (day.equalsIgnoreCase("Fri"))) {
 			return 6;
-		} else if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
+		} else if ((day.equalsIgnoreCase("Saturday")) || (day.equalsIgnoreCase("Sat"))) {
 			return 7;
+		} else if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
+			return 1;
 		} else {
 			return 0;
 		}
 
 	}
+	
 }
