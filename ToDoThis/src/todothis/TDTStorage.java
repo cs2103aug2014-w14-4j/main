@@ -57,7 +57,8 @@ public class TDTStorage implements ITDTStorage {
 			}
 			br.close();
 		} catch(Exception e) {
-			bw = new BufferedWriter(new FileWriter(fileName));
+			//bw = new BufferedWriter(new FileWriter(fileName));
+			e.printStackTrace();
 		}
 		
 	}
@@ -78,9 +79,8 @@ public class TDTStorage implements ITDTStorage {
 			Iterator<Task> iter = this.getTaskIterator();
 			while(iter.hasNext()) {
 				Task task = iter.next();
-				System.out.println("HERERER" + task.getDateAndTime());
 				bw.write(task.getLabelName() + "\t" + task.getDetails() + "\t" + 
-				task.isHighPriority() + "\t" + task.isDone() + 
+				task.isHighPriority() + "\t" + task.isDone() + "\t" +
 				task.getDateAndTime().getStartDate() + "\t" +
 				task.getDateAndTime().getEndDate() + "\t" +
 				task.getDateAndTime().getStartTime() + "\t" +
@@ -149,10 +149,9 @@ public class TDTStorage implements ITDTStorage {
 					"\t" +task.getDueTime() +"\t" +task.isHighPriority());
 			System.out.println();
 		}*/
-		TDTStorage storage = new TDTStorage("TestStorage.txt");
-		storage.readInitialise();
-		HashMap<String, ArrayList<Task>> map = storage.copyLabelMap();
-		System.out.println(map.get("Today").get(0).getDetails());
+		String string = " " + "\t" + " ";
+		String[] test = string.split("\t");
+		System.out.println(test.length);
 		
 	}
 	

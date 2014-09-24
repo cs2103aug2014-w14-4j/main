@@ -5,13 +5,13 @@ import java.util.TimeZone;
 
 public class TDTDateAndTime {
 	//store converted date format dd/mm/yyyy
-	private String startDate = "";
-	private String endDate = "";
+	private String startDate = "null";
+	private String endDate = "null";
 	//store converted time format XX:XX 24hrs format
-	private String startTime = "";
-	private String endTime = "";
+	private String startTime = "null";
+	private String endTime = "null";
 	
-	private String details = "";
+	private String details = "null";
 	
 	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 	//constructor
@@ -27,10 +27,10 @@ public class TDTDateAndTime {
 		this.endTime = endTime;
 	}
 	public TDTDateAndTime(){
-		this.startDate = "";
-		this.endDate = "";
-		this.startTime = "";
-		this.endTime = "";
+		this.startDate = "null";
+		this.endDate = "null";
+		this.startTime = "null";
+		this.endTime = "null";
 	}
 	/*
 	public static void main(String args[]){
