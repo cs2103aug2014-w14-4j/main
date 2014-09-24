@@ -24,6 +24,17 @@ public class TDTParserTest {
 		
 		assertEquals(COMMANDTYPE.ADD,command1.getCommandType());
 		assertEquals(testString1,command1.getCommandDetails());
+		
+		String testDateAndTime = "meet at 313 sommerset 30-2-2014";
+		Command command2 = parser.parse(testDateAndTime);
+		String commandDetails = "meet at 313 sommerset";
+		String DateAndTime = "30-2-2014";
+		
+		assertEquals(COMMANDTYPE.ADD,command2.getCommandType());
+		assertEquals(commandDetails,command2.getCommandDetails());
+		assertEquals(DateAndTime,command2.getDateAndTime().getStartDate());
+		
+		
 	
 	}
 	
