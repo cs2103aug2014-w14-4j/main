@@ -10,12 +10,10 @@ public class TDTParser implements ITDTParser {
 	public Command parse(String userCommand) {
 		COMMANDTYPE commandType = COMMANDTYPE.INVALID;
 		String labelName = "";
-		String dueDate = "";
-		String dueTime = "";
 		boolean isHighPriority = false;
 		String commandDetails = "";
 		int taskID = -1;
-		TDTDateAndTime dateAndTime;
+		TDTDateAndTime dateAndTime = null;
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
 		prepositionWords.add("at");
