@@ -14,6 +14,8 @@ public class TDTParser implements ITDTParser {
 		String commandDetails = "";
 		int taskID = -1;
 		TDTDateAndTime dateAndTime = new TDTDateAndTime();
+		String commandDetailsTemp = "";
+		String remainingWordsTemp = "";
 		
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
@@ -28,28 +30,56 @@ public class TDTParser implements ITDTParser {
 		switch(commandType) {
 			case ADD :
 				commandDetails = userCommand;
+				System.out.println(commandDetails);
 				if (commandDetails.contains("!")) {
 					isHighPriority = true;
 				}
-				parts = commandDetails.split(" ");/*
+				parts = commandDetails.split(" ");
 				for (int i = 0; i < parts.length-1; i++) {
 					if (prepositionWords.contains(parts[i])) {
 						String nextWord = parts[i+1];
 						if (TDTDateAndTime.checkDate(nextWord)) {
-							dateAndTime = new TDTDateAndTime(parts[i] + " " + nextWord);
-							commandDetails = commandDetails.replaceAll(nextWord, "");
-							commandDetails = commandDetails.replaceAll(parts[i], "");
+							for (int a = 0; a < i; a++) {
+								commandDetailsTemp += ( parts[a] + " ");
+							}
+							for (int b = i; b < parts.length; b++) {
+								remainingWordsTemp += parts[b];
+								commandDetailsTemp += " ";
+							}
+							remainingWords = remainingWordsTemp;
+							commandDetails = commandDetailsTemp.trim();
+							System.out.println(commandDetails + "date");
+							dateAndTime = new TDTDateAndTime(remainingWords);
+							break;
 						} else if (TDTDateAndTime.checkTime(nextWord)) {
-							dateAndTime = new TDTDateAndTime(parts[i] + " " + nextWord);
-							commandDetails = commandDetails.replaceAll(nextWord, "");
-							commandDetails = commandDetails.replaceAll(parts[i], "");
+							for (int a = 0; a < i; a++) {
+								commandDetailsTemp += ( parts[a] + " ");
+							}
+							for (int b = i; b < parts.length; b++) {
+								remainingWordsTemp += parts[b];
+								commandDetailsTemp += " ";
+							}
+							remainingWords = remainingWordsTemp;
+							commandDetails = commandDetailsTemp.trim();
+							System.out.println(commandDetails + "date");
+							dateAndTime = new TDTDateAndTime(remainingWords);
+							break;
 						} else if (TDTDateAndTime.checkDay(nextWord) != 0) {
-							dateAndTime = new TDTDateAndTime(parts[i] + " " + nextWord);
-							commandDetails = commandDetails.replaceAll(nextWord, "");
-							commandDetails = commandDetails.replaceAll(parts[i], "");
+							for (int a = 0; a < i; a++) {
+								commandDetailsTemp += ( parts[a] + " ");
+							}
+							for (int b = i; b < parts.length; b++) {
+								remainingWordsTemp += parts[b];
+								commandDetailsTemp += " ";
+							}
+							remainingWords = remainingWordsTemp;
+							commandDetails = commandDetailsTemp.trim();
+							System.out.println(commandDetails + "date");
+							dateAndTime = new TDTDateAndTime(remainingWords);
+							break;
 						}
 					}
-				}*/
+				}
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
@@ -85,24 +115,48 @@ public class TDTParser implements ITDTParser {
 				if (valid) {
 					commandDetails = remainingWords.trim();
 					// gets [remainingWords]
-					for (int k = 0; k < parts.length-1; k++) {
-						if (prepositionWords.contains(parts[k])) {
-							String nextWord = parts[k+1];
+					for (int i = 0; i < parts.length-1; i++) {
+						if (prepositionWords.contains(parts[i])) {
+							String nextWord = parts[i+1];
 							if (TDTDateAndTime.checkDate(nextWord)) {
-								dateAndTime = new TDTDateAndTime(parts[k] + " " + nextWord);
-								commandDetails = commandDetails.replaceAll(nextWord, "");
-								commandDetails = commandDetails.replaceAll(parts[k], "");
-							
+								for (int a = 0; a < i; a++) {
+									commandDetailsTemp += ( parts[a] + " ");
+								}
+								for (int b = i; b < parts.length; b++) {
+									remainingWordsTemp += parts[b];
+									commandDetailsTemp += " ";
+								}
+								remainingWords = remainingWordsTemp;
+								commandDetails = commandDetailsTemp.trim();
+								System.out.println(commandDetails + "date");
+								dateAndTime = new TDTDateAndTime(remainingWords);
+								break;
 							} else if (TDTDateAndTime.checkTime(nextWord)) {
-								dateAndTime = new TDTDateAndTime(parts[k] + " " + nextWord);
-								commandDetails = commandDetails.replaceAll(nextWord, "");
-								commandDetails = commandDetails.replaceAll(parts[k], "");
-								
+								for (int a = 0; a < i; a++) {
+									commandDetailsTemp += ( parts[a] + " ");
+								}
+								for (int b = i; b < parts.length; b++) {
+									remainingWordsTemp += parts[b];
+									commandDetailsTemp += " ";
+								}
+								remainingWords = remainingWordsTemp;
+								commandDetails = commandDetailsTemp.trim();
+								System.out.println(commandDetails + "date");
+								dateAndTime = new TDTDateAndTime(remainingWords);
+								break;
 							} else if (TDTDateAndTime.checkDay(nextWord) != 0) {
-								dateAndTime = new TDTDateAndTime(parts[k] + " " + nextWord);
-								commandDetails = commandDetails.replaceAll(nextWord, "");
-								commandDetails = commandDetails.replaceAll(parts[k], "");
-								
+								for (int a = 0; a < i; a++) {
+									commandDetailsTemp += ( parts[a] + " ");
+								}
+								for (int b = i; b < parts.length; b++) {
+									remainingWordsTemp += parts[b];
+									commandDetailsTemp += " ";
+								}
+								remainingWords = remainingWordsTemp;
+								commandDetails = commandDetailsTemp.trim();
+								System.out.println(commandDetails + "date");
+								dateAndTime = new TDTDateAndTime(remainingWords);
+								break;
 							}
 						}
 					}
