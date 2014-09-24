@@ -15,6 +15,7 @@ public class TDTParser implements ITDTParser {
 		boolean isHighPriority = false;
 		String commandDetails = "";
 		int taskID = -1;
+		TDTDateAndTime dateAndTime;
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
 		prepositionWords.add("at");
@@ -22,14 +23,7 @@ public class TDTParser implements ITDTParser {
 		prepositionWords.add("from");
 		prepositionWords.add("about");
 		prepositionWords.add("to");
-		/*
-		 * should include this in the checkDay? 
-		prepositionWords.add("later");
-		prepositionWords.add("tmr");
-		prepositionWords.add("tomorrow");
-		prepositionWords.add("next week...?");
-		
-		*/
+
 		commandType = determineCommandType(getFirstWord(userCommand));
 		String remainingWords = removeFirstWord(userCommand);
 		switch(commandType) {
@@ -43,15 +37,15 @@ public class TDTParser implements ITDTParser {
 					if (prepositionWords.contains(parts[i])) {
 						String nextWord = parts[i+1];
 						if (checkDate(nextWord)) {
-							new TDTDateAndTime(nextWord);
+							dateAndTime = new TDTDateAndTime(nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
 							break;
 						} else if (checkTime(nextWord)) {
-							new TDTDateAndTime(nextWord);
+							dateAndTime = new TDTDateAndTime(nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
 							break;
 						} else if (checkDay(nextWord) != 0) {
-							new TDTDateAndTime(nextWord);
+							dateAndTime = new TDTDateAndTime(nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
 							break;
 						}
@@ -96,15 +90,15 @@ public class TDTParser implements ITDTParser {
 						if (prepositionWords.contains(parts[k])) {
 							String nextWord = parts[k+1];
 							if (checkDate(nextWord)) {
-								new TDTDateAndTime(nextWord);
+								dateAndTime = new TDTDateAndTime(nextWord);
 								commandDetails = commandDetails.replaceAll(nextWord, "");
 								break;
 							} else if (checkTime(nextWord)) {
-								new TDTDateAndTime(nextWord);
+								dateAndTime = new TDTDateAndTime(nextWord);
 								commandDetails = commandDetails.replaceAll(nextWord, "");
 								break;
 							} else if (checkDay(nextWord) != 0) {
-								new TDTDateAndTime(nextWord);
+								dateAndTime = new TDTDateAndTime(nextWord);
 								commandDetails = commandDetails.replaceAll(nextWord, "");
 								break;
 							}
@@ -156,7 +150,7 @@ public class TDTParser implements ITDTParser {
 				break;
 		}
 
-		return new Command(commandType, labelName, taskID, commandDetails, dueDate, dueTime,
+		return new Command(commandType, labelName, taskID, commandDetails, dateAndTime,
 				isHighPriority);
 	}
 
