@@ -31,7 +31,7 @@ public class TDTParser implements ITDTParser {
 				if (commandDetails.contains("!")) {
 					isHighPriority = true;
 				}
-				parts = commandDetails.split(" ");
+				parts = commandDetails.split(" "); /*
 				for (int i = 0; i < parts.length-1; i++) {
 					if (prepositionWords.contains(parts[i])) {
 						String nextWord = parts[i+1];
@@ -49,7 +49,7 @@ public class TDTParser implements ITDTParser {
 							commandDetails = commandDetails.replaceAll(parts[i], "");
 						}
 					}
-				}
+				}*/
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
