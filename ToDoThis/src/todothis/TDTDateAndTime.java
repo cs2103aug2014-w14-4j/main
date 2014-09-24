@@ -238,6 +238,16 @@ public class TDTDateAndTime {
 		}
 		displayDateTime(isDeadline);
 	}
+//-------------------------------check if Time valid-------------------------------
+	public static boolean isTimeRangeValid(String time){
+		String [] timeParts = time.split(":");
+		int hours = Integer.parseInt(timeParts[0]);
+		int minutes = Integer.parseInt(timeParts[1]);
+		if(hours < 24 && hours >= 0 && minutes < 60 && minutes >= 0){
+			return true;
+		}
+		return false;
+	}
 	
 	public static int getNumOfDaysFromMonth(int month, int year) {
 		int days = 0;
