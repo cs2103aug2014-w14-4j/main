@@ -17,6 +17,7 @@ public class Task implements Comparable<Task> {
 		this.setHide(p);
 		this.setDone(false);
 		this.setHighPriority(false);
+		this.setDateAndTime(dateAndTime);
 	}
 
 	
@@ -29,6 +30,7 @@ public class Task implements Comparable<Task> {
 		this.setHide(hide);
 		this.setDone(done);
 		this.setHighPriority(p);
+		this.setDateAndTime(dateAndTime);
 	}
 	
 	//-------------------------------------------------------------------------------
