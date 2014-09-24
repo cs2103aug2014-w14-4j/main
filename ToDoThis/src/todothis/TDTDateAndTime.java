@@ -6,11 +6,11 @@ import java.util.TimeZone;
 
 public class TDTDateAndTime {
 	//store converted date format dd/mm/yyyy
-	private static String startDate = "";
-	private static String endDate = "";
+	private String startDate = "";
+	private String endDate = "";
 	//store converted time format XX:XX 24hrs format
-	private static String startTime = "";
-	private static String endTime = "";
+	private String startTime = "";
+	private String endTime = "";
 	
 	private String details = "";
 	
@@ -27,16 +27,18 @@ public class TDTDateAndTime {
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
+	/*
 	public static void main(String args[]){
+	
 		decodeDetails("from 2pm on 12-12-2014 to 12am on 13-12-2014");
 		System.out.println(startDate);
 		System.out.println(endDate);
 		System.out.println(startTime);
 		System.out.println(endTime);
 		
-	}
+	}*/
 	
-	public static void decodeDetails(String details){
+	public void decodeDetails(String details){
 		//String [] days = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 		
 		String [] parts = details.toLowerCase().split(" ");
