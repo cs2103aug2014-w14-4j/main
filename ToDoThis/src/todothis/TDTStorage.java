@@ -78,6 +78,7 @@ public class TDTStorage implements ITDTStorage {
 			Iterator<Task> iter = this.getTaskIterator();
 			while(iter.hasNext()) {
 				Task task = iter.next();
+				System.out.println("HERERER" + task.getDateAndTime());
 				bw.write(task.getLabelName() + "\t" + task.getDetails() + "\t" + 
 				task.isHighPriority() + "\t" + task.isDone() + 
 				task.getDateAndTime().getStartDate() + "\t" +

@@ -13,7 +13,8 @@ public class TDTParser implements ITDTParser {
 		boolean isHighPriority = false;
 		String commandDetails = "";
 		int taskID = -1;
-		TDTDateAndTime dateAndTime = null;
+		TDTDateAndTime dateAndTime = new TDTDateAndTime();
+		
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
 		prepositionWords.add("at");
@@ -30,7 +31,7 @@ public class TDTParser implements ITDTParser {
 				if (commandDetails.contains("!")) {
 					isHighPriority = true;
 				}
-				parts = commandDetails.split(" ");
+				parts = commandDetails.split(" ");/*
 				for (int i = 0; i < parts.length-1; i++) {
 					if (prepositionWords.contains(parts[i])) {
 						String nextWord = parts[i+1];
@@ -48,7 +49,7 @@ public class TDTParser implements ITDTParser {
 							commandDetails = commandDetails.replaceAll(parts[i], "");
 						}
 					}
-				}
+				}*/
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
@@ -150,7 +151,6 @@ public class TDTParser implements ITDTParser {
 				//Will not reach here
 				break;
 		}
-
 		return new Command(commandType, labelName, taskID, commandDetails, dateAndTime,
 				isHighPriority);
 	}

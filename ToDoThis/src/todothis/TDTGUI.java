@@ -13,6 +13,9 @@ import javax.swing.JTextField;
 
 import todothis.ITDTParser.COMMANDTYPE;
 
+import java.awt.Color;
+import java.util.Iterator;
+
 public class TDTGUI extends JFrame {
 	public static final String FILENAME = "todothis.txt";
 	public static final String DEFAULT_LABEL = "TODAY";
@@ -50,6 +53,33 @@ public class TDTGUI extends JFrame {
 			}
 		});
 	}
+	
+	private String displayTask() {
+		StringBuilder sb = new StringBuilder();
+		String label = "";
+		Iterator<Task> iterator = storage.getTaskIterator();
+		while(iterator.hasNext()) {
+			Task task = iterator.next();
+			if(!task.isHide()){
+				if(label.equals("") || !task.getLabelName().equals(label)) {
+					label = task.getLabelName();
+					sb.append("---------------------------\n");
+					sb.append(task.getLabelName() + ": \n");
+				}
+				sb.append("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDateAndTime().getStartDate() + 
+						"\t" + task.getDateAndTime().getStartTime()+"\n");
+				if(task.isHighPriority()) {
+					sb.append("\t" + "(!!!!)\n");
+				} 
+				if(task.isDone()) {
+					sb.append("\t" + "(DONE)\n");
+				}
+				sb.append("\n");
+			}
+		}
+		sb.append("---------------------------\n");
+		return sb.toString();
+	}
 
 	/**
 	 * Create the frame.
@@ -64,6 +94,8 @@ public class TDTGUI extends JFrame {
 		
 		commandLabel.setBounds(10, 11, 679, 14);
 		contentPane.add(commandLabel);
+		taskPane.setBackground(Color.CYAN);
+		taskPane.setFocusable(false);
 		
 		
 		
@@ -74,6 +106,7 @@ public class TDTGUI extends JFrame {
 		
 		feedbackArea.setBounds(10, 422, 679, 128);
 		contentPane.add(feedbackArea);
+		feedbackArea.setFocusable(false);
 		
 		
 		commandField.setBounds(64, 8, 625, 20);
@@ -94,10 +127,12 @@ public class TDTGUI extends JFrame {
 					commandField.setText("");
 					Command command = parser.parse(userCommand);
 					String feedback = logic.executeCommand(command);
+					taskLabel.setText("Adding task to: " + storage.getCurrLabel());
+					feedbackArea.setText(feedback);
 					if(command.getCommandType() != COMMANDTYPE.SEARCH) {
+						//taskPane.setText(displayTask());
+					} else {
 						taskPane.setText("");
-						feedbackArea.setText(feedback);
-						
 					}
 					
 				}

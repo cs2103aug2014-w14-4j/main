@@ -1,6 +1,5 @@
 package todothis;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -26,6 +25,12 @@ public class TDTDateAndTime {
 		this.endDate = endDate;
 		this.startTime = startTime;
 		this.endTime = endTime;
+	}
+	public TDTDateAndTime(){
+		this.startDate = "";
+		this.endDate = "";
+		this.startTime = "";
+		this.endTime = "";
 	}
 	/*
 	public static void main(String args[]){
