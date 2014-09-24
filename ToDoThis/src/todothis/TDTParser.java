@@ -34,18 +34,18 @@ public class TDTParser implements ITDTParser {
 				for (int i = 0; i < parts.length-1; i++) {
 					if (prepositionWords.contains(parts[i])) {
 						String nextWord = parts[i+1];
-						if (checkDate(nextWord)) {
-							dateAndTime = new TDTDateAndTime(nextWord);
+						if (TDTDateAndTime.checkDate(nextWord)) {
+							dateAndTime = new TDTDateAndTime(parts[i] + " " + nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
-							break;
-						} else if (checkTime(nextWord)) {
-							dateAndTime = new TDTDateAndTime(nextWord);
+							commandDetails = commandDetails.replaceAll(parts[i], "");
+						} else if (TDTDateAndTime.checkTime(nextWord)) {
+							dateAndTime = new TDTDateAndTime(parts[i] + " " + nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
-							break;
-						} else if (checkDay(nextWord) != 0) {
-							dateAndTime = new TDTDateAndTime(nextWord);
+							commandDetails = commandDetails.replaceAll(parts[i], "");
+						} else if (TDTDateAndTime.checkDay(nextWord) != 0) {
+							dateAndTime = new TDTDateAndTime(parts[i] + " " + nextWord);
 							commandDetails = commandDetails.replaceAll(nextWord, "");
-							break;
+							commandDetails = commandDetails.replaceAll(parts[i], "");
 						}
 					}
 				}
@@ -87,18 +87,21 @@ public class TDTParser implements ITDTParser {
 					for (int k = 0; k < parts.length-1; k++) {
 						if (prepositionWords.contains(parts[k])) {
 							String nextWord = parts[k+1];
-							if (checkDate(nextWord)) {
-								dateAndTime = new TDTDateAndTime(nextWord);
+							if (TDTDateAndTime.checkDate(nextWord)) {
+								dateAndTime = new TDTDateAndTime(parts[k] + " " + nextWord);
 								commandDetails = commandDetails.replaceAll(nextWord, "");
-								break;
-							} else if (checkTime(nextWord)) {
-								dateAndTime = new TDTDateAndTime(nextWord);
+								commandDetails = commandDetails.replaceAll(parts[k], "");
+							
+							} else if (TDTDateAndTime.checkTime(nextWord)) {
+								dateAndTime = new TDTDateAndTime(parts[k] + " " + nextWord);
 								commandDetails = commandDetails.replaceAll(nextWord, "");
-								break;
-							} else if (checkDay(nextWord) != 0) {
-								dateAndTime = new TDTDateAndTime(nextWord);
+								commandDetails = commandDetails.replaceAll(parts[k], "");
+								
+							} else if (TDTDateAndTime.checkDay(nextWord) != 0) {
+								dateAndTime = new TDTDateAndTime(parts[k] + " " + nextWord);
 								commandDetails = commandDetails.replaceAll(nextWord, "");
-								break;
+								commandDetails = commandDetails.replaceAll(parts[k], "");
+								
 							}
 						}
 					}
@@ -151,84 +154,6 @@ public class TDTParser implements ITDTParser {
 		return new Command(commandType, labelName, taskID, commandDetails, dateAndTime,
 				isHighPriority);
 	}
-
-
-	private boolean checkTime(String nextWord) {
-		// check time possible cases
-		// 2am 11pm --
-		// 2:00 12:15 2.00 --
-		// 2:00pm 12:15pm 2.00pm 12.15pm --
-		// 2359 230
-		// 2359pm 230pm --
-		
-		// shortest 2am || longest 12:15pm 
-		if (nextWord.length() > 2 || nextWord.length() <= 7) {
-			if ((nextWord.substring(nextWord.length()-2, nextWord.length()-1).equals("am")) || 
-					(nextWord.substring(nextWord.length()-2, nextWord.length()-1).equals("pm"))) {
-
-				// eg 2:00pm 12:15pm 2.00pm 12.15pm
-				if ((nextWord.charAt(nextWord.length()-6) == ':') || (nextWord.charAt(nextWord.length()-6) == '.')) {
-					return true;
-
-					// eg 2359pm 230pm 2am 11pm 
-					// only digits. 2:345pm , 12344pm invalid.
-				} else if (nextWord.matches("\\d+")) {
-					if ((nextWord.length() > 2) || (nextWord.length() < 7)){
-						return true;
-					}
-				}
-
-				// eg 2:00 12:15 2.00
-			} else if (((nextWord.charAt(nextWord.length()-4)) == ':') ||((nextWord.charAt(nextWord.length()-4)) == '.')) {
-				return true;
-
-				// eg 2359 230
-			} else if ( (nextWord.length() == 3) || (nextWord.length() == 4)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-	private boolean checkDate(String nextWord) {
-		if ((nextWord.split("/").length == 3) || (nextWord.split("/").length == 2)) {
-			return true;
-		} else if ((nextWord.split("-").length == 3) || (nextWord.split("-").length == 2)) {
-			return true;
-		} else if ((nextWord.split(".").length == 3) || (nextWord.split(".").length == 2)) {
-			return true;
-		} else if ((nextWord.length() == 6) || (nextWord.length() == 8)) {
-			if (nextWord.matches("\\d+")) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private int checkDay(String day) {
-		if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
-			return 2;
-		} else if ((day.equalsIgnoreCase("Tuesday")) || (day.equalsIgnoreCase("Tue")) 
-				|| (day.equalsIgnoreCase("Tues"))) {
-			return 3;	
-		} else if ((day.equalsIgnoreCase("Wednesday")) || (day.equalsIgnoreCase("Wed"))) {
-			return 4;
-		} else if ((day.equalsIgnoreCase("Thursday")) || (day.equalsIgnoreCase("Thur"))
-				|| (day.equalsIgnoreCase("Thurs"))) {
-			return 5;
-		} else if ((day.equalsIgnoreCase("Friday")) || (day.equalsIgnoreCase("Fri"))) {
-			return 6;
-		} else if ((day.equalsIgnoreCase("Saturday")) || (day.equalsIgnoreCase("Sat"))) {
-			return 7;
-		} else if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
-			return 1;
-		} else {
-			return 0;
-		}
-
-	}
-
 
 	//By default command is assume to be ADD.
 	private static COMMANDTYPE determineCommandType(String commandTypeString) {
