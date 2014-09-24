@@ -26,7 +26,6 @@ public class TDTDateAndTime {
 		this.endDate = endDate;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		
 	}
 	
 	public void decodeDetails(String details){
