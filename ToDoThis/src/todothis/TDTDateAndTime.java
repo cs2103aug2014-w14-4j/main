@@ -36,14 +36,14 @@ public class TDTDateAndTime {
 	public static void main(String args[]){
 	
 		TDTDateAndTime test = new TDTDateAndTime();
-		test.decodeDetails("12/12/2013 1.20am to 12/1");
+		test.decodeDetails("121314 1.20am to 12/1");
 		System.out.println(test.startDate);
 		System.out.println(test.endDate);
 		System.out.println(test.startTime);
 		System.out.println(test.endTime);
 		
-	}
-	*/
+	}*/
+	
 	public void decodeDetails(String details){
 		
 		String [] parts = details.toLowerCase().split(" ");
@@ -86,12 +86,14 @@ public class TDTDateAndTime {
 					}
 				}
 				//if 9/12 entered, add on to 9/12/2014
-				if(datePartsTemp.length == 2){
-					dateParts[0] = datePartsTemp[0];
-					dateParts[1] = datePartsTemp[1];
-					dateParts[2] = Integer.toString(currentYear);
-				}else{
-					dateParts = datePartsTemp;
+				if(datePartsTemp != null){
+					if(datePartsTemp.length == 2){
+						dateParts[0] = datePartsTemp[0];
+						dateParts[1] = datePartsTemp[1];
+						dateParts[2] = Integer.toString(currentYear);
+					}else{
+						dateParts = datePartsTemp;
+					}
 				}
 		
 				if(endTimeDate == true){
@@ -265,11 +267,10 @@ public class TDTDateAndTime {
 						if(temp.matches("\\d+")){
 							return true;
 						}
-					
-						// eg 2359pm 230pm 2am 11pm 
-						// only digits. 2:345pm , 12344pm invalid.
 					} 
 				}
+				// eg 2359pm 230pm 2am 11pm 
+				// only digits. 2:345pm , 12344pm invalid.
 				if (nextWord.substring(0, nextWord.length()-2).matches("\\d+")) {
 					return true;
 				}
