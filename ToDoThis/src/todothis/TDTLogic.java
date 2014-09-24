@@ -67,7 +67,7 @@ public class TDTLogic implements ITDTLogic {
 		String labelName = storage.getCurrLabel();
 		int taskId = storage.getLabelSize(labelName) + 1;
 		Task task = new Task(taskId, labelName, command.getCommandDetails(),
-				command.getDueDate(), command.getDueTime(), command.isHighPriority());
+				command.getDateAndTime(), command.isHighPriority());
 		storage.addTask(task);
 		storage.write();
 		return "Add success";
@@ -176,8 +176,6 @@ public class TDTLogic implements ITDTLogic {
 		String labelName = command.getLabelName().toUpperCase();
 		int taskID = command.getTaskID();
 		String commandDetails = command.getCommandDetails();
-		String dueDate = command.getDueDate();
-		String dueTime = command.getDueTime();
 		boolean isHighPriority = command.isHighPriority();
 	
 		if(!storage.getLabelMap().containsKey(labelName)){
@@ -188,8 +186,7 @@ public class TDTLogic implements ITDTLogic {
 			
 		}else{
 			storage.getLabelMap().get(labelName).get(taskID - 1).setDetails(commandDetails);
-			storage.getLabelMap().get(labelName).get(taskID - 1).setDueDate(dueDate);
-			storage.getLabelMap().get(labelName).get(taskID - 1).setDueTime(dueTime);
+			storage.getLabelMap().get(labelName).get(taskID - 1).setDateAndTime(command.getDateAndTime());
 			storage.getLabelMap().get(labelName).get(taskID - 1).setHighPriority(isHighPriority);
 		}
 		return "";

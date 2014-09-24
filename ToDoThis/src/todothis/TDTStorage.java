@@ -39,16 +39,18 @@ public class TDTStorage implements ITDTStorage {
 			while(br.ready()) {
 				String line = br.readLine();
 				String[] params = line.split("\t");
-				Task task = new Task(0, params[0], params[1] , params[2], params[3],
+				TDTDateAndTime date = new TDTDateAndTime(params[4], params[5], 
+						params[6], params[7] );
+				Task task = new Task(0, params[0], params[1] , date,false, false,
 						false);
 				if(!labelMap.containsKey(params[0])) {
 					labelMap.put(params[0], new ArrayList<Task>());
 				}
 				task.setTaskID(this.getLabelSize(params[0]) + 1);
-				if(params[4].equals("true")) {
+				if(params[2].equals("true")) {
 					task.setHighPriority(true);
 				}
-				if(params[5].equals("true")) {
+				if(params[3].equals("true")) {
 					task.setDone(true);
 				}
 				this.addTask(task);	
@@ -77,8 +79,11 @@ public class TDTStorage implements ITDTStorage {
 			while(iter.hasNext()) {
 				Task task = iter.next();
 				bw.write(task.getLabelName() + "\t" + task.getDetails() + "\t" + 
-				task.getDueDate() + "\t" + task.getDueTime() + "\t" +
-						task.isHighPriority() + "\t" + task.isDone());
+				task.isHighPriority() + "\t" + task.isDone() + 
+				task.getDateAndTime().getStartDate() + "\t" +
+				task.getDateAndTime().getEndDate() + "\t" +
+				task.getDateAndTime().getStartTime() + "\t" +
+				task.getDateAndTime().getEndTime());
 				bw.newLine();
 			}
 			bw.close();
@@ -112,7 +117,7 @@ public class TDTStorage implements ITDTStorage {
 				hmap.put(task.getLabelName(), new ArrayList<Task>());
 			}
 			hmap.get(task.getLabelName()).add(new Task(task.getTaskID(), task.getLabelName(),
-					 task.getDetails(), task.getDueDate(), task.getDueTime(), task.isHighPriority(), 
+					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
 					 task.isDone(), task.isHide()));
 		}
 		return hmap;

@@ -48,8 +48,8 @@ public class TodoThis {
 					System.out.println("---------------------------");
 					System.out.println(task.getLabelName() + ": ");
 				}
-				System.out.print("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDueDate() + 
-						"\t" + task.getDueTime());
+				System.out.print("\t" + task.getTaskID() + ") " + task.getDetails() + "\t" + task.getDateAndTime().getStartDate() + 
+						"\t" + task.getDateAndTime().getStartTime());
 				if(task.isHighPriority()) {
 					System.out.print("\t" + "(!!!!)");
 				} 
