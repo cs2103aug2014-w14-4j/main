@@ -230,7 +230,7 @@ public class TDTDateAndTime {
 		// 2:00pm 12:15pm 2.00pm 12.15pm --
 		// 2359 230
 		// 2359pm 230pm -- 
-		String temp;
+		String temp = "";
 		// shortest 2am || longest 12:15pm 
 		if (nextWord.length() > 2 && nextWord.length() <= 7) {
 			if ((nextWord.substring(nextWord.length()-2, nextWord.length()).equals("am")) || 
@@ -239,7 +239,7 @@ public class TDTDateAndTime {
 				// eg 2:00pm 12:15pm 2.00pm 12.15pm
 				if(nextWord.length() >4){
 					if ((nextWord.charAt(nextWord.length()-5) == ':') || (nextWord.charAt(nextWord.length()-5) == '.')) {
-						temp = nextWord.replaceAll(nextWord.charAt(nextWord.length()-5) + "" , "");
+						temp = nextWord.replace(".", "");
 						temp = temp.substring(0, temp.length()-2);
 						if(temp.matches("\\d+")){
 							return true;
