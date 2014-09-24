@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JFrame;
@@ -13,22 +14,33 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JViewport;
 
 import todothis.ITDTParser.COMMANDTYPE;
 
 public class TDTGUI extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String FILENAME = "todothis.txt";
 	public static final String DEFAULT_LABEL = "TODAY";
 	private TDTStorage storage;
 	private TDTLogic logic;
 	private TDTParser parser;
 	private String userCommand;
+	private ArrayList<String> commandHistory = new ArrayList<String>();
+	private int historyPointer = 0;
 	JLabel commandLabel = new JLabel("I want to: ");
 	JTextPane taskPane = new JTextPane();
 	JTextArea feedbackArea = new JTextArea();
 	JTextField commandField = new JTextField();
 	private JPanel contentPane;
 	JLabel taskLabel = new JLabel();
+	JScrollPane scrollPane = new JScrollPane();
+	
+	JViewport vp;
+	
 
 	/**
 	 * Launch the application.
@@ -41,12 +53,9 @@ public class TDTGUI extends JFrame {
 					TDTGUI frame = new TDTGUI();
 					frame.feedbackArea.setText(frame.doInit());
 					frame.setVisible(true);
+					
 					frame.taskPane.setText(frame.displayTask());
-			
 					frame.taskLabel.setText("Adding task to: " + frame.storage.getCurrLabel());
-					
-	
-					
 					
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -113,21 +122,29 @@ public class TDTGUI extends JFrame {
 		
 		commandLabel.setBounds(10, 11, 679, 14);
 		contentPane.add(commandLabel);
-		taskPane.setBackground(Color.CYAN);
-		taskPane.setFocusable(false);
+		
+		
+		
+		
 		//SCROLL PANE
-		JScrollPane scrollPane = new JScrollPane(taskPane);
 		
 		
-		
+		scrollPane.setBounds(10, 58, 679, 353);
+		contentPane.add(scrollPane);
+		scrollPane.setRowHeaderView(taskPane);
+		taskPane.setBackground(Color.CYAN);
+		//taskPane.setEditorKit(new HTMLEditorKit());
+		taskPane.setFocusable(false);
+		scrollPane.setFocusable(true);
+		scrollPane.getViewport().setView(taskPane);
 		taskPane.setEditable(false);
-		taskPane.setBounds(10, 52, 679, 362);
-		contentPane.add(taskPane);
+		feedbackArea.setEditable(false);
 		
-		
-		feedbackArea.setBounds(10, 422, 679, 128);
-		contentPane.add(feedbackArea);
 		feedbackArea.setFocusable(false);
+		commandLabel.setFocusable(false);
+		feedbackArea.setBounds(10, 422, 679, 128);
+		
+		contentPane.add(feedbackArea);
 		
 		
 		commandField.setBounds(64, 8, 625, 20);
@@ -143,19 +160,44 @@ public class TDTGUI extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent arg0) {
-				if(arg0.getKeyChar() == '\n') {
-					userCommand = commandField.getText();
-					commandField.setText("");
-					Command command = parser.parse(userCommand);
-					String feedback = logic.executeCommand(command);
-					taskLabel.setText("Adding task to: " + storage.getCurrLabel());
-					feedbackArea.setText(feedback);
-					if(command.getCommandType() != COMMANDTYPE.SEARCH) {
-						taskPane.setText(displayTask());
-					} else {
-						taskPane.setText("");
-					}
+				int keyCode = arg0.getKeyCode();
+				switch(keyCode) {
+					case KeyEvent.VK_ENTER :
+						userCommand = commandField.getText();
+						commandHistory.add(userCommand);
+						setHistoryPointer(commandHistory.size());
+						commandField.setText("");
+						Command command = parser.parse(userCommand);
+						String feedback = logic.executeCommand(command);
+						taskLabel.setText("Adding task to: " + storage.getCurrLabel());
+						feedbackArea.setText(feedback);
+						if(command.getCommandType() != COMMANDTYPE.SEARCH) {
+							taskPane.setText(displayTask());
+						} else {
+							taskPane.setText("");
+						}
+						break;
+					case KeyEvent.VK_UP :
+						historyPointer--;
+						if(historyPointer < 0) {
+							commandField.setText("");
+							setHistoryPointer(-1);
+						} else {
+							commandField.setText(commandHistory.get(historyPointer));
+						}
+						break;
+					case KeyEvent.VK_DOWN :
+						historyPointer++;
+						if(historyPointer >= commandHistory.size()) {
+							commandField.setText("");
+							setHistoryPointer(commandHistory.size());
+						} else {
+							commandField.setText(commandHistory.get(historyPointer));
+						}
+						break;
 					
+					default :
+						break;
 				}
 				
 			}
@@ -186,5 +228,21 @@ public class TDTGUI extends JFrame {
 			e.printStackTrace();
 		}
 		return "Todo-This ready!";
+	}
+
+	public ArrayList<String> getCommandHistory() {
+		return commandHistory;
+	}
+
+	public void setCommandHistory(ArrayList<String> commandHistory) {
+		this.commandHistory = commandHistory;
+	}
+
+	public int getHistoryPointer() {
+		return historyPointer;
+	}
+
+	public void setHistoryPointer(int historyPointer) {
+		this.historyPointer = historyPointer;
 	}
 }
