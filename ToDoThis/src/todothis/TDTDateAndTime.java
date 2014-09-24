@@ -32,17 +32,13 @@ public class TDTDateAndTime {
 		this.startTime = "null";
 		this.endTime = "null";
 	}
-	/*
+	
 	public static void main(String args[]){
 	
-		TDTDateAndTime test = new TDTDateAndTime();
-		test.decodeDetails("121314 1.20am to 12/1");
-		System.out.println(test.startDate);
-		System.out.println(test.endDate);
-		System.out.println(test.startTime);
-		System.out.println(test.endTime);
+		TDTDateAndTime test = new TDTDateAndTime("on monday 7am - tuesday 8pm");
+		test.display();
 		
-	}*/
+	}
 	
 	public void decodeDetails(String details){
 		
@@ -206,8 +202,44 @@ public class TDTDateAndTime {
 		return details;
 	}
 	
-	//----------------------CHECK FUNCTIONS--------------------------------
-	private static int getNumOfDaysFromMonth(int month, int year) {
+	//-------------------------------------------DISPLAY SWEE SWEE-------------------------------
+	public void displayDateTime(boolean deadline){
+		if(deadline == true){
+			if(!getEndDate().equals("null")){
+				System.out.println("Due Date: " + getEndDate());
+			}
+			if(!getEndTime().equals("null")){
+				System.out.println("Due Time: " + getEndTime());
+			}
+		}else{
+			if(!getStartDate().equals("null")){
+				System.out.println("Start Date: " + getStartDate());
+			}
+			if(!getStartTime().equals("null")){
+				System.out.println("Start Time: " + getStartTime());
+			}
+			if(!getEndDate().equals("null")){
+				System.out.println("End Date: " + getEndDate());
+			}
+			if(!getEndTime().equals("null")){
+				System.out.println("End Time: " + getEndTime());
+			}
+		}
+	}
+	public void display(){
+		boolean isDeadline = false;
+		if(!getStartDate().equals("null") || !getStartTime().equals("null")){
+			System.out.println("(TIMED TASK)");
+		}else if(!getEndDate().equals("null") || !getEndTime().equals("null")){
+			System.out.println("(DEADLINE TASK)");
+			isDeadline = true;
+		}else{
+			System.out.println("(FLOATING TASK)");
+		}
+		displayDateTime(isDeadline);
+	}
+	
+	public static int getNumOfDaysFromMonth(int month, int year) {
 		int days = 0;
 		boolean isLeapYear = false;
 		switch (month) {
@@ -245,7 +277,7 @@ public class TDTDateAndTime {
 		}
 		return days;
 	}
-	
+	//----------------------CHECK FUNCTIONS--------------------------------
 	public static boolean checkTime(String nextWord) {
 		// check time possible cases
 		// 2am 11pm --
