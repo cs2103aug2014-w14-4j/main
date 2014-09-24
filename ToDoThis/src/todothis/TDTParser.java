@@ -30,7 +30,6 @@ public class TDTParser implements ITDTParser {
 		switch(commandType) {
 			case ADD :
 				commandDetails = userCommand;
-				System.out.println(commandDetails);
 				if (commandDetails.contains("!")) {
 					isHighPriority = true;
 				}
@@ -44,11 +43,11 @@ public class TDTParser implements ITDTParser {
 							}
 							for (int b = i; b < parts.length; b++) {
 								remainingWordsTemp += parts[b];
-								commandDetailsTemp += " ";
+								remainingWordsTemp += " ";
 							}
 							remainingWords = remainingWordsTemp;
 							commandDetails = commandDetailsTemp.trim();
-							dateAndTime = new TDTDateAndTime(remainingWords);
+							dateAndTime = new TDTDateAndTime(remainingWords.trim());
 							break;
 						} else if (TDTDateAndTime.checkTime(nextWord)) {
 							for (int a = 0; a < i; a++) {
@@ -56,11 +55,11 @@ public class TDTParser implements ITDTParser {
 							}
 							for (int b = i; b < parts.length; b++) {
 								remainingWordsTemp += parts[b];
-								commandDetailsTemp += " ";
+								remainingWordsTemp += " ";
 							}
 							remainingWords = remainingWordsTemp;
 							commandDetails = commandDetailsTemp.trim();
-							dateAndTime = new TDTDateAndTime(remainingWords);
+							dateAndTime = new TDTDateAndTime(remainingWords.trim());
 							break;
 						} else if (TDTDateAndTime.checkDay(nextWord) != 0) {
 							for (int a = 0; a < i; a++) {
@@ -68,11 +67,11 @@ public class TDTParser implements ITDTParser {
 							}
 							for (int b = i; b < parts.length; b++) {
 								remainingWordsTemp += parts[b];
-								commandDetailsTemp += " ";
+								remainingWordsTemp += " ";
 							}
 							remainingWords = remainingWordsTemp;
 							commandDetails = commandDetailsTemp.trim();
-							dateAndTime = new TDTDateAndTime(remainingWords);
+							dateAndTime = new TDTDateAndTime(remainingWords.trim());
 							break;
 						}
 					}
@@ -121,7 +120,7 @@ public class TDTParser implements ITDTParser {
 								}
 								for (int b = i; b < parts.length; b++) {
 									remainingWordsTemp += parts[b];
-									commandDetailsTemp += " ";
+									remainingWordsTemp+= " ";
 								}
 								remainingWords = remainingWordsTemp;
 								commandDetails = commandDetailsTemp.trim();
@@ -134,7 +133,7 @@ public class TDTParser implements ITDTParser {
 								}
 								for (int b = i; b < parts.length; b++) {
 									remainingWordsTemp += parts[b];
-									commandDetailsTemp += " ";
+									remainingWordsTemp += " ";
 								}
 								remainingWords = remainingWordsTemp;
 								commandDetails = commandDetailsTemp.trim();
@@ -147,7 +146,7 @@ public class TDTParser implements ITDTParser {
 								}
 								for (int b = i; b < parts.length; b++) {
 									remainingWordsTemp += parts[b];
-									commandDetailsTemp += " ";
+									remainingWordsTemp += " ";
 								}
 								remainingWords = remainingWordsTemp;
 								commandDetails = commandDetailsTemp.trim();

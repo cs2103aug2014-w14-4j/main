@@ -1,20 +1,20 @@
 package todothis;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Iterator;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import todothis.ITDTParser.COMMANDTYPE;
-
-import java.awt.Color;
-import java.util.Iterator;
 
 public class TDTGUI extends JFrame {
 	public static final String FILENAME = "todothis.txt";
@@ -115,6 +115,8 @@ public class TDTGUI extends JFrame {
 		contentPane.add(commandLabel);
 		taskPane.setBackground(Color.CYAN);
 		taskPane.setFocusable(false);
+		//SCROLL PANE
+		JScrollPane scrollPane = new JScrollPane(taskPane);
 		
 		
 		
