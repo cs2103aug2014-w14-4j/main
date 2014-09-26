@@ -249,6 +249,24 @@ public class TDTDateAndTime {
 		return false;
 	}
 	
+	//-------------------------------check if Date valid-------------------------------
+	public static boolean isValidDateRange() {
+		String [] dateParts = new String[3];
+		
+		int year = Integer.parseInt(dateParts[2]);
+		int month = Integer.parseInt(dateParts[1]);
+		int date = Integer.parseInt(dateParts[0]);
+		 if ((year > 1900) && (year < 2099)) {
+			 if ((month >= 1) && (month <= 12)) {
+				 if (date <= getNumOfDaysFromMonth(month, year)) {
+					 return true;
+				 }
+			 }
+		 }
+		return false;
+		
+	}
+	
 	public static int getNumOfDaysFromMonth(int month, int year) {
 		int days = 0;
 		boolean isLeapYear = false;
