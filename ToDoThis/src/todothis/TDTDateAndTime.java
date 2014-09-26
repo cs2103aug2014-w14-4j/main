@@ -249,10 +249,8 @@ public class TDTDateAndTime {
 		return false;
 	}
 	
-	//-------------------------------check if Date valid-------------------------------
-	public static boolean isValidDateRange() {
-		String [] dateParts = new String[3];
-		
+//-------------------------------check if Date valid-------------------------------
+	public static boolean isValidDateRange(String[] dateParts) {
 		int year = Integer.parseInt(dateParts[2]);
 		int month = Integer.parseInt(dateParts[1]);
 		int date = Integer.parseInt(dateParts[0]);
