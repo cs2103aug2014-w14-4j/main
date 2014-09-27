@@ -239,7 +239,7 @@ public class TDTDateAndTime {
 		displayDateTime(isDeadline);
 	}
 //-------------------------------check if Time valid-------------------------------
-	public static boolean isTimeRangeValid(String time){
+	public static boolean isValidTimeRange(String time){
 		String [] timeParts = time.split(":");
 		int hours = Integer.parseInt(timeParts[0]);
 		int minutes = Integer.parseInt(timeParts[1]);
@@ -250,13 +250,15 @@ public class TDTDateAndTime {
 	}
 	
 //-------------------------------check if Date valid-------------------------------
-	public static boolean isValidDateRange(String[] dateParts) {
-		int year = Integer.parseInt(dateParts[2]);
+	public static boolean isValidDateRange(String date) {
+		String [] dateParts = date.split("/");
+		int day = Integer.parseInt(dateParts[0]);
 		int month = Integer.parseInt(dateParts[1]);
-		int date = Integer.parseInt(dateParts[0]);
-		 if ((year > 1900) && (year < 2099)) {
+		int year = Integer.parseInt(dateParts[2]);
+		
+		 if ((year >= 1900) && (year <= 2099)) {
 			 if ((month >= 1) && (month <= 12)) {
-				 if (date <= getNumOfDaysFromMonth(month, year)) {
+				 if ((day >= 1) && (day <= getNumOfDaysFromMonth(month, year))) {
 					 return true;
 				 }
 			 }
