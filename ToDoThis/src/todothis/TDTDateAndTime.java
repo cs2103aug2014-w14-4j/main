@@ -34,9 +34,12 @@ public class TDTDateAndTime {
 	}
 	
 	public static void main(String args[]){
-	
-		TDTDateAndTime test = new TDTDateAndTime("on monday 7am - tuesday 8pm");
-		test.display();
+		
+		if(isValidTimeCompare("3:20","5:30")){
+			System.out.println("TIO");
+		}else{
+			System.out.println("WRONG");
+		}
 		
 	}
 	
@@ -248,6 +251,25 @@ public class TDTDateAndTime {
 		}
 		return false;
 	}
+	//use for "from Date1 to Date2" date1 and date2 same.
+	public static boolean isValidTimeCompare(String startTime, String endTime){
+		String [] startTimeParts = startTime.split(":");
+		String [] endTimeParts = endTime.split(":");
+		
+		int startHours = Integer.parseInt(startTimeParts[0]);
+		int startMinutes = Integer.parseInt(startTimeParts[1]);
+		int endHours = Integer.parseInt(endTimeParts[0]);
+		int endMinutes = Integer.parseInt(endTimeParts[1]);
+		
+		if(endHours > startHours){
+			return true;
+		}else if(endHours == startHours){
+			if(endMinutes > startMinutes){
+				return true;
+			}
+		}
+		return false;
+	}
 	
 //-------------------------------check if Date valid-------------------------------
 	public static boolean isValidDateRange(String date) {
@@ -264,9 +286,32 @@ public class TDTDateAndTime {
 			 }
 		 }
 		return false;
-		
 	}
-	
+
+	public static boolean isValidDateCompare(String startDate, String endDate){
+		String [] startDateParts = startDate.split("/");
+		String [] endDateParts = endDate.split("/");
+		
+		int startDay = Integer.parseInt(startDateParts[0]);
+		int startMonth = Integer.parseInt(startDateParts[1]);
+		int startYear = Integer.parseInt(startDateParts[2]);
+		int endDay = Integer.parseInt(endDateParts[0]);
+		int endMonth = Integer.parseInt(endDateParts[1]);
+		int endYear = Integer.parseInt(endDateParts[2]);
+		
+		if(endYear > startYear){
+			return true;
+		}else if(endYear == startYear){
+			if(endMonth > startMonth){
+				return true;
+			}else if(endMonth == startMonth){
+				if(endDay >= startDay){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	public static int getNumOfDaysFromMonth(int month, int year) {
 		int days = 0;
 		boolean isLeapYear = false;
