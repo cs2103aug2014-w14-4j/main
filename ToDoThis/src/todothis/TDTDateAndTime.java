@@ -35,11 +35,8 @@ public class TDTDateAndTime {
 	
 	public static void main(String args[]){
 		
-		if(isValidTimeCompare("3:20","5:30")){
-			System.out.println("TIO");
-		}else{
-			System.out.println("WRONG");
-		}
+		TDTDateAndTime test = new TDTDateAndTime("9pm to 10pm");
+		test.display();
 		
 	}
 	
@@ -146,10 +143,10 @@ public class TDTDateAndTime {
 								parts[a].charAt(parts[a].length()-3) == '.'){
 							timeParts[0] = parts[a].substring(0,parts[a].length()-3);
 							timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
+						}else{
+							timeParts[0] = parts[a].substring(0,parts[a].length()-2);
+							timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
 						}
-					}else{
-						timeParts[0] = parts[a].substring(0,parts[a].length()-2);
-						timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
 					}
 				}
 				if(endTimeDate == true){
