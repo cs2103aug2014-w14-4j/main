@@ -34,7 +34,7 @@ public class TDTParser implements ITDTParser {
 					isHighPriority = true;
 				}
 				parts = commandDetails.split(" ");
-				for (int i = 0; i < parts.length-1; i++) {
+				for (int i = 0; i < parts.length; i++) {
 					String checkWord = parts[i];
 					int end = i;
 					if (TDTDateAndTime.checkDate(checkWord)) {
@@ -50,7 +50,7 @@ public class TDTParser implements ITDTParser {
 						remainingWords = remainingWordsTemp.trim();
 						commandDetails = commandDetailsTemp.trim();
 						dateAndTime = new TDTDateAndTime(remainingWords);
-						
+						break;
 					} else if (TDTDateAndTime.checkTime(checkWord)) {
 						if (prepositionWords.contains(parts[i-1])) {
 							end = i-1;
@@ -64,6 +64,7 @@ public class TDTParser implements ITDTParser {
 						remainingWords = remainingWordsTemp.trim();
 						commandDetails = commandDetailsTemp.trim();
 						dateAndTime = new TDTDateAndTime(remainingWords);
+						break;
 					} else if (TDTDateAndTime.checkDay(checkWord) != 0) {
 						if (prepositionWords.contains(parts[i-1])) {
 							end = i-1;
@@ -77,6 +78,7 @@ public class TDTParser implements ITDTParser {
 						remainingWords = remainingWordsTemp.trim();
 						commandDetails = commandDetailsTemp.trim();
 						dateAndTime = new TDTDateAndTime(remainingWords);
+						break;
 					}
 				}
 				break;
