@@ -109,6 +109,9 @@ public class TDTParser implements ITDTParser {
 					if (parts[1].matches("\\d+")) {
 						taskID = Integer.parseInt(parts[1]);
 						labelName = parts[0];
+					} else {
+						taskID = Integer.parseInt(parts[0]);
+						labelName = parts[1];
 					}
 				}
 				break;
@@ -119,12 +122,14 @@ public class TDTParser implements ITDTParser {
 				for (int i = 0; i < parts.length; i++) {
 					if (parts[i].matches("\\d+")) {
 						taskID = Integer.parseInt(parts[i]);
-						for (int j = 0; j < i; j++) {
-							labelName += parts[j];
+						if (i != 0) {
+							for (int j = 0; j < i; j++) {
+								labelName += parts[j];
+								remainingWords = remainingWords.replace(labelName, "");
+							}
 						}
 						valid = true;
 						remainingWords = remainingWords.replace(parts[i], "");
-						remainingWords = remainingWords.replace(labelName, "");
 						break;
 					}
 				}
@@ -233,6 +238,9 @@ public class TDTParser implements ITDTParser {
 					if (parts[1].matches("\\d+")) {
 						taskID = Integer.parseInt(parts[1]);
 						labelName = parts[0];
+					} else {
+						taskID = Integer.parseInt(parts[0]);
+						labelName = parts[1];	
 					}
 				}
 				break;
