@@ -96,7 +96,7 @@ public class TDTParser implements ITDTParser {
 				if (parts.length == 0) {
 					break;
 				}
-				// delete label / delete taskID
+				// delete [label] / delete [taskID]
 				if (parts.length == 1) {
 					if (parts[0].matches("\\d+")) {
 						taskID = Integer.parseInt(parts[0]);
@@ -104,7 +104,7 @@ public class TDTParser implements ITDTParser {
 						labelName = parts[0];
 					}
 				}
-				// delete label taskID
+				// delete [label][taskID] (assumes label to be one word)
 				if (parts.length == 2) {
 					if (parts[1].matches("\\d+")) {
 						taskID = Integer.parseInt(parts[1]);
@@ -118,21 +118,42 @@ public class TDTParser implements ITDTParser {
 			case EDIT :
 				valid = false;
 				parts = remainingWords.split(" ");
-				// gets [labelName][taskID]  
-				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].matches("\\d+")) {
-						taskID = Integer.parseInt(parts[i]);
-						if (i != 0) {
+				if (parts.length == 0) {
+					break;
+				}
+				// [taskID][commandDetails]
+				if (parts[0].matches("\\d+")) {
+					taskID = Integer.parseInt(parts[0]);
+					remainingWords.replace(parts[0], "");
+					valid = true;
+					
+					// [label name (able to be more than one word)] [number]
+			/*	} else if (parts.length > 1) {
+					for (int i = 0; i < parts.length; i++) {
+						if (parts[i].matches("\\d+")) {
+							taskID = Integer.parseInt(parts[i]);
 							for (int j = 0; j < i; j++) {
 								labelName += parts[j];
-								remainingWords = remainingWords.replace(labelName, "");
 							}
+							remainingWords = remainingWords.replace(labelName, "");
+							remainingWords = remainingWords.replace(parts[i], "");
+							break;
 						}
+					}
+					valid = true;
+				} 
+			*/
+				// [labelname][taskID][commandDetails]
+				} else if (parts.length > 1) {
+					if (parts[1].matches("\\d+")) {
+						taskID = Integer.parseInt(parts[1]);
+						labelName = parts[0];
+						remainingWords = remainingWords.replace(labelName, "");
+						remainingWords = remainingWords.replace(parts[1], "");
 						valid = true;
-						remainingWords = remainingWords.replace(parts[i], "");
-						break;
 					}
 				}
+				
 				if (valid) {
 					// same as ADD
 					commandDetails = remainingWords.trim();
