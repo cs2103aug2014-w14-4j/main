@@ -1,6 +1,7 @@
 package todothis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import todothis.ITDTParser.COMMANDTYPE;
@@ -77,38 +78,52 @@ public class TDTLogic implements ITDTLogic {
 	@Override
 	public String doDelete(Command command) {
 		String label = command.getLabelName().toUpperCase();
-		if(command.getTaskID() != -1) {
-			//Deleting a task
+		int taskId = command.getTaskID();
+		
+		//delete
+		if(label.equals("") && taskId == -1) {
+			storage.setLabelMap(new HashMap<String, ArrayList<Task>>());
+			storage.getLabelMap().put(TodoThis.DEFAULT_LABEL, new ArrayList<Task>());
+			return storage.getFileName() + " is cleared!";
+		}
+		
+		//delete label
+		if(!label.equals("") && taskId == -1) {
+			if(storage.getLabelMap().containsKey(label) && !label.equals(TodoThis.DEFAULT_LABEL)) {
+				storage.getLabelMap().remove(label);
+				return "Label deleted.";
+			} else {
+				return "Error. Label does not exist or attempting to delete default label.";
+			}
+		}
+		
+		//delete task from current label
+		if(label.equals("") && taskId != -1) {
+			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
+			if(taskId <= array.size() && command.getTaskID() > 0) {
+				array.remove(taskId - 1);
+				renumberTaskID(array);
+				return "Task deleted";
+			} else {
+				return "error. Invalid task number.";
+			}
+		}
+		
+		//delete task from specific label
+		if(!label.equals("") && taskId != -1) {
 			if(storage.getLabelMap().containsKey(label)) {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
-				if(command.getTaskID() <= array.size() && command.getTaskID() > 0) {
-					array.remove(command.getTaskID() - 1);
+				if(taskId <= array.size() && command.getTaskID() > 0) {
+					array.remove(taskId - 1);
 					renumberTaskID(array);
 					return "Task deleted";
 				} else {
 					return "error. Invalid task number.";
-				} 
-			} else {
-				return "error. Label does not exist";
-			}
-		} else {
-			//Deleting a label
-			if(label.equals(TodoThis.DEFAULT_LABEL)) {
-				storage.getLabelMap().put(TodoThis.DEFAULT_LABEL, new ArrayList<Task>());
-				storage.write();
-				return "Label deleted";
-			}
-			if(storage.getLabelMap().containsKey(label)) {
-				if(command.getLabelName().equals(storage.getCurrLabel())) {
-					storage.setCurrLabel(TodoThis.DEFAULT_LABEL);
 				}
-				storage.getLabelMap().remove(label);
-				storage.write();
-				return "Label Deleted";
-			} else {
-				return "error. Label does not exist";
 			}
 		}
+		//Shouldnt reach here
+		return "Error. Invalid delete.";
 		
 	}
 
@@ -171,7 +186,6 @@ public class TDTLogic implements ITDTLogic {
 
 	@Override
 	public String doEdit(Command command) {
-		// TODO Auto-generated method stub
 		
 		String labelName = command.getLabelName().toUpperCase();
 		int taskID = command.getTaskID();
@@ -210,7 +224,6 @@ public class TDTLogic implements ITDTLogic {
 
 	@Override
 	public String doDisplay(Command command) {
-		// TODO Auto-generated method stub
 		String labelName = command.getLabelName().toUpperCase();
 		Iterator<Task> i;
 		if(labelName.equals("")){
@@ -261,25 +274,59 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String doDone(Command command) {
-		String labelName = command.getLabelName().toUpperCase();
-		int taskID = command.getTaskID();
-		Iterator <Task> i;
-	
-		if(!storage.getLabelMap().containsKey(labelName)){
-			return "Label Name cannot be found!";
-		}else if(taskID == -1 ){
-			i = storage.getLabelMap().get(labelName).iterator();
-			while(i.hasNext()){
-				Task temp = i.next();
-				temp.setDone(true);
+		String label = command.getLabelName().toUpperCase();
+		int taskId = command.getTaskID();
+		
+		//done
+		if(label.equals("") && taskId == -1) {
+			Iterator<Task> iter = storage.getTaskIterator();
+			while(iter.hasNext()) {
+				Task next = iter.next();
+				next.setDone(true);
 			}
-		}else if(storage.getLabelMap().get(labelName).size() < taskID ||
-				taskID <=0){
-			return "TaskID to be marked done cannot be found! OUT OF RANGE!";
-		}else{
-			storage.getLabelMap().get(labelName).get(taskID - 1).setDone(true);
+			return "All tasks are done!";
 		}
-		return "";
+		
+		//done label
+		if(!label.equals("") && taskId == -1) {
+			if(storage.getLabelMap().containsKey(label)) {
+				ArrayList<Task> array = storage.getLabelMap().get(label);
+				for(int i = 0 ; i < array.size(); i ++) {
+					array.get(i).setDone(true);
+				}
+				return "Tasks under " + label + "are done.";
+			} else {
+				return "Error. Label does not exist.";
+			}
+		}
+		
+		//done task from current label
+		if(label.equals("") && taskId != -1) {
+			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
+			if(taskId <= array.size() && command.getTaskID() > 0) {
+				array.get(taskId - 1).setDone(true);
+				return "Task done";
+			} else {
+				return "error. Invalid task number.";
+			}
+		}
+		
+		//delete task from specific label
+		if(!label.equals("") && taskId != -1) {
+			if(storage.getLabelMap().containsKey(label)) {
+				ArrayList<Task> array = storage.getLabelMap().get(label);
+				if(taskId <= array.size() && command.getTaskID() > 0) {
+					array.get(taskId).setDone(true);
+					return "Task done";
+				} else {
+					return "error. Invalid task number.";
+				}
+			} else {
+				return "Error. Label does not exist.";
+			}
+		}
+		//Shouldnt reach here
+		return "Error. Invalid done.";
 	}
 	
 	
@@ -288,10 +335,13 @@ public class TDTLogic implements ITDTLogic {
 		String label = command.getLabelName().toUpperCase();
 		if(storage.getLabelMap().containsKey(label)) {
 			storage.setCurrLabel(label);
+		} else if(label.equals("")){
+			return "Error. Label name is blank.";
 		} else {
 			storage.getLabelMap().put(label, new ArrayList<Task>());
 			storage.setCurrLabel(label);
 			storage.write();
+			return "Label created!";
 		}
 		return "";
 	}
