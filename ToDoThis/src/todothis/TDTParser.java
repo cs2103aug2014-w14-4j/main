@@ -38,6 +38,9 @@ public class TDTParser implements ITDTParser {
 					String checkWord = parts[i];
 					int end = i;
 					if (TDTDateAndTime.checkDate(checkWord)) {
+						if (i==0) {
+							break;
+						}
 						if (prepositionWords.contains(parts[i-1])) {
 							end = i-1;
 						}
@@ -52,6 +55,9 @@ public class TDTParser implements ITDTParser {
 						dateAndTime = new TDTDateAndTime(remainingWords);
 						break;
 					} else if (TDTDateAndTime.checkTime(checkWord)) {
+						if (i==0) {
+							break;
+						}
 						if (prepositionWords.contains(parts[i-1])) {
 							end = i-1;
 						}
@@ -66,6 +72,9 @@ public class TDTParser implements ITDTParser {
 						dateAndTime = new TDTDateAndTime(remainingWords);
 						break;
 					} else if (TDTDateAndTime.checkDay(checkWord) != 0) {
+						if (i==0) {
+							break;
+						}
 						if (prepositionWords.contains(parts[i-1])) {
 							end = i-1;
 						}
@@ -84,12 +93,23 @@ public class TDTParser implements ITDTParser {
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
-				String lastWord = parts[parts.length - 1];
-				if (lastWord.matches("\\d+")) {
-					taskID = Integer.parseInt(lastWord);
-					labelName = remainingWords.substring(0, remainingWords.lastIndexOf(" "));
-				} else {
-					labelName = remainingWords;
+				if (parts.length == 0) {
+					break;
+				}
+				// delete label / delete taskID
+				if (parts.length == 1) {
+					if (parts[0].matches("\\d+")) {
+						taskID = Integer.parseInt(parts[0]);
+					} else {
+						labelName = parts[0];
+					}
+				}
+				// delete label taskID
+				if (parts.length == 2) {
+					if (parts[1].matches("\\d+")) {
+						taskID = Integer.parseInt(parts[1]);
+						labelName = parts[0];
+					}
 				}
 				break;
 			case EDIT :
@@ -115,10 +135,13 @@ public class TDTParser implements ITDTParser {
 						isHighPriority = true;
 					}
 					parts = commandDetails.split(" ");
-					for (int i = 0; i < parts.length-1; i++) {
+					for (int i = 0; i < parts.length; i++) {
 						String checkWord = parts[i];
 						int end = i;
 						if (TDTDateAndTime.checkDate(checkWord)) {
+							if (i==0) {
+								break;
+							}
 							if (prepositionWords.contains(parts[i-1])) {
 								end = i-1;
 							}
@@ -133,6 +156,9 @@ public class TDTParser implements ITDTParser {
 							dateAndTime = new TDTDateAndTime(remainingWords);
 							
 						} else if (TDTDateAndTime.checkTime(checkWord)) {
+							if (i==0) {
+								break;
+							}
 							if (prepositionWords.contains(parts[i-1])) {
 								end = i-1;
 							}
@@ -146,6 +172,9 @@ public class TDTParser implements ITDTParser {
 							commandDetails = commandDetailsTemp.trim();
 							dateAndTime = new TDTDateAndTime(remainingWords);
 						} else if (TDTDateAndTime.checkDay(checkWord) != 0) {
+							if (i==0) {
+								break;
+							}
 							if (prepositionWords.contains(parts[i-1])) {
 								end = i-1;
 							}
@@ -189,13 +218,22 @@ public class TDTParser implements ITDTParser {
 				break;
 			case DONE :
 				commandType = COMMANDTYPE.DONE;
-				String[] tempWords = remainingWords.split(" ");
-				String lastWord1 = tempWords[tempWords.length -1];
-				if (lastWord1.matches("\\d+")) {
-					taskID = Integer.parseInt(lastWord1);
-					labelName = remainingWords.substring(0, remainingWords.lastIndexOf(" "));
-				} else {
-					labelName = remainingWords;
+				parts = remainingWords.split(" ");
+				if (parts.length == 0) {
+					break;
+				}
+				if (parts.length == 1) {
+					if (parts[0].matches("\\d+")) {
+						taskID = Integer.parseInt(parts[0]);
+					} else {
+						labelName = parts[0];
+					}
+				}
+				if (parts.length == 2) {
+					if (parts[1].matches("\\d+")) {
+						taskID = Integer.parseInt(parts[1]);
+						labelName = parts[0];
+					}
 				}
 				break;
 			case INVALID :
