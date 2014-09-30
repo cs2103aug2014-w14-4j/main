@@ -120,6 +120,8 @@ public class TDTLogic implements ITDTLogic {
 				} else {
 					return "error. Invalid task number.";
 				}
+			} else {
+				return "error. Label does not exist.";
 			}
 		}
 		//Shouldnt reach here
