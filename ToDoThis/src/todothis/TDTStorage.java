@@ -17,12 +17,14 @@ public class TDTStorage implements ITDTStorage {
 	private HashMap<String, ArrayList<Task>> labelMap;
 	private String currLabel = TodoThis.DEFAULT_LABEL;
 	private Stack<HashMap<String, ArrayList<Task>>> undoStack;
+	private Stack<String> labelPointerStack;
 	private BufferedWriter bw;
 	
 	public TDTStorage(String fileName) {
 		this.setFileName(fileName);
 		setLabelMap(new HashMap<String, ArrayList<Task>>());
 		setUndoStack(new Stack<HashMap<String, ArrayList<Task>>>());
+		setLabelPointerStack(new Stack<String>());
 		labelMap.put(currLabel, new ArrayList<Task>());
 	}
 	
@@ -109,13 +111,15 @@ public class TDTStorage implements ITDTStorage {
 	
 	public HashMap<String, ArrayList<Task>> copyLabelMap() {
 		HashMap<String, ArrayList<Task>> hmap = new HashMap<String, ArrayList<Task>>();
-		
+		Iterator<String> labelIter = labelMap.keySet().iterator();
 		Iterator<Task> taskIter = this.getTaskIterator();
+		
+		while(labelIter.hasNext()) {
+			String next = labelIter.next();
+			hmap.put(next, new ArrayList<Task>());
+		}
 		while(taskIter.hasNext()) {
 			Task task =  taskIter.next();
-			if(!hmap.containsKey(task.getLabelName())) {
-				hmap.put(task.getLabelName(), new ArrayList<Task>());
-			}
 			hmap.get(task.getLabelName()).add(new Task(task.getTaskID(), task.getLabelName(),
 					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
 					 task.isDone(), task.isHide()));
@@ -184,6 +188,15 @@ public class TDTStorage implements ITDTStorage {
 
 	public void setUndoStack(Stack<HashMap<String, ArrayList<Task>>> undoStack) {
 		this.undoStack = undoStack;
+	}
+
+	public Stack<String> getLabelPointerStack() {
+		return labelPointerStack;
+	}
+
+
+	public void setLabelPointerStack(Stack<String> labelPointerStack) {
+		this.labelPointerStack = labelPointerStack;
 	}
 
 	//-------------------------------------------------------------------------------

@@ -16,6 +16,7 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String executeCommand(Command command) {
+		storage.getLabelPointerStack().push(storage.getCurrLabel());
 		switch(command.getCommandType()) {
 			case ADD :
 				storage.getUndoStack().push(storage.copyLabelMap());
@@ -40,6 +41,7 @@ public class TDTLogic implements ITDTLogic {
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doHide(command);
 			case UNDO :
+				storage.getLabelPointerStack().pop();
 				String feedback = doUndo(command);
 				storage.write();
 				return feedback;	
@@ -69,6 +71,8 @@ public class TDTLogic implements ITDTLogic {
 		int taskId = storage.getLabelSize(labelName) + 1;
 		Task task = new Task(taskId, labelName, command.getCommandDetails(),
 				command.getDateAndTime(), command.isHighPriority());
+		TDTDateAndTime dnt = command.getDateAndTime();
+		
 		storage.addTask(task);
 		storage.write();
 		return "Add success";
@@ -238,6 +242,7 @@ public class TDTLogic implements ITDTLogic {
 		if(command.getCommandType() != COMMANDTYPE.SEARCH) {
 			if(!storage.getUndoStack().isEmpty()) {
 				storage.setLabelMap(storage.getUndoStack().pop());
+				storage.setCurrLabel(storage.getLabelPointerStack().pop());
 				return "Undo success!";
 			} else {
 				return "No command to undo.";
@@ -343,7 +348,7 @@ public class TDTLogic implements ITDTLogic {
 			if(storage.getLabelMap().containsKey(label)) {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
 				if(taskId <= array.size() && command.getTaskID() > 0) {
-					array.get(taskId).setDone(true);
+					array.get(taskId - 1).setDone(true);
 					return "Task done";
 				} else {
 					return "error. Invalid task number.";
@@ -359,18 +364,25 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String doLabel(Command command) {
-		String label = command.getLabelName().toUpperCase();
-		if(storage.getLabelMap().containsKey(label)) {
-			storage.setCurrLabel(label);
-		} else if(label.equals("")){
-			return "Error. Label name is blank.";
-		} else {
-			storage.getLabelMap().put(label, new ArrayList<Task>());
-			storage.setCurrLabel(label);
-			storage.write();
-			return "Label created!";
+		String[] label = command.getLabelName().toUpperCase().split(" ");
+		
+		if(label.length > 1 || label.length <= 0) {
+			return "Error. Invalid Label name.";
 		}
-		return "";
+		
+		if(storage.getLabelMap().containsKey(label[0])) {
+			storage.setCurrLabel(label[0]);
+		} else if(label[0].equals("") || label[0].matches("\\d+")) {
+			return "Error. Invalid label name.";
+		} else {
+			storage.getLabelMap().put(label[0], new ArrayList<Task>());
+			storage.setCurrLabel(label[0]);
+			storage.write();
+			return "Label created";
+		}
+		
+		//Shouldnt reach here
+		return "Invalid Label command.";
 	}
 
 }

@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -66,46 +67,30 @@ public class TDTGUI extends JFrame {
 	
 	private String displayTask() {
 		StringBuilder sb = new StringBuilder();
-		String label = "";
-		Iterator<Task> iterator = storage.getTaskIterator();
-		while(iterator.hasNext()) {
-			Task task = iterator.next();
-			if(!task.isHide()){
-				if(label.equals("") || !task.getLabelName().equals(label)) {
-					label = task.getLabelName();
-					sb.append("---------------------------\n");
-					sb.append(task.getLabelName() + ": \n");
+		Set<String> labelSet = storage.getLabelMap().keySet();
+		Iterator<String> labelIter = labelSet.iterator();
+		ArrayList<Task> array;
+		
+		while(labelIter.hasNext()) {
+			String currLabel = labelIter.next();
+			array = storage.getLabelMap().get(currLabel);
+			sb.append("------------------------------------------------------------\n");
+			sb.append(currLabel + ": \n");
+			for(int i = 0 ; i < array.size(); i++) {
+				Task task = array.get(i);
+				if(!task.isHide()){
+					sb.append("\t" + task.getDateAndTime().display() + "\n");
+					sb.append("\t" + task.getTaskID() + ") " + task.getDetails());
+					if(task.isHighPriority()) {
+						sb.append("\t" + "(!!!!)\n");
+					} 
+					if(task.isDone()) {
+						sb.append("\t" + "(DONE)\n");
+					}
+					sb.append("\n\n");
 				}
-				String startDate = "";
-				String endDate = "";
-				String startTime = "";
-				String endTime = "";
-				if(!task.getDateAndTime().getStartDate().equals("null")) {
-					startDate = task.getDateAndTime().getStartDate();
-				}
-				if(!task.getDateAndTime().getEndDate().equals("null")) {
-					endDate = task.getDateAndTime().getEndDate();
-				}
-				if(!task.getDateAndTime().getStartTime().equals("null")) {
-					startTime = task.getDateAndTime().getStartTime();
-				}
-				if(!task.getDateAndTime().getEndTime().equals("null")) {
-					endTime = task.getDateAndTime().getEndTime();
-				}
-				sb.append("\t" + "Start Date: " + startDate + "\t" + "End Date: "
-				+ endDate + "\t" + "Start Time: " + "\t" + startTime + "\t"
-				+ "End Time: " + "\t" + endTime + "\n");
-				sb.append("\t" + task.getTaskID() + ") " + task.getDetails());
-				if(task.isHighPriority()) {
-					sb.append("\t" + "(!!!!)\n");
-				} 
-				if(task.isDone()) {
-					sb.append("\t" + "(DONE)\n");
-				}
-				sb.append("\n\n");
 			}
 		}
-		sb.append("---------------------------\n");
 		return sb.toString();
 	}
 
@@ -120,7 +105,7 @@ public class TDTGUI extends JFrame {
 		contentPane.setLayout(null);
 		
 		
-		commandLabel.setBounds(10, 11, 679, 14);
+		commandLabel.setBounds(10, 11, 576, 14);
 		contentPane.add(commandLabel);
 		
 		
@@ -129,7 +114,7 @@ public class TDTGUI extends JFrame {
 		//SCROLL PANE
 		
 		
-		scrollPane.setBounds(10, 58, 679, 353);
+		scrollPane.setBounds(10, 58, 576, 353);
 		contentPane.add(scrollPane);
 		scrollPane.setRowHeaderView(taskPane);
 		taskPane.setBackground(Color.CYAN);
@@ -142,12 +127,12 @@ public class TDTGUI extends JFrame {
 		
 		feedbackArea.setFocusable(false);
 		commandLabel.setFocusable(false);
-		feedbackArea.setBounds(10, 422, 679, 128);
+		feedbackArea.setBounds(10, 422, 576, 128);
 		
 		contentPane.add(feedbackArea);
 		
 		
-		commandField.setBounds(64, 8, 625, 20);
+		commandField.setBounds(64, 8, 521, 20);
 		contentPane.add(commandField);
 		commandField.setColumns(10);
 		commandField.setFocusable(true);
