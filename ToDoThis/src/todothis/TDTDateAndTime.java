@@ -35,7 +35,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	public static void main(String args[]){
 		
-		TDTDateAndTime test1 = new TDTDateAndTime("on mon to sat");
+		TDTDateAndTime test1 = new TDTDateAndTime("on mon to next mon");
 		System.out.println(test1.display());
 	
 		
@@ -180,7 +180,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				
 				if(endTimeDate == true){
 					if(!startDate.equals("null")){
-						if(compareToDate(startDate,toBeAddedDate) == -1){
+						if(compareToDate(startDate,toBeAddedDate) == -1 || 
+								compareToDate(startDate,toBeAddedDate) == 0 ){
 							currentDay = currentDay + 7;
 						}
 					}
