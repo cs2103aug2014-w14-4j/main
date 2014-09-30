@@ -3,7 +3,7 @@ package todothis;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class TDTDateAndTime {
+public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	//store converted date format dd/mm/yyyy
 	private String startDate = "null";
 	private String endDate = "null";
@@ -35,8 +35,9 @@ public class TDTDateAndTime {
 	
 	public static void main(String args[]){
 		
-		TDTDateAndTime test = new TDTDateAndTime("9pm to 10pm");
-		test.display();
+		TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014 8pm");
+		TDTDateAndTime test2 = new TDTDateAndTime("11/11/2014 9pm");
+		System.out.println(test1.compareTo(test2));
 		
 	}
 	
@@ -203,40 +204,44 @@ public class TDTDateAndTime {
 	}
 	
 	//-------------------------------------------DISPLAY SWEE SWEE-------------------------------
-	public void displayDateTime(boolean deadline){
+	public String displayDateTime(boolean deadline){
+		String dateAndTimeContents = "";
 		if(deadline == true){
 			if(!getEndDate().equals("null")){
-				System.out.println("Due Date: " + getEndDate());
+				dateAndTimeContents = dateAndTimeContents + "  Due Date: " + getEndDate();
 			}
 			if(!getEndTime().equals("null")){
-				System.out.println("Due Time: " + getEndTime());
+				dateAndTimeContents = dateAndTimeContents + "  Due Time: " + getEndTime();
 			}
 		}else{
 			if(!getStartDate().equals("null")){
-				System.out.println("Start Date: " + getStartDate());
+				dateAndTimeContents = dateAndTimeContents + "  Start Date: " + getStartDate();
 			}
 			if(!getStartTime().equals("null")){
-				System.out.println("Start Time: " + getStartTime());
+				dateAndTimeContents = dateAndTimeContents + "  Start Time: " + getStartTime();
 			}
 			if(!getEndDate().equals("null")){
-				System.out.println("End Date: " + getEndDate());
+				dateAndTimeContents = dateAndTimeContents + "  End Date: " + getEndDate();
 			}
 			if(!getEndTime().equals("null")){
-				System.out.println("End Time: " + getEndTime());
+				dateAndTimeContents = dateAndTimeContents + "  End Time: " + getEndTime();
 			}
 		}
+		return dateAndTimeContents;
 	}
-	public void display(){
+	public String display(){
 		boolean isDeadline = false;
+		String displayString = "";
 		if(!getStartDate().equals("null") || !getStartTime().equals("null")){
-			System.out.println("(TIMED TASK)");
+			displayString = "(TIMED TASK)";
 		}else if(!getEndDate().equals("null") || !getEndTime().equals("null")){
-			System.out.println("(DEADLINE TASK)");
+			displayString = "(DEADLINE TASK)";
 			isDeadline = true;
 		}else{
-			System.out.println("(FLOATING TASK)");
+			displayString = "(FLOATING TASK)";
 		}
-		displayDateTime(isDeadline);
+		displayString = displayString + displayDateTime(isDeadline);
+		return displayString;
 	}
 //-------------------------------check if Time valid-------------------------------
 	public static boolean isValidTimeRange(String time){
@@ -266,6 +271,29 @@ public class TDTDateAndTime {
 			}
 		}
 		return false;
+	}
+	
+	public static int compareToTime(String time1, String time2){
+		String [] time1Parts = time1.split(":");
+		String [] time2Parts = time2.split(":");
+		
+		int time1Hours = Integer.parseInt(time1Parts[0]);
+		int time1Minutes = Integer.parseInt(time1Parts[1]);
+		int time2Hours = Integer.parseInt(time2Parts[0]);
+		int time2Minutes = Integer.parseInt(time2Parts[1]);
+		
+		if(time2Hours > time1Hours){
+			return 1;
+		}else if(time2Hours == time1Hours){
+			if(time2Minutes > time1Minutes){
+				return 1;
+			}else if(time2Minutes == time1Minutes){
+				return 0;
+			}else{
+				return -1;
+			}
+		}
+		return -1;
 	}
 	
 //-------------------------------check if Date valid-------------------------------
@@ -308,6 +336,35 @@ public class TDTDateAndTime {
 			}
 		}
 		return false;
+	}
+	
+	public static int compareToDate(String date1, String date2){
+		String [] date1Parts = date1.split("/");
+		String [] date2Parts = date2.split("/");
+		
+		int date1Day = Integer.parseInt(date1Parts[0]);
+		int date1Month = Integer.parseInt(date1Parts[1]);
+		int date1Year = Integer.parseInt(date1Parts[2]);
+		int date2Day = Integer.parseInt(date2Parts[0]);
+		int date2Month = Integer.parseInt(date2Parts[1]);
+		int date2Year = Integer.parseInt(date2Parts[2]);
+		
+		if(date2Year > date1Year){
+			return 1;
+		}else if(date2Year == date1Year){
+			if(date2Month > date1Month){
+				return 1;
+			}else if(date2Month == date1Month){
+				if(date2Day > date1Day){
+					return 1;
+				}else if(date2Day == date1Day){
+					return 0;
+				}else{
+					return -1;
+				}
+			}
+		}
+		return -1;
 	}
 	public static int getNumOfDaysFromMonth(int month, int year) {
 		int days = 0;
@@ -357,6 +414,7 @@ public class TDTDateAndTime {
 		// 2359pm 230pm -- 
 		String temp = "";
 		// shortest 2am || longest 12:15pm 
+		nextWord = nextWord.toLowerCase();
 		if (nextWord.length() > 2 && nextWord.length() <= 7) {
 			if ((nextWord.substring(nextWord.length()-2, nextWord.length()).equals("am")) || 
 					(nextWord.substring(nextWord.length()-2, nextWord.length()).equals("pm"))) {
@@ -428,6 +486,71 @@ public class TDTDateAndTime {
 			return 0;
 		}
 
+	}
+	
+	@Override
+	public int compareTo(TDTDateAndTime arg0) {
+		String thisDate = "null";
+		String thisTime = "null"; 
+		String comparedDate = "null";
+		String comparedTime = "null";
+		
+		if(this.getStartDate().equals("null")){
+			thisDate = this.getEndDate();
+		}else{
+			thisDate = this.getStartDate();
+		}
+		
+		if(this.getStartTime().equals("null")){
+			thisTime = this.getEndTime();
+		}else{
+			thisTime = this.getStartTime();
+		}
+		
+		if(arg0.getStartDate().equals("null")){
+			comparedDate = arg0.getEndDate();
+		}else{
+			comparedDate = arg0.getStartDate();
+		}
+		
+		if(arg0.getStartTime().equals("null")){
+			comparedTime = arg0.getEndTime();
+		}else{
+			comparedTime = arg0.getStartTime();
+		}
+		
+		System.out.println(thisDate);
+		System.out.println(comparedDate);
+		
+		if(thisDate.equals("null") && !comparedDate.equals("null")){ //compareddate<thisdate
+			return 1;
+		}else if(thisDate.equals("null") && comparedDate.equals("null")){
+			return 0;
+		}else if(!thisDate.equals("null") && comparedDate.equals("null")){
+			return -1;
+		}
+		
+		if(compareToDate(thisDate, comparedDate) == 1){ //thisdate<compareddate
+			return -1;
+		}else if(compareToDate(thisDate, comparedDate) == 0){
+			if(thisTime.equals("null") && !comparedTime.equals("null")){
+				return 1;
+			}else if(thisTime.equals("null") && comparedTime.equals("null")){
+				return 0;
+			}else if(!thisTime.equals("null") && comparedTime.equals("null")){
+				return -1;
+			}
+			
+			if(compareToTime(thisTime, comparedTime) == 1){ //thistime<comparedtime
+				return -1;
+			}else if(compareToTime(thisTime, comparedTime) == 0){
+				return 0;
+			}else{
+				return 1;
+			}
+		}else{
+			return 1;
+		}
 	}
 	
 }

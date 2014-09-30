@@ -57,8 +57,7 @@ public class TDTStorage implements ITDTStorage {
 			}
 			br.close();
 		} catch(Exception e) {
-			//bw = new BufferedWriter(new FileWriter(fileName));
-			e.printStackTrace();
+			bw = new BufferedWriter(new FileWriter(fileName));
 		}
 		
 	}

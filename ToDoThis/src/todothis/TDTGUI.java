@@ -89,8 +89,8 @@ public class TDTGUI extends JFrame {
 				if(!task.getDateAndTime().getStartTime().equals("null")) {
 					startTime = task.getDateAndTime().getStartTime();
 				}
-				if(!task.getDateAndTime().getEndDate().equals("null")) {
-					endDate = task.getDateAndTime().getEndDate();
+				if(!task.getDateAndTime().getEndTime().equals("null")) {
+					endTime = task.getDateAndTime().getEndTime();
 				}
 				sb.append("\t" + "Start Date: " + startDate + "\t" + "End Date: "
 				+ endDate + "\t" + "Start Time: " + "\t" + startTime + "\t"
