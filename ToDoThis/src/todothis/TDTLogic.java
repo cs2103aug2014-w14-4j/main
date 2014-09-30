@@ -89,11 +89,14 @@ public class TDTLogic implements ITDTLogic {
 		
 		//delete label
 		if(!label.equals("") && taskId == -1) {
-			if(storage.getLabelMap().containsKey(label) && !label.equals(TodoThis.DEFAULT_LABEL)) {
+			if(storage.getLabelMap().containsKey(label)) {
 				storage.getLabelMap().remove(label);
+				if(label.equals(TodoThis.DEFAULT_LABEL)) {
+					storage.getLabelMap().put(TodoThis.DEFAULT_LABEL, new ArrayList<Task>());
+				}
 				return "Label deleted.";
 			} else {
-				return "Error. Label does not exist or attempting to delete default label.";
+				return "Error. Label does not exist.";
 			}
 		}
 		
@@ -189,23 +192,45 @@ public class TDTLogic implements ITDTLogic {
 	@Override
 	public String doEdit(Command command) {
 		
-		String labelName = command.getLabelName().toUpperCase();
-		int taskID = command.getTaskID();
+		String label = command.getLabelName().toUpperCase();
+		int taskId = command.getTaskID();
 		String commandDetails = command.getCommandDetails();
 		boolean isHighPriority = command.isHighPriority();
-	
-		if(!storage.getLabelMap().containsKey(labelName)){
-			return "Label Name cannot be found!";
-		}else if(storage.getLabelMap().get(labelName).size() < taskID ||
-				taskID <=0){
-			return "TaskID to be edit cannot be found! OUT OF RANGE!";
-			
-		}else{
-			storage.getLabelMap().get(labelName).get(taskID - 1).setDetails(commandDetails);
-			storage.getLabelMap().get(labelName).get(taskID - 1).setDateAndTime(command.getDateAndTime());
-			storage.getLabelMap().get(labelName).get(taskID - 1).setHighPriority(isHighPriority);
+		TDTDateAndTime dateAndTime = command.getDateAndTime();
+
+		//edit task from current label
+		if(label.equals("") && taskId != -1) {
+			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
+			if(taskId <= array.size() && command.getTaskID() > 0) {
+				Task task = array.get(taskId - 1);
+				task.setDetails(commandDetails);
+				task.setDateAndTime(dateAndTime);
+				task.setHighPriority(isHighPriority);
+				return "Task edited";
+			} else {
+				return "error. Invalid task number.";
+			}
 		}
-		return "";
+
+		//edit task from specific label
+		if(!label.equals("") && taskId != -1) {
+			if(storage.getLabelMap().containsKey(label)) {
+				ArrayList<Task> array = storage.getLabelMap().get(label);
+				if(taskId <= array.size() && command.getTaskID() > 0) {
+					Task task = array.get(taskId - 1);
+					task.setDetails(commandDetails);
+					task.setDateAndTime(dateAndTime);
+					task.setHighPriority(isHighPriority);
+					return "Task edited";
+				} else {
+					return "error. Invalid task number.";
+				}
+			} else {
+				return "Error. Label does not exist.";
+			}
+		}
+		
+		return "Error. Invalid edit command.";
 	}
 
 	@Override
