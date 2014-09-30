@@ -35,9 +35,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	public static void main(String args[]){
 		
-		TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014 8pm");
-		TDTDateAndTime test2 = new TDTDateAndTime("11/11/2014 9pm");
-		System.out.println(test1.compareTo(test2));
+		TDTDateAndTime test1 = new TDTDateAndTime("on mon to sat");
+		System.out.println(test1.display());
+	
 		
 	}
 	
@@ -47,15 +47,16 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		
 		boolean endTimeDate = false;
 		
-		int currentDay = cal.get(Calendar.DATE);
-		int currentMonth = cal.get(Calendar.MONTH) + 1;
-		int currentYear = cal.get(Calendar.YEAR);
-		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-		//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-		//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
 		
 		for(int a = 0; a < parts.length;a++){
+			int currentDay = cal.get(Calendar.DATE);
+			int currentMonth = cal.get(Calendar.MONTH) + 1;
+			int currentYear = cal.get(Calendar.YEAR);
+			int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+			//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+			//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+			int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
+			
 			if(parts[a].equals("to") || parts[a].equals("till") || 
 					parts[a].equals("by") || parts[a].equals("until") ||
 					parts[a].equals("-") ){
@@ -173,15 +174,21 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					currentMonth = 1; //set to Jan
 					currentYear++;
 				}
+				String toBeAddedDate = Integer.toString(currentDay) + "/" + 
+						Integer.toString(currentMonth) + "/" +
+						Integer.toString(currentYear);
+				
 				if(endTimeDate == true){
+					if(!startDate.equals("null")){
+						if(compareToDate(startDate,toBeAddedDate) == -1){
+							currentDay = currentDay + 7;
+						}
+					}
 					endDate = Integer.toString(currentDay) + "/" + 
-								Integer.toString(currentMonth) + "/" +
-								Integer.toString(currentYear);
-					
-				}else{
-					startDate = Integer.toString(currentDay) + "/" + 
 							Integer.toString(currentMonth) + "/" +
 							Integer.toString(currentYear);
+				}else{
+					startDate = toBeAddedDate;
 				}
 			}
 		}
@@ -203,7 +210,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		return details;
 	}
 	
-	//-------------------------------------------DISPLAY SWEE SWEE-------------------------------
+	//-------------------------------------------DISPLAY------------------------------------------------
 	public String displayDateTime(boolean deadline){
 		String dateAndTimeContents = "";
 		if(deadline == true){
@@ -243,7 +250,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		displayString = displayString + displayDateTime(isDeadline);
 		return displayString;
 	}
-//-------------------------------check if Time valid-------------------------------
+//-------------------------------Time Related Methods------------------------------------------
 	public static boolean isValidTimeRange(String time){
 		String [] timeParts = time.split(":");
 		int hours = Integer.parseInt(timeParts[0]);
@@ -296,7 +303,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		return -1;
 	}
 	
-//-------------------------------check if Date valid-------------------------------
+//-------------------------------Date related methods-------------------------------------
 	public static boolean isValidDateRange(String date) {
 		String [] dateParts = date.split("/");
 		int day = Integer.parseInt(dateParts[0]);
@@ -487,7 +494,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 
 	}
-	
+	//------------------------------------COMPARABLE----------------------------------------
 	@Override
 	public int compareTo(TDTDateAndTime arg0) {
 		String thisDate = "null";
