@@ -204,40 +204,44 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 	
 	//-------------------------------------------DISPLAY SWEE SWEE-------------------------------
-	public void displayDateTime(boolean deadline){
+	public String displayDateTime(boolean deadline){
+		String dateAndTimeContents = "";
 		if(deadline == true){
 			if(!getEndDate().equals("null")){
-				System.out.println("Due Date: " + getEndDate());
+				dateAndTimeContents = dateAndTimeContents + "  Due Date: " + getEndDate();
 			}
 			if(!getEndTime().equals("null")){
-				System.out.println("Due Time: " + getEndTime());
+				dateAndTimeContents = dateAndTimeContents + "  Due Time: " + getEndTime();
 			}
 		}else{
 			if(!getStartDate().equals("null")){
-				System.out.println("Start Date: " + getStartDate());
+				dateAndTimeContents = dateAndTimeContents + "  Start Date: " + getStartDate();
 			}
 			if(!getStartTime().equals("null")){
-				System.out.println("Start Time: " + getStartTime());
+				dateAndTimeContents = dateAndTimeContents + "  Start Time: " + getStartTime();
 			}
 			if(!getEndDate().equals("null")){
-				System.out.println("End Date: " + getEndDate());
+				dateAndTimeContents = dateAndTimeContents + "  End Date: " + getEndDate();
 			}
 			if(!getEndTime().equals("null")){
-				System.out.println("End Time: " + getEndTime());
+				dateAndTimeContents = dateAndTimeContents + "  End Time: " + getEndTime();
 			}
 		}
+		return dateAndTimeContents;
 	}
-	public void display(){
+	public String display(){
 		boolean isDeadline = false;
+		String displayString = "";
 		if(!getStartDate().equals("null") || !getStartTime().equals("null")){
-			System.out.println("(TIMED TASK)");
+			displayString = "(TIMED TASK)";
 		}else if(!getEndDate().equals("null") || !getEndTime().equals("null")){
-			System.out.println("(DEADLINE TASK)");
+			displayString = "(DEADLINE TASK)";
 			isDeadline = true;
 		}else{
-			System.out.println("(FLOATING TASK)");
+			displayString = "(FLOATING TASK)";
 		}
-		displayDateTime(isDeadline);
+		displayString = displayString + displayDateTime(isDeadline);
+		return displayString;
 	}
 //-------------------------------check if Time valid-------------------------------
 	public static boolean isValidTimeRange(String time){
