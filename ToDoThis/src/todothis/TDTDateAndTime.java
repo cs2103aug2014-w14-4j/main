@@ -35,8 +35,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	public static void main(String args[]){
 		
-		TDTDateAndTime test1 = new TDTDateAndTime("on mon to next mon");
-		System.out.println(test1.display());
+		TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
+		TDTDateAndTime test2 = new TDTDateAndTime("9pm");
+		System.out.println(test1.compareTo(test2));
 	
 		
 	}
@@ -347,6 +348,15 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 	
 	public static int compareToDate(String date1, String date2){
+		
+		if(date1.equals("null") && !date2.equals("null")){ //compareddate<thisdate
+			return -1;
+		}else if(date1.equals("null") && date2.equals("null")){
+			return 0;
+		}else if(!date1.equals("null") && date2.equals("null")){
+			return 1;
+		}
+		
 		String [] date1Parts = date1.split("/");
 		String [] date2Parts = date2.split("/");
 		
@@ -496,6 +506,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 
 	}
 	//------------------------------------COMPARABLE----------------------------------------
+	//NEEDS TESTING!
 	@Override
 	public int compareTo(TDTDateAndTime arg0) {
 		String thisDate = "null";
@@ -529,14 +540,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		
 		System.out.println(thisDate);
 		System.out.println(comparedDate);
-		
-		if(thisDate.equals("null") && !comparedDate.equals("null")){ //compareddate<thisdate
-			return 1;
-		}else if(thisDate.equals("null") && comparedDate.equals("null")){
-			return 0;
-		}else if(!thisDate.equals("null") && comparedDate.equals("null")){
-			return -1;
-		}
 		
 		if(compareToDate(thisDate, comparedDate) == 1){ //thisdate<compareddate
 			return -1;
