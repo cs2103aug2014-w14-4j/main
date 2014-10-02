@@ -6,6 +6,10 @@ public class TDTParser implements ITDTParser {
 	private String[] parts;
 	private boolean valid;
 	
+	// anything with !!!  added doesnt appear until reopened.
+	// edit 22 hi 22 cannot work - done
+	// cannot refactor yet 
+	
 	@Override
 	public Command parse(String userCommand) {
 		COMMANDTYPE commandType = COMMANDTYPE.INVALID;
@@ -124,25 +128,9 @@ public class TDTParser implements ITDTParser {
 				// [taskID][commandDetails]
 				if (parts[0].matches("\\d+")) {
 					taskID = Integer.parseInt(parts[0]);
-					remainingWords.replace(parts[0], "");
+					remainingWords = remainingWords.replace(parts[0], "");
 					valid = true;
 					
-					// [label name (able to be more than one word)] [number]
-			/*	} else if (parts.length > 1) {
-					for (int i = 0; i < parts.length; i++) {
-						if (parts[i].matches("\\d+")) {
-							taskID = Integer.parseInt(parts[i]);
-							for (int j = 0; j < i; j++) {
-								labelName += parts[j];
-							}
-							remainingWords = remainingWords.replace(labelName, "");
-							remainingWords = remainingWords.replace(parts[i], "");
-							break;
-						}
-					}
-					valid = true;
-				} 
-			*/
 				// [labelname][taskID][commandDetails]
 				} else if (parts.length > 1) {
 					if (parts[1].matches("\\d+")) {
