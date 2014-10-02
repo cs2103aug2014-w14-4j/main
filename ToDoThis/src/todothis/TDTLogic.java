@@ -25,6 +25,7 @@ public class TDTLogic implements ITDTLogic {
 				storage.getUndoStack().push(storage.copyLabelMap());
 				return doDelete(command);
 			case EDIT :
+				storage.getUndoStack().push(storage.copyLabelMap());
 				return doEdit(command);
 			case LABEL :
 				storage.getUndoStack().push(storage.copyLabelMap());
