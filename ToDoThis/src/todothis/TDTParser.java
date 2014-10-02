@@ -296,11 +296,14 @@ public class TDTParser implements ITDTParser {
 	}
 
 	private static String getFirstWord(String userCommand) {
-		 
-		String userWords = userCommand.substring(0, userCommand.indexOf(" "));
-		userWords = userWords.replaceAll(("\\W"), "");
-		//String userWords = userCommand.trim().split("\\s+")[0];
-		return userWords;
+		if(userCommand.indexOf(" ") == -1) {
+			userCommand = userCommand.replaceAll(("\\W"), "");
+			return userCommand;
+		} else {
+			String userWord = userCommand.substring(0, userCommand.indexOf(" "));
+			userWord = userWord.replaceAll(("\\W"), "");
+			return userWord;
+		}
 	}
 
 }
