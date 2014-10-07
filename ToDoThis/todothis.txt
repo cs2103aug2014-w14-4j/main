@@ -1,0 +1,12 @@
+3
+TODAY
+LATER
+TMR
+TODAY	buy egg	false	false	24/12/12	null	null	null
+TODAY	buy egg	false	true	null	null	23:12	null
+TODAY	buy egg	false	true	null	null	23:12	null
+TODAY	buy egg	false	false	null	null	23:12	null
+TODAY	24/24/12	false	false	null	null	null	null
+TODAY	buy egg 11.6pm	false	false	null	null	null	null
+LATER	hello world	false	false	null	null	null	null
+TMR	labem later	false	false	null	null	null	null

@@ -41,6 +41,8 @@ public class Task implements Comparable<Task> {
 	@Override
 	public int compareTo(Task task) {
 		if (this.isHighPriority && !task.isHighPriority) {
+			return -1;
+		} else if(!this.isHighPriority && task.isHighPriority) {
 			return 1;
 		}
 		else {

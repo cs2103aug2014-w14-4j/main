@@ -1,6 +1,7 @@
 package todothis;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -72,8 +73,18 @@ public class TDTLogic implements ITDTLogic {
 		TDTDateAndTime dnt = command.getDateAndTime();
 		
 		storage.addTask(task);
+		sort(storage.getLabelMap());
 		storage.write();
 		return "Add success";
+	}
+	
+	private void sort(HashMap<String,ArrayList<Task>> hmap) {
+		Iterator<ArrayList<Task>> iter = hmap.values().iterator();
+		while(iter.hasNext()) {
+			ArrayList<Task> next = iter.next();
+			Collections.sort(next);
+			this.renumberTaskID(next);
+		}
 	}
 	
 

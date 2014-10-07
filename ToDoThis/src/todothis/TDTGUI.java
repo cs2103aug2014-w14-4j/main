@@ -81,14 +81,13 @@ public class TDTGUI extends JFrame {
 				Task task = array.get(i);
 				if(!task.isHide()){
 					if(task.isDone()){
-						sb.append("<span color = #606060>");
+						sb.append("<span color = #606060><strike>");
 					} else if(task.isHighPriority()) {
 						sb.append("<span color = \"red\">");
 					}
-					sb.append(task.getDateAndTime().display() + "<br>");
-					sb.append("\t" + task.getTaskID() + ") " + task.getDetails());
-					
-					sb.append("</span><br>");
+					sb.append(task.getTaskID() + ") " + task.getDateAndTime().display() 
+							+ "<br>");
+					sb.append(task.getDetails()+ "</span><br>");
 				}
 			}
 		}
