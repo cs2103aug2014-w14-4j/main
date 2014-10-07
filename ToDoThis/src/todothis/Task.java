@@ -39,9 +39,21 @@ public class Task implements Comparable<Task> {
 
 
 	@Override
-	public int compareTo(Task arg0) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int compareTo(Task task) {
+		if (this.isHighPriority && !task.isHighPriority) {
+			return 1;
+		}
+		else {
+			if (this.getDateAndTime().compareTo(task.getDateAndTime()) == 1) {
+				return 1;
+			}
+			else if (this.getDateAndTime().compareTo(task.getDateAndTime()) == -1) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		}
 	}
 	
 	//------------------Getters & Setters--------------------------------
