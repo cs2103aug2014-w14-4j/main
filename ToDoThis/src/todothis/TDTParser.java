@@ -17,6 +17,7 @@ public class TDTParser implements ITDTParser {
 		String commandDetails = "";
 		int taskID = -1;
 		TDTDateAndTime dateAndTime = new TDTDateAndTime();
+		String dateAndTimeParts = "";
 		
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
@@ -25,6 +26,9 @@ public class TDTParser implements ITDTParser {
 		prepositionWords.add("from");
 		prepositionWords.add("about");
 		prepositionWords.add("to");
+		prepositionWords.add("-");
+		prepositionWords.add("until");
+		prepositionWords.add("till");
 
 		commandType = determineCommandType(getFirstWord(userCommand));
 		String remainingWords = removeFirstWord(userCommand);
@@ -33,10 +37,13 @@ public class TDTParser implements ITDTParser {
 			case ADD :
 				commandDetails = userCommand;
 				isHighPriority = isPriority(commandDetails);
+				if (isHighPriority) {
+					commandDetails.replace("!", "");
+				}
 				parts = commandDetails.split(" ");
+				commandDetails = " ";
 				for (int i = 0; i < parts.length; i++) {
 					String checkWord = parts[i];
-					int end = i;
 					if (TDTDateAndTime.checkDate(checkWord)) {
 						completeDetails = true;
 					} else if (TDTDateAndTime.checkTime(checkWord)) {
@@ -48,15 +55,22 @@ public class TDTParser implements ITDTParser {
 					if (completeDetails) {
 						if (i!=0) {
 							if (prepositionWords.contains(parts[i-1])) {
-								end = i-1;
+								dateAndTimeParts += parts[i-1] + " ";
+								dateAndTimeParts += checkWord + " ";
+							} else {
+								dateAndTimeParts += checkWord + " ";
 							}
-							commandDetails = getCommandDetails(end);
-							remainingWords = getRemainingWords(end);
-							dateAndTime = new TDTDateAndTime(remainingWords);
-							break;
+						} else {
+							dateAndTimeParts += checkWord + " ";
+						}
+						completeDetails = false;
+					} else {
+						if (!prepositionWords.contains(checkWord)) {
+							commandDetails += checkWord + " ";
 						}
 					}
 				}
+				dateAndTime = new TDTDateAndTime(dateAndTimeParts);
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
@@ -109,30 +123,40 @@ public class TDTParser implements ITDTParser {
 					// same as ADD
 					commandDetails = remainingWords.trim();
 					isHighPriority = isPriority(commandDetails);
+					if (isHighPriority) {
+						commandDetails.replace("!", "");
+					}
 					parts = commandDetails.split(" ");
+					commandDetails = " ";
 					for (int i = 0; i < parts.length; i++) {
 						String checkWord = parts[i];
-						int end = i;
 						if (TDTDateAndTime.checkDate(checkWord)) {
 							completeDetails = true;
 						} else if (TDTDateAndTime.checkTime(checkWord)) {
 							completeDetails = true;
-						} else if (TDTDateAndTime.checkDay(checkWord) != 0) {
+						} else if (TDTDateAndTime.checkDay(checkWord)!= 0) {
 							completeDetails = true;
 						}
 						
 						if (completeDetails) {
 							if (i!=0) {
 								if (prepositionWords.contains(parts[i-1])) {
-									end = i-1;
+									dateAndTimeParts += parts[i-1] + " ";
+									dateAndTimeParts += checkWord + " ";
+								} else {
+									dateAndTimeParts += checkWord + " ";
 								}
-								commandDetails = getCommandDetails(end);
-								remainingWords = getRemainingWords(end);
-								dateAndTime = new TDTDateAndTime(remainingWords);
-								break;
+							} else {
+								dateAndTimeParts += checkWord + " ";
+							}
+							completeDetails = false;
+						} else {
+							if (!prepositionWords.contains(checkWord)) {
+								commandDetails += checkWord + " ";
 							}
 						}
 					}
+					dateAndTime = new TDTDateAndTime(dateAndTimeParts);
 				}
 				break;
 			case LABEL :
@@ -223,21 +247,6 @@ public class TDTParser implements ITDTParser {
 	/**
 	 * This function gets the remaining words to be set as the date and time
 	 */
-	public String getRemainingWords(int end) {
-		String remainingWordsTemp = ""; 
-		for (int b = end; b < parts.length; b++) {
-			remainingWordsTemp += (parts[b] + " ");
-		}
-		return remainingWordsTemp.trim();
-	}
-
-	public String getCommandDetails(int end) {
-		String commandDetailsTemp = "";
-		for (int a = 0; a < end; a++) {
-			commandDetailsTemp += (parts[a] + " ");
-		}
-		return commandDetailsTemp.trim();
-	}
 	
 	//By default command is assume to be ADD.
 	private static COMMANDTYPE determineCommandType(String commandTypeString) {
