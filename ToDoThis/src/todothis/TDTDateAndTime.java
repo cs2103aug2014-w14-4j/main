@@ -422,14 +422,15 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			days = 30;
 			break;
 		case 2:
-			if (year % 400 == 0)
+			if (year % 400 == 0){
 				isLeapYear = true;
-			else if (year % 100 == 0)
+			} else if (year % 100 == 0){
 				isLeapYear = false;
-			else if (year % 4 == 0)
+			} else if (year % 4 == 0){
 				isLeapYear = true;
-			else
+			} else {
 				isLeapYear = false;
+			}
 			if (isLeapYear) {
 				days = 29;
 				break;
@@ -595,8 +596,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 	}
 	//------------------------------------CHECK FOR CLASHES-------------------------------
-
-	
+	//NEED TEST
 	public boolean isClash(TDTDateAndTime arg0){
 		if(arg0.isTimedTask() == true){
 			if(!this.getStartDate().equals("null") && !this.getStartTime().equals("null")){
@@ -605,22 +605,75 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 							arg0.getStartTime().equals(this.getStartTime())){
 						return true;
 					}
-				}else{
-					/*
-					String [] startDateParts = this.getStartDate().split("/");
-					int startDateDay = Integer.parseInt(startDateParts[0]);
-					int startDateMonth = Integer.parseInt(startDateParts[1]);
-					int startDateYear = Integer.parseInt(startDateParts[2]);
-					
-					String [] endDateParts = this.getEndDate().split("/");
-					int endDateDay = Integer.parseInt(endDateParts[0]);
-					int endDateMonth = Integer.parseInt(endDateParts[1]);
-					int endDateYear = Integer.parseInt(endDateParts[2]);
-					*/
-					
+				}else if((!this.getEndDate().equals("null") && !this.getEndTime().equals("null")) &&
+						!arg0.getStartDate().equals("null")){
+					//condition where this->has SD ED ST ET and arg0->has SD may have ED may have ST ET
+					if(compareToDate(this.getStartDate(),arg0.getStartDate()) == 1 &&
+							compareToDate(this.getEndDate(),arg0.getStartDate()) == -1){ 
+						// SDate = 8/10/2014 EDate = 11/10/2014 startArgdate = 10/10/2014
+						return true;
+					}else if(compareToDate(this.getStartDate(),arg0.getStartDate()) == 0 &&
+							compareToDate(this.getEndDate(),arg0.getStartDate()) == -1 &&
+							!arg0.getStartTime().equals("null")){
+						// SDate = 8/10/2014 EDate = 11/10/2014 Argdate = 8/10/2014 NEED CHECK TIMING
+						if(compareToTime(this.getStartTime(),arg0.getStartTime()) == 1 ||
+								compareToTime(this.getStartTime(),arg0.getStartTime()) == 0){
+							// Timing SDate 8/10/2014 0800 argdate 8/10/2014 0900/0800
+							return true;
+						}
+					}else if(compareToDate(this.getStartDate(),arg0.getStartDate()) == 1 &&
+							compareToDate(this.getEndDate(),arg0.getStartDate()) == 0 && 
+							!arg0.getStartTime().equals("null")){
+						// SDate = 8/10/2014 EDate = 11/10/2014 Argdate = 11/10/2014 NEED CHECK TIMING
+						if(compareToTime(this.getEndTime(),arg0.getStartTime()) == -1){
+							// Timing EDate 11/10/2014 0800 argdate 11/10/2014 0700
+							return true;
+						}
+					}else if(compareToDate(this.getStartDate(),arg0.getStartDate()) == 0 &&
+							compareToDate(this.getEndDate(),arg0.getStartDate()) == 0 &&
+							!arg0.getStartTime().equals("null")){
+						// SDate = 8/10/2014 EDate = 8/10/2014 Argdate = 8/10/2014 NEED CHECK TIMING
+						if((compareToTime(this.getStartTime(),arg0.getStartTime()) == 1 ||
+								compareToTime(this.getStartTime(),arg0.getStartTime()) == 0) &&
+								compareToTime(this.getEndTime(),arg0.getStartTime()) == -1){
+							//Timing date same sTime = 0900 eTime = 1200 argtime = 1000/0900
+							return true;
+						}
+					}else if(!arg0.getEndDate().equals("null")){
+						if(compareToDate(this.getStartDate(),arg0.getEndDate()) == 1 &&
+							compareToDate(this.getEndDate(),arg0.getEndDate()) == -1){
+							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate = 10/10/2014
+							return true;
+						}else if(compareToDate(this.getStartDate(),arg0.getEndDate()) == 0 &&
+								compareToDate(this.getEndDate(),arg0.getEndDate()) == -1 &&
+								!arg0.getEndTime().equals("null")){
+							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate = 8/10/2014
+							if(compareToTime(this.getStartTime(),arg0.getEndTime()) == 1){
+								//Timing SDate 8/10/2014 0800 argdate 8/10/2014 0900
+								return true;
+							}
+						}else if(compareToDate(this.getStartDate(),arg0.getEndDate()) == 1 &&
+								compareToDate(this.getEndDate(),arg0.getEndDate()) == 0 &&
+								!arg0.getEndTime().equals("null")){
+							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate = 11/10/2014
+							if(compareToTime(this.getEndTime(),arg0.getEndTime()) == -1 ||
+									compareToTime(this.getEndTime(),arg0.getEndTime()) == 0){
+								//Timing EDate 11/10/2014 0800 endargdate 11/10/2014 0700/0800
+								return true;
+							}
+						}else if(compareToDate(this.getStartDate(),arg0.getEndDate()) == 0 &&
+								compareToDate(this.getEndDate(),arg0.getEndDate()) == 0 &&
+								!arg0.getEndTime().equals("null")){
+							// SDate = 8/10/2014 EDate = 8/10/2014 endArgdate = 8/10/2014
+							if(compareToTime(this.getStartTime(),arg0.getEndTime()) == 1 &&
+									(compareToTime(this.getEndTime(),arg0.getEndTime()) == -1 ||
+									compareToTime(this.getEndTime(),arg0.getEndTime()) == 0)){
+								return true;
+							}
+						}
+					}
 				}
 			}
-			
 		}
 		return false;
 	}
