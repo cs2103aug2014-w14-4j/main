@@ -4,22 +4,19 @@ import java.util.ArrayList;
 
 public class TDTParser implements ITDTParser {
 	private String[] parts;
-	private boolean valid;
 	
 	// anything with !!!  added doesnt appear until reopened.
-	// edit 22 hi 22 cannot work - done
-	// cannot refactor yet 
 	
 	@Override
 	public Command parse(String userCommand) {
 		COMMANDTYPE commandType = COMMANDTYPE.INVALID;
 		String labelName = "";
 		boolean isHighPriority = false;
+		boolean completeDetails = false;
+		boolean isValidEdit = false;
 		String commandDetails = "";
 		int taskID = -1;
 		TDTDateAndTime dateAndTime = new TDTDateAndTime();
-		String commandDetailsTemp = "";
-		String remainingWordsTemp = "";
 		
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
@@ -31,179 +28,111 @@ public class TDTParser implements ITDTParser {
 
 		commandType = determineCommandType(getFirstWord(userCommand));
 		String remainingWords = removeFirstWord(userCommand);
+		
 		switch(commandType) {
 			case ADD :
 				commandDetails = userCommand;
-				if (commandDetails.contains("!")) {
-					isHighPriority = true;
-				}
+				isHighPriority = isPriority(commandDetails);
 				parts = commandDetails.split(" ");
 				for (int i = 0; i < parts.length; i++) {
 					String checkWord = parts[i];
 					int end = i;
 					if (TDTDateAndTime.checkDate(checkWord)) {
-						if (i==0) {
-							break;
-						}
-						if (prepositionWords.contains(parts[i-1])) {
-							end = i-1;
-						}
-						for (int a = 0; a < end; a++) {
-							commandDetailsTemp += (parts[a] + " ");
-						}
-						for (int b = end; b < parts.length; b++) {
-							remainingWordsTemp += (parts[b] + " ");
-						}
-						remainingWords = remainingWordsTemp.trim();
-						commandDetails = commandDetailsTemp.trim();
-						dateAndTime = new TDTDateAndTime(remainingWords);
-						break;
+						completeDetails = true;
 					} else if (TDTDateAndTime.checkTime(checkWord)) {
-						if (i==0) {
+						completeDetails = true;
+					} else if (TDTDateAndTime.checkDay(checkWord)!= 0) {
+						completeDetails = true;
+					}
+					
+					if (completeDetails) {
+						if (i!=0) {
+							if (prepositionWords.contains(parts[i-1])) {
+								end = i-1;
+							}
+							commandDetails = getCommandDetails(end);
+							remainingWords = getRemainingWords(end);
+							dateAndTime = new TDTDateAndTime(remainingWords);
 							break;
 						}
-						if (prepositionWords.contains(parts[i-1])) {
-							end = i-1;
-						}
-						for (int a = 0; a < end; a++) {
-							commandDetailsTemp += (parts[a] + " ");
-						}
-						for (int b = end; b < parts.length; b++) {
-							remainingWordsTemp += (parts[b] + " ");
-						}
-						remainingWords = remainingWordsTemp.trim();
-						commandDetails = commandDetailsTemp.trim();
-						dateAndTime = new TDTDateAndTime(remainingWords);
-						break;
-					} else if (TDTDateAndTime.checkDay(checkWord) != 0) {
-						if (i==0) {
-							break;
-						}
-						if (prepositionWords.contains(parts[i-1])) {
-							end = i-1;
-						}
-						for (int a = 0; a < end; a++) {
-							commandDetailsTemp += (parts[a] + " ");
-						}
-						for (int b = end; b < parts.length; b++) {
-							remainingWordsTemp += (parts[b] + " ");
-						}
-						remainingWords = remainingWordsTemp.trim();
-						commandDetails = commandDetailsTemp.trim();
-						dateAndTime = new TDTDateAndTime(remainingWords);
-						break;
 					}
 				}
 				break;
 			case DELETE :
 				parts = remainingWords.split(" ");
-				if (parts.length == 0) {
+				if (!isValidPartsLength()) {
 					break;
 				}
 				// delete [label] / delete [taskID]
 				if (parts.length == 1) {
 					if (parts[0].matches("\\d+")) {
-						taskID = Integer.parseInt(parts[0]);
+						taskID = getTaskID(0);
 					} else {
-						labelName = parts[0];
+						labelName = getLabelName(0);
 					}
 				}
-				// delete [label][taskID] (assumes label to be one word)
+				// delete [label][taskID] or delete [taskID][label] (assumes label to be one word)
 				if (parts.length == 2) {
 					if (parts[1].matches("\\d+")) {
-						taskID = Integer.parseInt(parts[1]);
-						labelName = parts[0];
+						taskID = getTaskID(1);
+						labelName = getLabelName(0);
 					} else {
-						taskID = Integer.parseInt(parts[0]);
-						labelName = parts[1];
+						taskID = getTaskID(0);
+						labelName = getLabelName(1);
 					}
 				}
 				break;
 			case EDIT :
-				valid = false;
 				parts = remainingWords.split(" ");
-				if (parts.length == 0) {
+				if (!isValidPartsLength()) {
 					break;
 				}
 				// [taskID][commandDetails]
 				if (parts[0].matches("\\d+")) {
-					taskID = Integer.parseInt(parts[0]);
-					remainingWords = remainingWords.replace(parts[0], "");
-					valid = true;
-					
+					taskID = getTaskID(0);
+					if (parts.length > 1) {
+						remainingWords = remainingWords.substring(parts[0].length()).trim();
+						isValidEdit = true;
+					}
 				// [labelname][taskID][commandDetails]
 				} else if (parts.length > 1) {
 					if (parts[1].matches("\\d+")) {
-						taskID = Integer.parseInt(parts[1]);
-						labelName = parts[0];
-						remainingWords = remainingWords.replace(labelName, "");
-						remainingWords = remainingWords.replace(parts[1], "");
-						valid = true;
+						taskID = getTaskID(1);
+						labelName = getLabelName(0);
+						remainingWords = remainingWords.substring(parts[0].length()).trim();
+						remainingWords = remainingWords.substring(parts[1].length()).trim();
+						isValidEdit = true;
 					}
 				}
 				
-				if (valid) {
+				if (isValidEdit) {
 					// same as ADD
 					commandDetails = remainingWords.trim();
-					if (commandDetails.contains("!")) {
-						isHighPriority = true;
-					}
+					isHighPriority = isPriority(commandDetails);
 					parts = commandDetails.split(" ");
 					for (int i = 0; i < parts.length; i++) {
 						String checkWord = parts[i];
 						int end = i;
 						if (TDTDateAndTime.checkDate(checkWord)) {
-							if (i==0) {
-								break;
-							}
-							if (prepositionWords.contains(parts[i-1])) {
-								end = i-1;
-							}
-							for (int a = 0; a < end; a++) {
-								commandDetailsTemp += (parts[a] + " ");
-							}
-							for (int b = end; b < parts.length; b++) {
-								remainingWordsTemp += (parts[b] + " ");
-							}
-							remainingWords = remainingWordsTemp.trim();
-							commandDetails = commandDetailsTemp.trim();
-							dateAndTime = new TDTDateAndTime(remainingWords);
-							
+							completeDetails = true;
 						} else if (TDTDateAndTime.checkTime(checkWord)) {
-							if (i==0) {
-								break;
-							}
-							if (prepositionWords.contains(parts[i-1])) {
-								end = i-1;
-							}
-							for (int a = 0; a < end; a++) {
-								commandDetailsTemp += (parts[a] + " ");
-							}
-							for (int b = end; b < parts.length; b++) {
-								remainingWordsTemp += (parts[b] + " ");
-							}
-							remainingWords = remainingWordsTemp.trim();
-							commandDetails = commandDetailsTemp.trim();
-							dateAndTime = new TDTDateAndTime(remainingWords);
+							completeDetails = true;
 						} else if (TDTDateAndTime.checkDay(checkWord) != 0) {
-							if (i==0) {
+							completeDetails = true;
+						}
+						
+						if (completeDetails) {
+							if (i!=0) {
+								if (prepositionWords.contains(parts[i-1])) {
+									end = i-1;
+								}
+								commandDetails = getCommandDetails(end);
+								remainingWords = getRemainingWords(end);
+								dateAndTime = new TDTDateAndTime(remainingWords);
 								break;
 							}
-							if (prepositionWords.contains(parts[i-1])) {
-								end = i-1;
-							}
-							for (int a = 0; a < end; a++) {
-								commandDetailsTemp += (parts[a] + " ");
-							}
-							for (int b = end; b < parts.length; b++) {
-								remainingWordsTemp += (parts[b] + " ");
-							}
-							remainingWords = remainingWordsTemp.trim();
-							commandDetails = commandDetailsTemp.trim();
-							dateAndTime = new TDTDateAndTime(remainingWords);
 						}
 					}
-					commandDetails = remainingWords.trim();
 				}
 				break;
 			case LABEL :
@@ -233,23 +162,23 @@ public class TDTParser implements ITDTParser {
 			case DONE :
 				commandType = COMMANDTYPE.DONE;
 				parts = remainingWords.split(" ");
-				if (parts.length == 0) {
+				if (!isValidPartsLength()) {
 					break;
 				}
 				if (parts.length == 1) {
 					if (parts[0].matches("\\d+")) {
-						taskID = Integer.parseInt(parts[0]);
+						taskID = getTaskID(0);
 					} else {
-						labelName = parts[0];
+						labelName = getLabelName(0);
 					}
 				}
 				if (parts.length == 2) {
 					if (parts[1].matches("\\d+")) {
-						taskID = Integer.parseInt(parts[1]);
-						labelName = parts[0];
+						taskID = getTaskID(1);
+						labelName = getLabelName(0);
 					} else {
-						taskID = Integer.parseInt(parts[0]);
-						labelName = parts[1];	
+						taskID = getTaskID(0);
+						labelName = getLabelName(1);	
 					}
 				}
 				break;
@@ -264,6 +193,52 @@ public class TDTParser implements ITDTParser {
 				isHighPriority);
 	}
 
+	public String getLabelName(int i) {
+		return parts[i];
+	}
+
+	public int getTaskID(int i) {
+		int taskID;
+		taskID = Integer.parseInt(parts[i]);
+		return taskID;
+	}
+
+	private boolean isValidPartsLength() {
+		if(parts.length == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * This function checks if the task added is of priority.
+	 */
+	public boolean isPriority(String commandDetails) {
+		if (commandDetails.contains("!")) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * This function gets the remaining words to be set as the date and time
+	 */
+	public String getRemainingWords(int end) {
+		String remainingWordsTemp = ""; 
+		for (int b = end; b < parts.length; b++) {
+			remainingWordsTemp += (parts[b] + " ");
+		}
+		return remainingWordsTemp.trim();
+	}
+
+	public String getCommandDetails(int end) {
+		String commandDetailsTemp = "";
+		for (int a = 0; a < end; a++) {
+			commandDetailsTemp += (parts[a] + " ");
+		}
+		return commandDetailsTemp.trim();
+	}
+	
 	//By default command is assume to be ADD.
 	private static COMMANDTYPE determineCommandType(String commandTypeString) {
 		if (commandTypeString == null) {

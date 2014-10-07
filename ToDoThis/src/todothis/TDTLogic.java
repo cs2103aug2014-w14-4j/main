@@ -16,22 +16,19 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String executeCommand(Command command) {
+		String feedback = "";
 		storage.getLabelPointerStack().push(storage.getCurrLabel());
+		storage.getUndoStack().push(storage.copyLabelMap());
 		switch(command.getCommandType()) {
 			case ADD :
-				storage.getUndoStack().push(storage.copyLabelMap());
 				return doADD(command);
 			case DELETE :
-				storage.getUndoStack().push(storage.copyLabelMap());
 				return doDelete(command);
 			case EDIT :
-				storage.getUndoStack().push(storage.copyLabelMap());
 				return doEdit(command);
 			case LABEL :
-				storage.getUndoStack().push(storage.copyLabelMap());
 				return doLabel(command);
 			case SORT :
-				storage.getUndoStack().push(storage.copyLabelMap());
 				return doSort(command);
 			case SEARCH :
 				ArrayList<Task> searched = doSearch(command);
@@ -39,19 +36,19 @@ public class TDTLogic implements ITDTLogic {
 				this.printSearch(searched);
 				return "";
 			case HIDE :
-				storage.getUndoStack().push(storage.copyLabelMap());
 				return doHide(command);
 			case UNDO :
 				storage.getLabelPointerStack().pop();
-				String feedback = doUndo(command);
+				storage.getUndoStack().pop();
+				feedback = doUndo(command);
 				storage.write();
 				return feedback;	
 			case DISPLAY :
-				storage.getUndoStack().push(storage.copyLabelMap());
 				return doDisplay(command);
 			case DONE :
-				storage.getUndoStack().push(storage.copyLabelMap());
-				return doDone(command);	
+				feedback = doDone(command);	
+				storage.write();
+				return feedback;
 			default:
 				return "";
 		}

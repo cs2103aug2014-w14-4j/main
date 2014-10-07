@@ -20,11 +20,12 @@ public class TDTParserTest {
 		assertEquals(COMMANDTYPE.ADD,command.getCommandType());
 		assertEquals(testString,command.getCommandDetails());
 		
-		String testString1 = "tmr undo homework at 12.34pm on 22/9/2014";
+		String testString1 = "tmr undo homework at 12.34pm on 22/9/2014!";
 		Command command1 = parser.parse(testString1);
 		
 		assertEquals(COMMANDTYPE.ADD,command1.getCommandType());
 		assertEquals("tmr undo homework",command1.getCommandDetails());
+		assertTrue(command1.isHighPriority());
 	/*	
 		String testDateAndTime = "meet at 313 sommerset on 30-2-2014";
 		Command command2 = parser.parse(testDateAndTime);
