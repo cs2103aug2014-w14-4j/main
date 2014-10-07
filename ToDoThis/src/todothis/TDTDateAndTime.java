@@ -13,11 +13,16 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	private String details = "null";
 	
+	private boolean isTimedTask = false;
+	
 	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 	//constructor
 	public TDTDateAndTime(String dateAndTime_details){
 		details = dateAndTime_details;
 		decodeDetails(dateAndTime_details);
+		if(!getStartDate().equals("null") || !getStartTime().equals("null")){
+			isTimedTask = true;
+		}
 		
 	}
 	public TDTDateAndTime(String startDate, String endDate, String startTime, String endTime){
@@ -36,8 +41,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("9pm");
-		System.out.println(test1.compareTo(test2));
+		TDTDateAndTime test2 = new TDTDateAndTime("11.05pm");
+		System.out.println(test2.display());
 	
 		
 	}
@@ -130,7 +135,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					int temp;
 					temp = Integer.parseInt(timeParts[0]);
 					if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm")){
-						if(temp != 12){
+						if(temp < 12){
 							temp = temp + 12;  //convert to 24hrs format
 						}
 						timeParts[0] = Integer.toString(temp);
@@ -210,6 +215,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 	public String getDetails(){
 		return details;
+	}
+	public boolean isTimedTask(){
+		return isTimedTask;
 	}
 	
 	//-------------------------------------------DISPLAY------------------------------------------------
@@ -308,9 +316,20 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 //-------------------------------Date related methods-------------------------------------
 	public static boolean isValidDateRange(String date) {
 		String [] dateParts = date.split("/");
-		int day = Integer.parseInt(dateParts[0]);
-		int month = Integer.parseInt(dateParts[1]);
-		int year = Integer.parseInt(dateParts[2]);
+		int day, month, year;
+		
+		try{
+			day = Integer.parseInt(dateParts[0]);
+			month = Integer.parseInt(dateParts[1]);
+		}catch(Exception e){
+			return false;
+		}
+		try{
+			year = Integer.parseInt(dateParts[2]);
+		}catch(Exception e){
+			String temp = dateParts[2].replaceAll("[^0-9]", ""); 
+			year = Integer.parseInt(temp);
+		}
 		
 		 if ((year >= 1900) && (year <= 2099)) {
 			 if ((month >= 1) && (month <= 12)) {
@@ -505,6 +524,39 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 
 	}
+	//------------------------------------CHECK FOR CLASHES-------------------------------
+
+	
+	public boolean isClash(TDTDateAndTime arg0){
+		if(arg0.isTimedTask() == true){
+			if(!this.getStartDate().equals("null") && !this.getStartTime().equals("null")){
+				if(this.getEndDate().equals("null") && this.getEndTime().equals("null")){
+					if(arg0.getStartDate().equals(this.getStartDate()) && 
+							arg0.getStartTime().equals(this.getStartTime())){
+						return true;
+					}
+				}else{
+					/*
+					String [] startDateParts = this.getStartDate().split("/");
+					int startDateDay = Integer.parseInt(startDateParts[0]);
+					int startDateMonth = Integer.parseInt(startDateParts[1]);
+					int startDateYear = Integer.parseInt(startDateParts[2]);
+					
+					String [] endDateParts = this.getEndDate().split("/");
+					int endDateDay = Integer.parseInt(endDateParts[0]);
+					int endDateMonth = Integer.parseInt(endDateParts[1]);
+					int endDateYear = Integer.parseInt(endDateParts[2]);
+					
+					*/
+					
+				}
+			}
+			
+		}
+		return false;
+	}
+	
+	
 	//------------------------------------COMPARABLE----------------------------------------
 	//NEEDS TESTING!
 	@Override
@@ -537,9 +589,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}else{
 			comparedTime = arg0.getStartTime();
 		}
-		
-		System.out.println(thisDate);
-		System.out.println(comparedDate);
 		
 		if(compareToDate(thisDate, comparedDate) == 1){ //thisdate<compareddate
 			return -1;
