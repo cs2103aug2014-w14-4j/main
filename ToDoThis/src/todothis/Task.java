@@ -14,9 +14,9 @@ public class Task implements Comparable<Task> {
 		this.setDetails(details);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName);
-		this.setHide(p);
+		this.setHide(false);
 		this.setDone(false);
-		this.setHighPriority(false);
+		this.setHighPriority(p);
 		this.setDateAndTime(dateAndTime);
 	}
 

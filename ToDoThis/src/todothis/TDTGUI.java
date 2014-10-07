@@ -16,6 +16,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JViewport;
+import javax.swing.text.html.HTMLEditorKit;
 
 import todothis.ITDTParser.COMMANDTYPE;
 
@@ -74,20 +75,20 @@ public class TDTGUI extends JFrame {
 		while(labelIter.hasNext()) {
 			String currLabel = labelIter.next();
 			array = storage.getLabelMap().get(currLabel);
-			sb.append("------------------------------------------------------------\n");
-			sb.append(currLabel + ": \n");
+			sb.append("------------------------------------------------------------<br>");
+			sb.append("<span color = \"blue\"><b>" + currLabel + "</b></span>: <br>");
 			for(int i = 0 ; i < array.size(); i++) {
 				Task task = array.get(i);
 				if(!task.isHide()){
-					sb.append("\t" + task.getDateAndTime().display() + "\n");
-					sb.append("\t" + task.getTaskID() + ") " + task.getDetails());
-					if(task.isHighPriority()) {
-						sb.append("\t" + "(!!!!)\n");
-					} 
-					if(task.isDone()) {
-						sb.append("\t" + "(DONE)\n");
+					if(task.isDone()){
+						sb.append("<span color = #606060>");
+					} else if(task.isHighPriority()) {
+						sb.append("<span color = \"red\">");
 					}
-					sb.append("\n\n");
+					sb.append(task.getDateAndTime().display() + "<br>");
+					sb.append("\t" + task.getTaskID() + ") " + task.getDetails());
+					
+					sb.append("</span><br>");
 				}
 			}
 		}
@@ -118,7 +119,7 @@ public class TDTGUI extends JFrame {
 		contentPane.add(scrollPane);
 		scrollPane.setRowHeaderView(taskPane);
 		taskPane.setBackground(Color.CYAN);
-		//taskPane.setEditorKit(new HTMLEditorKit());
+		taskPane.setEditorKit(new HTMLEditorKit());
 		taskPane.setFocusable(false);
 		scrollPane.setFocusable(true);
 		scrollPane.getViewport().setView(taskPane);
