@@ -40,7 +40,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	public static void main(String args[]){
 		
-		TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
+		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
 		TDTDateAndTime test2 = new TDTDateAndTime("11.05pm");
 		System.out.println(test2.display());
 	
@@ -52,7 +52,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		String [] parts = details.toLowerCase().split(" ");
 		
 		boolean endTimeDate = false;
-		
 		
 		for(int a = 0; a < parts.length;a++){
 			int currentDay = cal.get(Calendar.DATE);
@@ -441,7 +440,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 		return days;
 	}
-	//----------------------CHECK FUNCTIONS--------------------------------
+	//----------------------CHECK TIME--------------------------------
+	
 	public static boolean checkTime(String nextWord) {
 		// check time possible cases
 		// 2am 11pm --
@@ -449,50 +449,88 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		// 2:00pm 12:15pm 2.00pm 12.15pm --
 		// 2359 230
 		// 2359pm 230pm -- 
-		String temp = "";
 		// shortest 2am || longest 12:15pm 
 		nextWord = nextWord.toLowerCase();
-		if (nextWord.length() > 2 && nextWord.length() <= 7) {
-			if ((nextWord.substring(nextWord.length()-2, nextWord.length()).equals("am")) || 
-					(nextWord.substring(nextWord.length()-2, nextWord.length()).equals("pm"))) {
-
+		if (isValidTimeLengthRange(nextWord)) {
+			if (isAMorPM(nextWord)) {
 				// eg 2:00pm 12:15pm 2.00pm 12.15pm
-				if(nextWord.length() >4){
-					if ((nextWord.charAt(nextWord.length()-5) == ':') || (nextWord.charAt(nextWord.length()-5) == '.')) {
-						temp = nextWord.replace(nextWord.charAt(nextWord.length()-5) + "", "");
-						temp = temp.substring(0, temp.length()-2);
-						if(temp.matches("\\d+")){
+				if(nextWord.length()>4) {
+					if (isValidTimeTypeAMPM(nextWord)) {
 							return true;
-						}
 					} 
 				}
-				// eg 2359pm 230pm 2am 11pm 
-				// only digits. 2:345pm , 12344pm invalid.
-				if (nextWord.substring(0, nextWord.length()-2).matches("\\d+")) {
+				// eg 2359pm 230pm 2am 11pm - only digits. 2:345pm , 12344pm are invalid.
+				if (isDigits(nextWord.substring(0, nextWord.length()-2))) {
 					return true;
 				}
-
 				// eg 2:00 12:15 2.00
-			} else if (((nextWord.charAt(nextWord.length()-3)) == ':') ||((nextWord.charAt(nextWord.length()-3)) == '.')) {
-
+			} else if (isValidTimeType(nextWord)) {
 				return true;
-
 				// eg 2359 230
 			} else if (((nextWord.length() == 3) || (nextWord.length() == 4)) &&
-						(nextWord.matches("\\d+"))) {
+						(isDigits(nextWord))) {
 				return true;
 			}
 		}
 		return false;
 	}
+	
+	public static boolean isValidTimeLengthRange(String nextWord) {
+		if(nextWord.length() > 2 && nextWord.length() <= 7) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * This function checks if the time input is of am or pm format.
+	 */
+	public static boolean isAMorPM(String nextWord) {
+		if ((nextWord.substring(nextWord.length()-2, nextWord.length()).equals("am")) || 
+				(nextWord.substring(nextWord.length()-2, nextWord.length()).equals("pm"))) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * This function checks if the time input of AM or PM is of valid format
+	 */
+	public static boolean isValidTimeTypeAMPM(String nextWord) {
+		if ((nextWord.charAt(nextWord.length()-5) == ':') || (nextWord.charAt(nextWord.length()-5) == '.')) {
+			String temp = nextWord.replace(nextWord.charAt(nextWord.length()-5) + "", "");
+			temp = temp.substring(0, temp.length()-2);
+			if (isDigits(temp)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * This function checks if the time input (not of AM or PM) is of valid format
+	 * eg 2:00 12:15 2.00
+	 */
+	public static boolean isValidTimeType(String nextWord) {
+		if (((nextWord.charAt(nextWord.length()-3)) == ':') ||((nextWord.charAt(nextWord.length()-3)) == '.')) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean isDigits(String temp) {
+		if(temp.matches("\\d+")) {
+			return true;
+		}
+		return false;
+	}
 
 
+	//---------------------------CHECK DATE------------------------------------------
 	public static boolean checkDate(String nextWord) {
 		if ((nextWord.split("/").length == 3) || (nextWord.split("/").length == 2)) {
 			return true;
 		} else if ((nextWord.split("-").length == 3) || (nextWord.split("-").length == 2)) {
-			return true;
-		} else if ((nextWord.split(".").length == 3) || (nextWord.split(".").length == 2)) {
 			return true;
 		} else if ((nextWord.length() == 6) || (nextWord.length() == 8)) {
 			if (nextWord.matches("\\d+")) {
@@ -524,6 +562,38 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 
 	}
+	
+	public static int checkMonth(String month) {
+
+		if ((month.equalsIgnoreCase("January")) || (month.equalsIgnoreCase("Jan"))) {
+			return 1;
+		} else if ((month.equalsIgnoreCase("February")) || (month.equalsIgnoreCase("Feb"))) {
+			return 2;	
+		} else if ((month.equalsIgnoreCase("March")) || (month.equalsIgnoreCase("Mar"))) {
+			return 3;
+		} else if ((month.equalsIgnoreCase("April")) || (month.equalsIgnoreCase("Apr"))) {
+			return 4;
+		} else if ((month.equalsIgnoreCase("May"))){
+			return 5;
+		} else if ((month.equalsIgnoreCase("June")) || (month.equalsIgnoreCase("Jun"))) {
+			return 6;
+		} else if ((month.equalsIgnoreCase("July")) || (month.equalsIgnoreCase("Jul"))) {
+			return 7;
+		} else if ((month.equalsIgnoreCase("August")) || (month.equalsIgnoreCase("Aug"))) {
+			return 8;
+		} else if ((month.equalsIgnoreCase("September")) || (month.equalsIgnoreCase("Sep")) 
+				|| (month.equalsIgnoreCase("Sept"))) {
+			return 9;
+		} else if ((month.equalsIgnoreCase("October")) || (month.equalsIgnoreCase("Oct"))) {
+			return 10;
+		} else if ((month.equalsIgnoreCase("November")) || (month.equalsIgnoreCase("Nov"))) {
+			return 11;
+		} else if ((month.equalsIgnoreCase("December")) || (month.equalsIgnoreCase("Dec"))) {
+			return 12;
+		} else {
+			return 0;
+		}
+	}
 	//------------------------------------CHECK FOR CLASHES-------------------------------
 
 	
@@ -546,7 +616,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					int endDateDay = Integer.parseInt(endDateParts[0]);
 					int endDateMonth = Integer.parseInt(endDateParts[1]);
 					int endDateYear = Integer.parseInt(endDateParts[2]);
-					
 					*/
 					
 				}
