@@ -35,39 +35,45 @@ public class TDTParser implements ITDTParser {
 		
 		switch(commandType) {
 			case ADD :
-				commandDetails = userCommand;
-				isHighPriority = isPriority(commandDetails);
+				remainingWords = userCommand;
+				isHighPriority = isPriority(remainingWords);
 				if (isHighPriority) {
-					commandDetails.replace("!", "");
+					remainingWords.replace("!", "");
 				}
-				parts = commandDetails.split(" ");
-				commandDetails = " ";
+				parts = remainingWords.split(" ");
+				
 				for (int i = 0; i < parts.length; i++) {
 					String checkWord = parts[i];
 					if (TDTDateAndTime.checkDate(checkWord)) {
 						completeDetails = true;
 					} else if (TDTDateAndTime.checkTime(checkWord)) {
 						completeDetails = true;
-					} else if (TDTDateAndTime.checkDay(checkWord)!= 0) {
+					} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
 						completeDetails = true;
+					} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
+						if (parts[i-1].contains("\\d+")) {
+							if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+")) ) {
+								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
+								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
+								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i+1]);
+								commandDetails = removeDetails(commandDetails, i);
+								checkWord = "";
+								i++;
+							}
+						}
 					}
-					
 					if (completeDetails) {
 						if (i!=0) {
 							if (prepositionWords.contains(parts[i-1])) {
-								dateAndTimeParts += parts[i-1] + " ";
-								dateAndTimeParts += checkWord + " ";
-							} else {
-								dateAndTimeParts += checkWord + " ";
-							}
-						} else {
-							dateAndTimeParts += checkWord + " ";
-						}
+								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
+								commandDetails = removeDetails(commandDetails, i);
+							} 
+								
+						} 
+						dateAndTimeParts = addDetails(dateAndTimeParts, checkWord);
 						completeDetails = false;
 					} else {
-						if (!prepositionWords.contains(checkWord)) {
-							commandDetails += checkWord + " ";
-						}
+						commandDetails = addDetails(commandDetails, checkWord);
 					}
 				}
 				dateAndTime = new TDTDateAndTime(dateAndTimeParts);
@@ -121,12 +127,12 @@ public class TDTParser implements ITDTParser {
 				
 				if (isValidEdit) {
 					// same as ADD
-					commandDetails = remainingWords.trim();
-					isHighPriority = isPriority(commandDetails);
+					remainingWords = remainingWords.trim();
+					isHighPriority = isPriority(remainingWords);
 					if (isHighPriority) {
-						commandDetails.replace("!", "");
+						remainingWords.replace("!", "");
 					}
-					parts = commandDetails.split(" ");
+					parts = remainingWords.split(" ");
 					commandDetails = " ";
 					for (int i = 0; i < parts.length; i++) {
 						String checkWord = parts[i];
@@ -134,26 +140,22 @@ public class TDTParser implements ITDTParser {
 							completeDetails = true;
 						} else if (TDTDateAndTime.checkTime(checkWord)) {
 							completeDetails = true;
-						} else if (TDTDateAndTime.checkDay(checkWord)!= 0) {
+						} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
+							completeDetails = true;
+						} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
 							completeDetails = true;
 						}
-						
 						if (completeDetails) {
 							if (i!=0) {
 								if (prepositionWords.contains(parts[i-1])) {
-									dateAndTimeParts += parts[i-1] + " ";
-									dateAndTimeParts += checkWord + " ";
-								} else {
-									dateAndTimeParts += checkWord + " ";
-								}
-							} else {
-								dateAndTimeParts += checkWord + " ";
-							}
+									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
+									commandDetails = removeDetails(commandDetails, i);
+								} 
+							} 
+							dateAndTimeParts = addDetails(dateAndTimeParts, checkWord);
 							completeDetails = false;
 						} else {
-							if (!prepositionWords.contains(checkWord)) {
-								commandDetails += checkWord + " ";
-							}
+							commandDetails = addDetails(commandDetails, checkWord);
 						}
 					}
 					dateAndTime = new TDTDateAndTime(dateAndTimeParts);
@@ -215,6 +217,17 @@ public class TDTParser implements ITDTParser {
 		}
 		return new Command(commandType, labelName, taskID, commandDetails, dateAndTime,
 				isHighPriority);
+	}
+
+	public String removeDetails(String commandDetails, int i) {
+		int last = commandDetails.length()-(parts[i-1].length());
+		commandDetails = commandDetails.substring(0, last);
+		return commandDetails.trim();
+	}
+
+	public String addDetails(String commandDetails, String checkWord) {
+		commandDetails += " " + checkWord;
+		return commandDetails.trim();
 	}
 
 	public String getLabelName(int i) {
