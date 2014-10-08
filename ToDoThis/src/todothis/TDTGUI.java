@@ -40,7 +40,6 @@ public class TDTGUI extends JFrame {
 	private JPanel contentPane;
 	JLabel taskLabel = new JLabel();
 	JScrollPane scrollPane = new JScrollPane();
-	
 	JViewport vp;
 	
 
@@ -93,6 +92,30 @@ public class TDTGUI extends JFrame {
 		}
 		return sb.toString();
 	}
+
+	private String displaySearch(ArrayList<Task> searched) {
+		Iterator<Task> iter = searched.iterator();
+		StringBuilder res = new StringBuilder();
+		res.append("<b>SEARCH RESULTS:</b><br>");
+		res.append("------------------------------------------------------------<br>");
+		while(iter.hasNext()){
+			Task next = iter.next();
+
+			if(next.isDone()){
+				res.append("<span color = #606060><strike>");
+			} else if(next.isHighPriority()) {
+				res.append("<span color = \"red\">");
+			}
+			res.append("<span color = \"blue\">Label: " + next.getLabelName() 
+					+"       TaskID: "+ next.getTaskID() + "</span><br>");
+			res.append(next.getDateAndTime().display()+ "<br>");
+			res.append(next.getDetails()+ "</span><br>");
+			res.append("------------------------------------------------------------<br>");
+		}
+		return res.toString();
+	}
+	
+	
 
 	/**
 	 * Create the frame.
@@ -152,14 +175,19 @@ public class TDTGUI extends JFrame {
 						commandHistory.add(userCommand);
 						setHistoryPointer(commandHistory.size());
 						commandField.setText("");
+						
 						Command command = parser.parse(userCommand);
-						String feedback = logic.executeCommand(command);
-						taskLabel.setText("Adding task to: " + storage.getCurrLabel());
-						feedbackArea.setText(feedback);
+						
 						if(command.getCommandType() != COMMANDTYPE.SEARCH) {
+							String feedback = logic.executeCommand(command);
+							taskLabel.setText("Adding task to: " + storage.getCurrLabel());
+							feedbackArea.setText(feedback);
 							taskPane.setText(displayTask());
 						} else {
-							taskPane.setText("");
+							ArrayList<Task> searched = logic.doSearch(command);
+							feedbackArea.setText(searched.size() + " result(s) found for \"" 
+									+ command.getCommandDetails() + "\".");
+							taskPane.setText(displaySearch(searched));
 						}
 						break;
 					case KeyEvent.VK_UP :
@@ -210,7 +238,7 @@ public class TDTGUI extends JFrame {
 		try {
 			storage.readInitialise();
 		} catch (Exception e) {
-			e.printStackTrace();
+			return "Unable to create todothis.txt";
 		}
 		return "Todo-This ready!";
 	}

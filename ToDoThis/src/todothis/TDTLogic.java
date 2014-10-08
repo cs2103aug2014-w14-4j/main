@@ -24,17 +24,14 @@ public class TDTLogic implements ITDTLogic {
 			case ADD :
 				return doADD(command);
 			case DELETE :
-				return doDelete(command);
+				feedback = doDelete(command);	
+				storage.write();
+				return feedback;
 			case EDIT :
 				return doEdit(command);
 			case LABEL :
 				return doLabel(command);
-			case SORT :
-				return doSort(command);
 			case SEARCH :
-				ArrayList<Task> searched = doSearch(command);
-				TodoThis.clearScreen();
-				this.printSearch(searched);
 				return "";
 			case HIDE :
 				return doHide(command);
@@ -55,23 +52,18 @@ public class TDTLogic implements ITDTLogic {
 		}
 	}
 	
-	// public Task(int taskID, String labelName, String details, String dueDate,
-	//			String dueTime, boolean p) {
-	//public Command(COMMANDTYPE commandType, String labelName, int taskID,
-	//		String commandDetails, String dueDate, String dueTime, 
-	//		boolean isHighPriority) {
-	/**
-	 *
-	 * @throws Exception 
-	 */
-	@Override
+
 	public String doADD(Command command){
 		String labelName = storage.getCurrLabel();
 		int taskId = storage.getLabelSize(labelName) + 1;
 		Task task = new Task(taskId, labelName, command.getCommandDetails(),
 				command.getDateAndTime(), command.isHighPriority());
 		TDTDateAndTime dnt = command.getDateAndTime();
-		
+		if(TDTDateAndTime.isValidDateRange(dnt.getStartDate())) {
+			
+		} else {
+			//return "Invalid date/time format.";
+		}
 		storage.addTask(task);
 		sort(storage.getLabelMap());
 		storage.write();
@@ -88,7 +80,6 @@ public class TDTLogic implements ITDTLogic {
 	}
 	
 
-	@Override
 	public String doDelete(Command command) {
 		String label = command.getLabelName().toUpperCase();
 		int taskId = command.getTaskID();
@@ -152,19 +143,7 @@ public class TDTLogic implements ITDTLogic {
 		}
 	}
 	
-	private void printSearch(ArrayList<Task> tasks) {
-		System.out.println(tasks.size() + " results found.");
-		System.out.println("--------------------------------------------------");
-		for(int i = 0; i < tasks.size(); i++) {
-			Task task = tasks.get(i);
-			System.out.println(i + 1 + ") Label: " + task.getLabelName() + "\t" +
-			"TaskID: " + task.getTaskID());
-			System.out.println("Details: " + task.getDetails());
-			System.out.println("--------------------------------------------------");
-		}
-	}
 
-	@Override
 	public ArrayList<Task> doSearch(Command command) {
 		boolean found = false;
 		ArrayList<Task> searchedTask = new ArrayList<Task>();
@@ -196,13 +175,8 @@ public class TDTLogic implements ITDTLogic {
 		return searchedTask;
 	}
 
-	@Override
-	public String doSort(Command command) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
+
 	public String doEdit(Command command) {
 		
 		String label = command.getLabelName().toUpperCase();
@@ -246,7 +220,6 @@ public class TDTLogic implements ITDTLogic {
 		return "Error. Invalid edit command.";
 	}
 
-	@Override
 	public String doUndo(Command command) {
 		if(command.getCommandType() != COMMANDTYPE.SEARCH) {
 			if(!storage.getUndoStack().isEmpty()) {
@@ -263,7 +236,6 @@ public class TDTLogic implements ITDTLogic {
 
 	
 
-	@Override
 	public String doDisplay(Command command) {
 		String labelName = command.getLabelName().toUpperCase();
 		Iterator<Task> i;
@@ -289,7 +261,6 @@ public class TDTLogic implements ITDTLogic {
 		return "";
 	}
 
-	@Override
 	public String doHide(Command command) {
 		Iterator <Task> i;
 		String labelName = command.getLabelName().toUpperCase();
@@ -313,7 +284,6 @@ public class TDTLogic implements ITDTLogic {
 	}
 	
 	
-	@Override
 	public String doDone(Command command) {
 		String label = command.getLabelName().toUpperCase();
 		int taskId = command.getTaskID();
@@ -371,7 +341,6 @@ public class TDTLogic implements ITDTLogic {
 	}
 	
 	
-	@Override
 	public String doLabel(Command command) {
 		String[] label = command.getLabelName().toUpperCase().split(" ");
 		
