@@ -30,7 +30,7 @@ public class TDTStorage implements ITDTStorage {
 	
 	
 	@Override
-	public void readInitialise() throws Exception {
+	public void readInitialise() throws IOException {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			int totalLabel = Integer.parseInt(br.readLine());
