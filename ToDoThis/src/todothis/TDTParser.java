@@ -29,6 +29,8 @@ public class TDTParser implements ITDTParser {
 		prepositionWords.add("-");
 		prepositionWords.add("until");
 		prepositionWords.add("till");
+		prepositionWords.add("next");
+		prepositionWords.add("following");
 
 		commandType = determineCommandType(getFirstWord(userCommand));
 		String remainingWords = removeFirstWord(userCommand);
@@ -38,10 +40,9 @@ public class TDTParser implements ITDTParser {
 				remainingWords = userCommand;
 				isHighPriority = isPriority(remainingWords);
 				if (isHighPriority) {
-					remainingWords.replace("!", "");
+					remainingWords = remainingWords.replace("!", "");
 				}
 				parts = remainingWords.split(" ");
-				
 				for (int i = 0; i < parts.length; i++) {
 					String checkWord = parts[i];
 					if (TDTDateAndTime.checkDate(checkWord)) {
@@ -51,8 +52,8 @@ public class TDTParser implements ITDTParser {
 					} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
 						completeDetails = true;
 					} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
-						if (parts[i-1].contains("\\d+")) {
-							if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+")) ) {
+						if ((i>0) && parts[i-1].contains("\\d+")) {
+							if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
 								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
 								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
 								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i+1]);
@@ -62,8 +63,9 @@ public class TDTParser implements ITDTParser {
 							}
 						}
 					}
+
 					if (completeDetails) {
-						if (i!=0) {
+						if (i>0) {
 							if (prepositionWords.contains(parts[i-1])) {
 								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
 								commandDetails = removeDetails(commandDetails, i);
@@ -133,7 +135,6 @@ public class TDTParser implements ITDTParser {
 						remainingWords.replace("!", "");
 					}
 					parts = remainingWords.split(" ");
-					commandDetails = " ";
 					for (int i = 0; i < parts.length; i++) {
 						String checkWord = parts[i];
 						if (TDTDateAndTime.checkDate(checkWord)) {
@@ -143,14 +144,25 @@ public class TDTParser implements ITDTParser {
 						} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
 							completeDetails = true;
 						} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
-							completeDetails = true;
+							if ((i>0) && parts[i-1].contains("\\d+")) {
+								if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
+									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
+									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
+									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i+1]);
+									commandDetails = removeDetails(commandDetails, i);
+									checkWord = "";
+									i++;
+								}
+							}
 						}
+
 						if (completeDetails) {
-							if (i!=0) {
+							if (i>0) {
 								if (prepositionWords.contains(parts[i-1])) {
 									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
 									commandDetails = removeDetails(commandDetails, i);
 								} 
+									
 							} 
 							dateAndTimeParts = addDetails(dateAndTimeParts, checkWord);
 							completeDetails = false;
