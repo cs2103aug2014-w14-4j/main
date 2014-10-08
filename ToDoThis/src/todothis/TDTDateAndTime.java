@@ -41,7 +41,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("12/12/12.");
+		TDTDateAndTime test2 = new TDTDateAndTime("11/11/2014.");
 		System.out.println(test2.display());
 	
 		
@@ -62,13 +62,14 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
 			int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
 			
+			parts[a] = parts[a].replaceAll("[.!,]", "");
+
 			if(parts[a].equals("to") || parts[a].equals("till") || 
 					parts[a].equals("by") || parts[a].equals("until") ||
 					parts[a].equals("-") ){
 				endTimeDate = true;
 			}
 			if(checkDate(parts[a])){
-				parts[a] = parts[a].replaceAll("[.!]", "");
 				String [] dateParts = new String[3];
 	 			String [] datePartsTemp = null;
 				// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
@@ -123,7 +124,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 							}else{
 								timeParts[0] = parts[a].substring(0, 2);
 								timeParts[1] = parts[a].substring(3, 5);
-								
 							}
 						}
 					}
@@ -326,14 +326,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		try{
 			day = Integer.parseInt(dateParts[0]);
 			month = Integer.parseInt(dateParts[1]);
-		}catch(Exception e){
-			return false;
-		}
-		try{
 			year = Integer.parseInt(dateParts[2]);
 		}catch(Exception e){
-			String temp = dateParts[2].replaceAll("[.!]", ""); 
-			year = Integer.parseInt(temp);
+			return false;
 		}
 		
 		 if ((year >= 1900) && (year <= 2099)) {
@@ -457,6 +452,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		// 2359 230
 		// 2359pm 230pm -- 
 		// shortest 2am || longest 12:15pm 
+		nextWord = nextWord.replaceAll("[.!,]", "");
 		nextWord = nextWord.toLowerCase();
 		if (isValidTimeLengthRange(nextWord)) {
 			if (isAMorPM(nextWord)) {
@@ -535,7 +531,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 
 	//---------------------------CHECK DATE------------------------------------------
 	public static boolean checkDate(String nextWord) {
-		nextWord = nextWord.replaceAll("[.!]", "");
+		nextWord = nextWord.replaceAll("[.!,]", "");
 		
 		if ((nextWord.split("/").length == 3) || (nextWord.split("/").length == 2)) {
 			return true;
