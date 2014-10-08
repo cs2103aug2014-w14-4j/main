@@ -70,7 +70,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			if(checkDate(parts[a])){
 				String [] dateParts = new String[3];
 	 			String [] datePartsTemp = null;
-				// 9/12, 9/12/2014, 8-11, 8-11-2015
+				// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
 				if ((parts[a].split("/").length == 3) || (parts[a].split("/").length == 2)) {
 					datePartsTemp = parts[a].split("/");
 				} else if ((parts[a].split("-").length == 3) || (parts[a].split("-").length == 2)) {
@@ -97,6 +97,10 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					}else{
 						dateParts = datePartsTemp;
 					}
+					if(datePartsTemp[2].length() == 2){
+						dateParts[2] = "20" + datePartsTemp[2];
+					}
+				
 				}
 		
 				if(endTimeDate == true){
