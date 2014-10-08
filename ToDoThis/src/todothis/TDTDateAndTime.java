@@ -41,7 +41,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("11.05pm");
+		TDTDateAndTime test2 = new TDTDateAndTime("12/12/12.");
 		System.out.println(test2.display());
 	
 		
@@ -68,6 +68,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				endTimeDate = true;
 			}
 			if(checkDate(parts[a])){
+				parts[a] = parts[a].replaceAll("[.!]", "");
 				String [] dateParts = new String[3];
 	 			String [] datePartsTemp = null;
 				// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
@@ -84,7 +85,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					dateParts[1] = parts[a].substring(2, 4);
 					if(parts[a].length() == 6){
 						dateParts[2] = "20" + parts[a].substring(4, 6); //valid year 2014-2099
-					}else{
+					}else if(parts[a].length() == 8){
 						dateParts[2] = parts[a].substring(4, 8);
 					}
 				}
@@ -97,12 +98,13 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					}else{
 						dateParts = datePartsTemp;
 					}
-					if(datePartsTemp[2].length() == 2){
-						dateParts[2] = "20" + datePartsTemp[2];
+					if(datePartsTemp.length == 3){
+						if(datePartsTemp[2].length() == 2){
+							dateParts[2] = "20" + datePartsTemp[2];
+						}
 					}
-				
 				}
-		
+
 				if(endTimeDate == true){
 					endDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
 				}else{
@@ -330,7 +332,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		try{
 			year = Integer.parseInt(dateParts[2]);
 		}catch(Exception e){
-			String temp = dateParts[2].replaceAll("[^0-9]", ""); 
+			String temp = dateParts[2].replaceAll("[.!]", ""); 
 			year = Integer.parseInt(temp);
 		}
 		
@@ -533,6 +535,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 
 	//---------------------------CHECK DATE------------------------------------------
 	public static boolean checkDate(String nextWord) {
+		nextWord = nextWord.replaceAll("[.!]", "");
+		
 		if ((nextWord.split("/").length == 3) || (nextWord.split("/").length == 2)) {
 			return true;
 		} else if ((nextWord.split("-").length == 3) || (nextWord.split("-").length == 2)) {
