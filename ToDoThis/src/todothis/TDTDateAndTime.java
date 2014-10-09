@@ -3,6 +3,7 @@ package todothis;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+
 public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	//store converted date format dd/mm/yyyy
 	private String startDate = "null";
@@ -14,6 +15,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	private String details = "null";
 	
 	private boolean isTimedTask = false;
+	
+	//private Logger logger = Logger.getLogger("TDTDateAndTime");
+
 	
 	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 	//constructor
@@ -41,7 +45,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("11/11/2014.");
+		TDTDateAndTime test2 = new TDTDateAndTime("11/11/2014");
 		System.out.println(test2.display());
 	
 		
@@ -267,6 +271,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 //-------------------------------Time Related Methods------------------------------------------
 	public static boolean isValidTimeRange(String time){
+		if(time.equals("null")){
+			return true;
+		}
 		String [] timeParts = time.split(":");
 		int hours = Integer.parseInt(timeParts[0]);
 		int minutes = Integer.parseInt(timeParts[1]);
@@ -322,6 +329,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static boolean isValidDateRange(String date) {
 		String [] dateParts = date.split("/");
 		int day, month, year;
+		if(date.equals("null")){
+			return true;
+		}
 		
 		try{
 			day = Integer.parseInt(dateParts[0]);
@@ -330,6 +340,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}catch(Exception e){
 			return false;
 		}
+		
 		
 		 if ((year >= 1900) && (year <= 2099)) {
 			 if ((month >= 1) && (month <= 12)) {

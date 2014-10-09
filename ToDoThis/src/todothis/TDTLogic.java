@@ -59,15 +59,18 @@ public class TDTLogic implements ITDTLogic {
 		Task task = new Task(taskId, labelName, command.getCommandDetails(),
 				command.getDateAndTime(), command.isHighPriority());
 		TDTDateAndTime dnt = command.getDateAndTime();
-		if(TDTDateAndTime.isValidDateRange(dnt.getStartDate())) {
-			
+		if(TDTDateAndTime.isValidDateRange(dnt.getStartDate()) && 
+				TDTDateAndTime.isValidDateRange(dnt.getEndDate()) &&
+				TDTDateAndTime.isValidTimeRange(dnt.getStartTime()) &&
+				TDTDateAndTime.isValidTimeRange(dnt.getEndTime())) {
+			storage.addTask(task);
+			sort(storage.getLabelMap());
+			storage.write();
+			return "Add success";
 		} else {
-			//return "Invalid date/time format.";
+			return "Invalid date/time format.";
 		}
-		storage.addTask(task);
-		sort(storage.getLabelMap());
-		storage.write();
-		return "Add success";
+
 	}
 	
 	private void sort(HashMap<String,ArrayList<Task>> hmap) {
