@@ -45,7 +45,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("11/11/2014");
+		TDTDateAndTime test2 = new TDTDateAndTime("by 2moro");
 		System.out.println(test2.display());
 	
 		
@@ -173,10 +173,16 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				}
 			}else if(checkDay(parts[a]) != 0){
 				int numOfDaysToAdd = 0;
-				if(checkDay(parts[a]) <= currentDayOfWeek){
-					numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
-				}else{
-					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+				if(checkDay(parts[a]) <= 7 && checkDay(parts[a]) > 0){
+					if(checkDay(parts[a]) <= currentDayOfWeek){
+						numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
+					}else{
+						numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+					}
+				}else if (checkDay(parts[a]) == 8){
+					//numofdaystoadd already 0;
+				}else if (checkDay(parts[a]) == 9){
+					numOfDaysToAdd++;
 				}
 				
 				if((currentDay + numOfDaysToAdd) > numOfDaysCurrentMonth){
@@ -557,7 +563,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 
 	public static int checkDay(String day) {
-		if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
+		if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
+			return 1;
+		}else if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
 			return 2;
 		} else if ((day.equalsIgnoreCase("Tuesday")) || (day.equalsIgnoreCase("Tue")) 
 				|| (day.equalsIgnoreCase("Tues"))) {
@@ -571,8 +579,12 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			return 6;
 		} else if ((day.equalsIgnoreCase("Saturday")) || (day.equalsIgnoreCase("Sat"))) {
 			return 7;
-		} else if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
-			return 1;
+		} else if ((day.equalsIgnoreCase("Today")) || (day.equalsIgnoreCase("Tdy"))) {
+			return 8;
+		} else if ((day.equalsIgnoreCase("Tomorrow")) || (day.equalsIgnoreCase("Tml"))
+				|| (day.equalsIgnoreCase("Tmw")) || (day.equalsIgnoreCase("Tmr")) 
+				|| (day.equalsIgnoreCase("2moro"))) {
+			return 9;
 		} else {
 			return 0;
 		}
