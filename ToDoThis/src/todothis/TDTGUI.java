@@ -84,9 +84,9 @@ public class TDTGUI extends JFrame {
 					} else if(task.isHighPriority()) {
 						sb.append("<span color = \"red\">");
 					}
-					sb.append(task.getTaskID() + ") " + task.getDateAndTime().display() 
+					sb.append("[" + task.getTaskID() + "] " + task.getDateAndTime().display() 
 							+ "<br>");
-					sb.append(task.getDetails()+ "</span><br>");
+					sb.append(task.getDetails()+ "</span><br><br>");
 				}
 			}
 		}
@@ -127,67 +127,97 @@ public class TDTGUI extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		
+		//commandLabel
 		commandLabel.setBounds(10, 11, 576, 14);
+		commandLabel.setFocusable(false);
 		contentPane.add(commandLabel);
-		
-		
-		
-		
+
 		//SCROLL PANE
-		
-		
 		scrollPane.setBounds(10, 58, 576, 353);
-		contentPane.add(scrollPane);
 		scrollPane.setRowHeaderView(taskPane);
+		scrollPane.setFocusable(true);
+		scrollPane.getViewport().setView(taskPane);
+		contentPane.add(scrollPane);
+		
+		//Task Pane
 		taskPane.setBackground(Color.CYAN);
 		taskPane.setEditorKit(new HTMLEditorKit());
 		taskPane.setFocusable(false);
-		scrollPane.setFocusable(true);
-		scrollPane.getViewport().setView(taskPane);
 		taskPane.setEditable(false);
+		
+		//Feedback Area
 		feedbackArea.setEditable(false);
-		
 		feedbackArea.setFocusable(false);
-		commandLabel.setFocusable(false);
 		feedbackArea.setBounds(10, 422, 576, 128);
-		
 		contentPane.add(feedbackArea);
 		
-		
+		//Command Field
 		commandField.setBounds(64, 8, 521, 20);
-		contentPane.add(commandField);
 		commandField.setColumns(10);
 		commandField.setFocusable(true);
+		contentPane.add(commandField);
 		
-		
+		//Task Label
 		taskLabel.setBounds(10, 36, 319, 14);
-		
 		contentPane.add(taskLabel);
+		
+		//Listerners
+		
+		scrollPane.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				int keyCode = arg0.getKeyCode();
+				if(arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
+					String feedback = logic.doUndo();
+					updateGUI(feedback, displayTask());
+				} 
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
 		commandField.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				int keyCode = arg0.getKeyCode();
-				switch(keyCode) {
+				if(arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
+					String feedback = logic.doUndo();
+					updateGUI(feedback, displayTask());
+				} 
+				
+				if(arg0.isControlDown() && keyCode == KeyEvent.VK_UP) {
+					
+				} else {
+					switch(keyCode) {
 					case KeyEvent.VK_ENTER :
 						userCommand = commandField.getText();
 						commandHistory.add(userCommand);
 						setHistoryPointer(commandHistory.size());
 						commandField.setText("");
-						
+
 						Command command = parser.parse(userCommand);
-						
+
 						if(command.getCommandType() != COMMANDTYPE.SEARCH) {
 							String feedback = logic.executeCommand(command);
-							taskLabel.setText("Adding task to: " + storage.getCurrLabel());
-							feedbackArea.setText(feedback);
-							taskPane.setText(displayTask());
+							updateGUI(feedback, displayTask());
 						} else {
 							ArrayList<Task> searched = logic.doSearch(command);
-							feedbackArea.setText(searched.size() + " result(s) found for \"" 
-									+ command.getCommandDetails() + "\".");
-							taskPane.setText(displaySearch(searched));
+							String feedback = searched.size() + " result(s) found for \"" 
+									+ command.getCommandDetails() + "\".";
+							updateGUI(feedback, displaySearch(searched));
 						}
 						break;
 					case KeyEvent.VK_UP :
@@ -208,9 +238,10 @@ public class TDTGUI extends JFrame {
 							commandField.setText(commandHistory.get(historyPointer));
 						}
 						break;
-					
+
 					default :
 						break;
+					}
 				}
 				
 			}
@@ -228,6 +259,12 @@ public class TDTGUI extends JFrame {
 			}
 			
 		});
+	}
+	
+	private void updateGUI(String feedback, String text) {
+		taskLabel.setText("Adding task to: " + storage.getCurrLabel());
+		feedbackArea.setText(feedback);
+		taskPane.setText(text);
 	}
 	
 	private String doInit() {

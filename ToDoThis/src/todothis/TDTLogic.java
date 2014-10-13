@@ -38,7 +38,7 @@ public class TDTLogic implements ITDTLogic {
 			case UNDO :
 				storage.getLabelPointerStack().pop();
 				storage.getUndoStack().pop();
-				feedback = doUndo(command);
+				feedback = doUndo();
 				storage.write();
 				return feedback;	
 			case DISPLAY :
@@ -223,17 +223,13 @@ public class TDTLogic implements ITDTLogic {
 		return "Error. Invalid edit command.";
 	}
 
-	public String doUndo(Command command) {
-		if(command.getCommandType() != COMMANDTYPE.SEARCH) {
-			if(!storage.getUndoStack().isEmpty()) {
-				storage.setLabelMap(storage.getUndoStack().pop());
-				storage.setCurrLabel(storage.getLabelPointerStack().pop());
-				return "Undo success!";
-			} else {
-				return "No command to undo.";
-			}
+	public String doUndo() {
+		if(!storage.getUndoStack().isEmpty()) {
+			storage.setLabelMap(storage.getUndoStack().pop());
+			storage.setCurrLabel(storage.getLabelPointerStack().pop());
+			return "Undo success!";
 		} else {
-			return "";
+			return "No command to undo.";
 		}
 	}
 
@@ -353,17 +349,15 @@ public class TDTLogic implements ITDTLogic {
 		
 		if(storage.getLabelMap().containsKey(label[0])) {
 			storage.setCurrLabel(label[0]);
+			return "Current label changed.";
 		} else if(label[0].equals("") || label[0].matches("\\d+")) {
-			return "Error. Invalid label name.";
+			return "Error. Label name cannot be blank or digits only.";
 		} else {
 			storage.getLabelMap().put(label[0], new ArrayList<Task>());
 			storage.setCurrLabel(label[0]);
 			storage.write();
 			return "Label created";
 		}
-		
-		//Shouldnt reach here
-		return "Invalid Label command.";
 	}
 
 }
