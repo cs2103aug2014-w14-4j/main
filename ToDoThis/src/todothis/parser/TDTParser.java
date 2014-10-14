@@ -109,7 +109,7 @@ public class TDTParser implements ITDTParser {
 		} else if (commandTypeString.equalsIgnoreCase("done")) {
 			return COMMANDTYPE.DONE;
 		} else if (commandTypeString.equalsIgnoreCase("redo")) {
-			return COMMANDTYPE.REDO;
+			return COMMANDTYPE.SORT;
 		} else {
 			return COMMANDTYPE.ADD;
 		}
