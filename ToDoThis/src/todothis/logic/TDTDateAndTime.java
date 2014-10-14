@@ -49,14 +49,14 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("by 12 aug 2014");
+		TDTDateAndTime test2 = new TDTDateAndTime("by 12~aug~14000");
 		System.out.println(test2.display());
 	
 		
 	}
 	
 	public void decodeDetails(String details){
-		
+		System.out.println(details);
 		String [] parts = details.toLowerCase().split(" ");
 		
 		boolean endTimeDate = false;
@@ -252,12 +252,18 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				}
 			}else if(checkMonth(parts[a].replaceAll("[0-9~]", "")) != 0){
 				String[] tempParts = parts[a].split("~");
+				
 				int day = Integer.parseInt(tempParts[0]);
 				int month = checkMonth(tempParts[1]);
-				if(tempParts[2].length() == 2){
-					tempParts[2] = "20" + tempParts[2];
+				int year = 0;
+				if(tempParts.length == 3){
+					if(tempParts[2].length() == 2){
+						tempParts[2] = "20" + tempParts[2];
+					}
+					year = Integer.parseInt(tempParts[2]);
+				}else{
+					year = currentYear;
 				}
-				int year = Integer.parseInt(tempParts[2]);
 				
 				if(endTimeDate == true){
 					endDate = day + "/" + month + "/" + year;

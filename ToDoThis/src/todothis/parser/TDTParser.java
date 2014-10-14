@@ -345,8 +345,8 @@ public class TDTParser implements ITDTParser {
 			dateAndTimeParts += " "+parts[i-1] + "~"+ parts[i];
 			if ((i+1 < parts.length) && (parts[i+1].matches("\\d+"))) {
 				dateAndTimeParts += "~"+ parts[i+1];
-				setCommandDetails(removeDetails(getCommandDetails(), i));
 			}
+			setCommandDetails(removeDetails(getCommandDetails(), i));
 		}
 	}
 	
