@@ -11,6 +11,7 @@ public class UndoCommand extends Command {
 
 	@Override
 	public String execute(TDTStorage storage) {
+		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
 		storage.getRedoStack().push(storage.getUndoStack().pop());
 		storage.getRedoLabelPointerStack().push(storage.getLabelPointerStack().pop());
 		if(!storage.getUndoStack().isEmpty()) {

@@ -16,25 +16,35 @@ public class HideCommand extends Command {
 
 	@Override
 	public String execute(TDTStorage storage) {
-		Iterator <Task> i;
-		String labelName = getLabelName().toUpperCase();
+		String[] labelNames = getLabelName().split(" ");
+		Iterator<Task> iter;
 
-		if(labelName.equals("")){
-			i = storage.getTaskIterator();
-			while(i.hasNext()){
-				i.next().setHide(true);
+		if(labelNames[0].equals("")){
+			iter = storage.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				temp.setHide(true);
 			}
-		}else{
-			if(storage.getLabelMap().containsKey(labelName)){
-				i = storage.getLabelMap().get(labelName).iterator();
-				while(i.hasNext()){
-					i.next().setHide(true);
+		}else {
+			iter = storage.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				if(containInArray(temp.getLabelName(), labelNames)){
+					temp.setHide(true);
 				}
-			}else{
-				return "Label name cannot be found!";
 			}
 		}
+		
 		return "";
+	}
+	
+	private static boolean containInArray(String label, String[] labelNames) {
+		for(int i = 0; i < labelNames.length; i++) {
+			if(labelNames[i].toUpperCase().equals(label)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public String getLabelName() {

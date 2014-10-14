@@ -16,28 +16,37 @@ public class DisplayCommand extends Command {
 
 	@Override
 	public String execute(TDTStorage storage) {
-		String labelName = getLabelName().toUpperCase();
-		Iterator<Task> i;
-		if(labelName.equals("")){
-			i = storage.getTaskIterator();
-			while(i.hasNext()){
-				Task temp = i.next();
+		String[] labelNames = getLabelName().split(" ");
+		Iterator<Task> iter;
+
+		if(labelNames[0].equals("")){
+			iter = storage.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
 				temp.setHide(false);
 			}
-		}else if(storage.getLabelMap().containsKey(labelName)){
-			i = storage.getTaskIterator();
-			while(i.hasNext()){
-				Task temp = i.next();
-				if(temp.getLabelName().equals(labelName)){
+		}else {
+			iter = storage.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				if(containInArray(temp.getLabelName(), labelNames)){
 					temp.setHide(false);
 				}else{
 					temp.setHide(true);
 				}
 			}
-		}else{
-			return "Display command invalid!";
 		}
+		
 		return "";
+	}
+
+	private static boolean containInArray(String label, String[] labelNames) {
+		for(int i = 0; i < labelNames.length; i++) {
+			if(labelNames[i].toUpperCase().equals(label)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public String getLabelName() {
