@@ -34,6 +34,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		this.endDate = endDate;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		if(!getStartDate().equals("null") || !getStartTime().equals("null")){
+			isTimedTask = true;
+		}
 	}
 	public TDTDateAndTime(){
 		this.startDate = "null";
