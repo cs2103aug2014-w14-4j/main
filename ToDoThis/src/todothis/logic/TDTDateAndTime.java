@@ -56,6 +56,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		String [] parts = details.toLowerCase().split(" ");
 		
 		boolean endTimeDate = false;
+		int thisOrNextOrFollowing = 0; //this = 1 next = 2 following = 3
 		
 		for(int a = 0; a < parts.length;a++){
 			int currentDay = cal.get(Calendar.DATE);
@@ -73,6 +74,15 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					parts[a].equals("-") ){
 				endTimeDate = true;
 			}
+			
+			if(parts[a].equals("this")){
+				thisOrNextOrFollowing = 1;
+			}else if(parts[a].equals("next")){
+				thisOrNextOrFollowing = 2;
+			}else if(parts[a].equals("following")){
+				thisOrNextOrFollowing = 3;
+			}
+			
 			if(checkDate(parts[a])){
 				String [] dateParts = new String[3];
 	 			String [] datePartsTemp = null;
@@ -174,10 +184,26 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			}else if(checkDay(parts[a]) != 0){
 				int numOfDaysToAdd = 0;
 				if(checkDay(parts[a]) <= 7 && checkDay(parts[a]) > 0){
-					if(checkDay(parts[a]) <= currentDayOfWeek){
-						numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
-					}else{
-						numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+					if(thisOrNextOrFollowing == 0){ //None of the above
+						if(checkDay(parts[a]) <= currentDayOfWeek){
+							numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
+						}else{
+							numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+						}
+					}else{//this
+						if(checkDay(parts[a]) == 1){//sunday
+							if(currentDayOfWeek != 0){
+								numOfDaysToAdd = 8 - currentDayOfWeek; 
+							}
+						}else{
+							numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+						}
+					}
+					if(thisOrNextOrFollowing == 2){//next
+						numOfDaysToAdd = numOfDaysToAdd + 7;
+						
+					}else if(thisOrNextOrFollowing == 3){//following
+						numOfDaysToAdd = numOfDaysToAdd + 14;
 					}
 				}else if (checkDay(parts[a]) == 8){
 					//numofdaystoadd already 0;
@@ -187,14 +213,22 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				
 				if((currentDay + numOfDaysToAdd) > numOfDaysCurrentMonth){
 					currentMonth++;
+					if(currentMonth > 12){
+						currentMonth = 1; //set to Jan
+						currentYear++;
+					}
 					currentDay = (currentDay + numOfDaysToAdd) - numOfDaysCurrentMonth;
+				}else if((currentDay + numOfDaysToAdd) <= 0){
+					currentMonth--;
+					if(currentMonth <= 0){
+						currentMonth = 12; //set to Dec
+						currentYear--;
+					}
+					currentDay = getNumOfDaysFromMonth(currentMonth, currentYear) + (currentDay + numOfDaysToAdd);
 				}else{
 					currentDay = currentDay + numOfDaysToAdd;
 				}
-				if(currentMonth > 12){
-					currentMonth = 1; //set to Jan
-					currentYear++;
-				}
+				
 				String toBeAddedDate = Integer.toString(currentDay) + "/" + 
 						Integer.toString(currentMonth) + "/" +
 						Integer.toString(currentYear);
