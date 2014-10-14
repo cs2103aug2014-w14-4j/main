@@ -228,14 +228,15 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 						currentMonth = 12; //set to Dec
 						currentYear--;
 					}
-					currentDay = getNumOfDaysFromMonth(currentMonth, currentYear) + (currentDay + numOfDaysToAdd);
+					currentDay = getNumOfDaysFromMonth(currentMonth, currentYear) 
+							+ (currentDay + numOfDaysToAdd);
 				}else{
 					currentDay = currentDay + numOfDaysToAdd;
 				}
 				
-				String toBeAddedDate = Integer.toString(currentDay) + "/" + 
-						Integer.toString(currentMonth) + "/" +
-						Integer.toString(currentYear);
+				String toBeAddedDate = currentDay + "/" 
+										+ currentMonth + "/" 
+											+ currentYear;
 				
 				if(endTimeDate == true){
 					if(!startDate.equals("null")){
@@ -244,9 +245,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 							currentDay = currentDay + 7;
 						}
 					}
-					endDate = Integer.toString(currentDay) + "/" + 
-							Integer.toString(currentMonth) + "/" +
-							Integer.toString(currentYear);
+					endDate = currentDay + "/" 
+								+ currentMonth + "/" 
+								+ currentYear;
 				}else{
 					startDate = toBeAddedDate;
 				}
@@ -256,6 +257,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				int day = Integer.parseInt(tempParts[0]);
 				int month = checkMonth(tempParts[1]);
 				int year = 0;
+				
 				if(tempParts.length == 3){
 					if(tempParts[2].length() == 2){
 						tempParts[2] = "20" + tempParts[2];
@@ -754,6 +756,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 									compareToTime(this.getEndTime(),arg0.getEndTime()) == 0)){
 								return true;
 							}
+						}else if(compareToDate(this.getStartDate(),arg0.getStartDate()) == -1 &&
+								compareToDate(this.getEndDate(),arg0.getEndDate()) == 1){
+							return true;
 						}
 					}
 				}
