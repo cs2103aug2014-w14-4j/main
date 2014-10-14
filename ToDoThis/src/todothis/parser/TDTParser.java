@@ -1,6 +1,8 @@
 package todothis.parser;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import todothis.command.AddCommand;
 import todothis.command.Command;
@@ -19,7 +21,6 @@ public class TDTParser implements ITDTParser {
 	
 	String[] parts;
 	String dateAndTimeParts = "";
-	
 	COMMANDTYPE commandType = COMMANDTYPE.INVALID;
 	String labelName;
 	boolean isHighPriority;
@@ -29,9 +30,12 @@ public class TDTParser implements ITDTParser {
 	int taskID;
 	TDTDateAndTime dateAndTime;
 	ArrayList<String> prepositionWordsArr;
+	
+	private Logger logger = Logger.getLogger("TDTParser");
 
-	@Override
 	public Command parse(String userCommand) {
+		
+		logger.log(Level.INFO, "start parsing");
 		
 		this.setCommandType(COMMANDTYPE.INVALID);
 		this.setLabelName("");
@@ -82,14 +86,16 @@ public class TDTParser implements ITDTParser {
 				//Will not reach here
 				break;
 		}
+		logger.log(Level.INFO, "end of parsing");
+
 		return null;
 	}
 	
 	/**
 	 * This function gets the remaining words to be set as the date and time
+	 * Default command is assumed to be ADD
 	 */
-	
-	//By default command is assume to be ADD.
+
 	private static COMMANDTYPE determineCommandType(String commandTypeString) {
 		if (commandTypeString == null) {
 			return COMMANDTYPE.INVALID;
@@ -130,7 +136,6 @@ public class TDTParser implements ITDTParser {
 			} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
 				completeMonthDetails(i);
 				i++;
-				checkWord = "";
 			} else {
 				setCommandDetails(addDetails(commandDetails, checkWord));
 			}
@@ -199,7 +204,7 @@ public class TDTParser implements ITDTParser {
 					setLabelName(parts[0]);
 				}
 			}
-			// delete [label][taskID] or delete [taskID][label] (assumes label to be one word)
+			// delete [label][taskID] or delete [taskID][label]
 			if (parts.length == 2) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
@@ -213,18 +218,10 @@ public class TDTParser implements ITDTParser {
 	}
 	
 	public void display() {
-		/*
-		String checkHide[] = getRemainingWords().split(" ");
-		setLabelName(checkHide[0]);
-		*/
 		setCommandDetails(getRemainingWords());
 	}
 	
 	public void hide() {
-		/*
-		String checkHide[] = getRemainingWords().split(" ");
-		setLabelName(checkHide[0]);
-		*/
 		setCommandDetails(getRemainingWords());
 	}
 
@@ -346,9 +343,7 @@ public class TDTParser implements ITDTParser {
 	private void completeMonthDetails(int i) {
 		if ((i>0) && parts[i-1].contains("\\d+")) {
 			if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
-				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
-				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
-				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i+1]);
+				dateAndTimeParts = parts[i-1] + "~"+ parts[i] +"~"+ parts[i+1];
 				setCommandDetails(removeDetails(getCommandDetails(), i));
 			}
 		}
