@@ -2,6 +2,7 @@ package todothis.logic;
 
 import java.util.Calendar;
 import java.util.TimeZone;
+//import java.util.logging.Logger;
 
 
 public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
@@ -48,7 +49,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("by 2moro");
+		TDTDateAndTime test2 = new TDTDateAndTime("by 12 aug 2014");
 		System.out.println(test2.display());
 	
 		
@@ -248,6 +249,20 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 							Integer.toString(currentYear);
 				}else{
 					startDate = toBeAddedDate;
+				}
+			}else if(checkMonth(parts[a].replaceAll("[0-9~]", "")) != 0){
+				String[] tempParts = parts[a].split("~");
+				int day = Integer.parseInt(tempParts[0]);
+				int month = checkMonth(tempParts[1]);
+				if(tempParts[2].length() == 2){
+					tempParts[2] = "20" + tempParts[2];
+				}
+				int year = Integer.parseInt(tempParts[2]);
+				
+				if(endTimeDate == true){
+					endDate = day + "/" + month + "/" + year;
+				}else{
+					startDate = day + "/" + month + "/" + year;
 				}
 			}
 		}
@@ -629,7 +644,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 	
 	public static int checkMonth(String month) {
-
 		if ((month.equalsIgnoreCase("January")) || (month.equalsIgnoreCase("Jan"))) {
 			return 1;
 		} else if ((month.equalsIgnoreCase("February")) || (month.equalsIgnoreCase("Feb"))) {
