@@ -17,6 +17,8 @@ import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
 import todothis.logic.TDTDateAndTime;
 
+// somerset 313 how. 313 is time. 
+
 public class TDTParser implements ITDTParser {
 	
 	String[] parts;
@@ -25,18 +27,16 @@ public class TDTParser implements ITDTParser {
 	String labelName;
 	boolean isHighPriority;
 	boolean isValidEdit;
+	boolean isSkipNextWord;
 	String commandDetails;
 	String remainingWords;
 	int taskID;
 	TDTDateAndTime dateAndTime;
 	ArrayList<String> prepositionWordsArr;
-	
 	private Logger logger = Logger.getLogger("TDTParser");
 
 	public Command parse(String userCommand) {
-		
 		logger.log(Level.INFO, "start parsing");
-		
 		this.setCommandType(COMMANDTYPE.INVALID);
 		this.setLabelName("");
 		this.setIsHighPriority(false);
@@ -48,54 +48,49 @@ public class TDTParser implements ITDTParser {
 
 		this.setCommandType(determineCommandType(getFirstWord(userCommand)));
 		this.setRemainingWords(removeFirstWord(userCommand));
-		
 		switch(getCommandType()) {
 			case ADD :
 				add(userCommand);
-				return new AddCommand(labelName, taskID,commandDetails, dateAndTime, 
-						isHighPriority);
+				return new AddCommand(getLabelName(), getTaskID(),getCommandDetails(), getDateAndTime(), 
+						getIsHighPriority());
 			case DELETE :
 				delete();
-				return new DeleteCommand(labelName, taskID);
+				return new DeleteCommand(getLabelName(), getTaskID());
 			case EDIT :
 				edit(userCommand);	
-				return new EditCommand(labelName, taskID,commandDetails, dateAndTime, 
-						isHighPriority);
+				return new EditCommand(getLabelName(), getTaskID(),getCommandDetails(), getDateAndTime(), 
+						getIsHighPriority());
 			case LABEL :
 				label();
-				return new LabelCommand(labelName);
+				return new LabelCommand(getLabelName());
 			case UNDO :
 				return new UndoCommand();
 			case REDO :
 				return new RedoCommand();
 			case SEARCH :
 				search();
-				return new SearchCommand(commandDetails);
+				return new SearchCommand(getCommandDetails());
 			case DISPLAY :
 				display();
-				return new DisplayCommand(commandDetails);
+				return new DisplayCommand(getCommandDetails());
 			case HIDE :
 				hide();
-				return new HideCommand(commandDetails);
+				return new HideCommand(getCommandDetails());
 			case DONE :
 				done();
-				return new DoneCommand(labelName, taskID);
+				return new DoneCommand(getLabelName(), getTaskID());
 			case INVALID :
 				break;
 			default:
-				//Will not reach here
 				break;
 		}
 		logger.log(Level.INFO, "end of parsing");
-
 		return null;
 	}
 	
 	/**
-	 * This function gets the remaining words to be set as the date and time
 	 * Default command is assumed to be ADD
 	 */
-
 	private static COMMANDTYPE determineCommandType(String commandTypeString) {
 		if (commandTypeString == null) {
 			return COMMANDTYPE.INVALID;
@@ -124,6 +119,7 @@ public class TDTParser implements ITDTParser {
 		}
 	}
 	
+//---------------------------------- main command methods -------------------------------------
 	public void add(String userCommand) {
 		this.setRemainingWords(userCommand);
 		isPriority(getRemainingWords());
@@ -134,19 +130,21 @@ public class TDTParser implements ITDTParser {
 					TDTDateAndTime.checkDay(checkWord)!=0) {
 				completeTimeDateDayDetails(i);
 			} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
+				setSkipNextWord(false);
 				completeMonthDetails(i);
-				i++;
+				if (isSkipNextWord()) {
+					i++;
+				}
 			} else {
-				setCommandDetails(addDetails(commandDetails, checkWord));
+				setCommandDetails(getCommandDetails() + " " +checkWord);
 			}
 		}
 		setDateAndTime(new TDTDateAndTime(dateAndTimeParts));
 	}
 	
 	public void done() {
-		parts = remainingWords.split(" ");
+		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			
 			if (parts.length == 1) {
 				if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
@@ -167,9 +165,8 @@ public class TDTParser implements ITDTParser {
 	}
 
 	public void edit(String userCommand) {
-		parts = remainingWords.split(" ");
+		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			
 			// [taskID][commandDetails]
 			if (parts[0].matches("\\d+")) {
 				setTaskID(Integer.parseInt(parts[0]));
@@ -194,7 +191,7 @@ public class TDTParser implements ITDTParser {
 	}
 
 	public void delete() {
-		parts = remainingWords.split(" ");
+		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
 			// delete [label] / delete [taskID]
 			if (parts.length == 1) {
@@ -233,6 +230,7 @@ public class TDTParser implements ITDTParser {
 		setLabelName(getRemainingWords());
 	}
 
+//------------------------------ other methods -----------------------------------------------
 	private static String removeFirstWord(String userCommand) {
 		return userCommand.replaceFirst(getFirstWord(userCommand), "").trim();
 	}
@@ -246,6 +244,91 @@ public class TDTParser implements ITDTParser {
 			userWord = userWord.replaceAll(("\\W"), "");
 			return userWord;
 		}
+	}
+	
+	/**
+	 * This function completes the commandDetails for an input that contains a date format by
+	 * which the month is spelled out.
+	 */
+	private void completeMonthDetails(int i) {
+		if ((i>0) && parts[i-1].matches("\\d+")) {
+			if ((i>1) && getPrepositionWords().contains(parts[i-2])) {
+				removeDetails(getCommandDetails(), i-2);
+			}
+			dateAndTimeParts += " "+parts[i-1] + "~"+ parts[i];
+			if ((i+1 < parts.length) && (parts[i+1].matches("\\d+"))) {
+				dateAndTimeParts += "~"+ parts[i+1];
+				setSkipNextWord(true);
+			}
+			removeDetails(getCommandDetails(), i-1);
+		}
+	}
+	
+	/**
+	 * This function completes the commandDetails for an input that contains a
+	 * date or day or time. 
+	 */
+	private void completeTimeDateDayDetails(int i) {
+		if (i>0) {
+			if (getPrepositionWords().contains(parts[i-1])) {
+				dateAndTimeParts += (" " + parts[i-1]);
+				removeDetails(getCommandDetails(), i-1);
+			} 	
+		} 
+		dateAndTimeParts += (" " + parts[i]);
+	}
+	
+	/**
+	 * This function removes the preposition word from the commandDetails.
+	 */
+	public void removeDetails(String details, int i) {
+		int last = details.length()-(parts[i].length());
+		details = details.substring(0, last);
+		setCommandDetails(details.trim());
+	}
+	
+	private boolean isValidPartsLength() {
+		if (parts.length == 0) {
+			return false;
+		}
+		return true;
+	}
+	
+	private void isPriority(String remainingWordsTemp) {
+		if (remainingWordsTemp.contains("!")) {
+			remainingWordsTemp = remainingWordsTemp.replace("!", "");
+			setIsHighPriority(true);
+		}
+	}
+	
+//--------------------------------- getter and setter -----------------------------------------
+	public ArrayList<String> getPrepositionWords() {
+		return prepositionWordsArr;
+	}
+
+	public void setPrepositionWords() {
+		ArrayList<String> prepositionWords = new ArrayList<String>();
+		prepositionWords.add("on");
+		prepositionWords.add("at");
+		prepositionWords.add("by");
+		prepositionWords.add("from");
+		prepositionWords.add("about");
+		prepositionWords.add("to");
+		prepositionWords.add("-");
+		prepositionWords.add("until");
+		prepositionWords.add("till");
+		prepositionWords.add("next");
+		prepositionWords.add("following");
+		prepositionWords.add("this");
+		this.prepositionWordsArr = prepositionWords;
+	}
+
+	public String getRemainingWords() {
+		return remainingWords;
+	}
+
+	public void setRemainingWords(String remainingWords) {
+		this.remainingWords = remainingWords;
 	}
 
 	public COMMANDTYPE getCommandType() {
@@ -262,13 +345,6 @@ public class TDTParser implements ITDTParser {
 
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
-	}
-
-	private void isPriority(String remainingWordsTemp) {
-		if (remainingWordsTemp.contains("!")) {
-			remainingWordsTemp = remainingWordsTemp.replace("!", "");
-			setIsHighPriority(true);
-		}
 	}
 
 	public boolean getIsHighPriority() {
@@ -310,72 +386,13 @@ public class TDTParser implements ITDTParser {
 	public void setDateAndTime(TDTDateAndTime dateAndTime) {
 		this.dateAndTime = dateAndTime;
 	}
-
-	public ArrayList<String> getPrepositionWords() {
-		return prepositionWordsArr;
-	}
-
-	public void setPrepositionWords() {
-		ArrayList<String> prepositionWords = new ArrayList<String>();
-		prepositionWords.add("on");
-		prepositionWords.add("at");
-		prepositionWords.add("by");
-		prepositionWords.add("from");
-		prepositionWords.add("about");
-		prepositionWords.add("to");
-		prepositionWords.add("-");
-		prepositionWords.add("until");
-		prepositionWords.add("till");
-		prepositionWords.add("next");
-		prepositionWords.add("following");
-		prepositionWords.add("this");
-		this.prepositionWordsArr = prepositionWords;
-	}
-
-	public String getRemainingWords() {
-		return remainingWords;
-	}
-
-	public void setRemainingWords(String remainingWords) {
-		this.remainingWords = remainingWords;
-	}
-
-	private void completeMonthDetails(int i) {
-		if ((i>0) && parts[i-1].matches("\\d+")) {
-			dateAndTimeParts += " "+parts[i-1] + "~"+ parts[i];
-			if ((i+1 < parts.length) && (parts[i+1].matches("\\d+"))) {
-				dateAndTimeParts += "~"+ parts[i+1];
-			}
-			setCommandDetails(removeDetails(getCommandDetails(), i));
-		}
-	}
 	
-	private void completeTimeDateDayDetails(int i) {
-		if (i>0) {
-			if (getPrepositionWords().contains(parts[i-1])) {
-				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
-				setCommandDetails(removeDetails(getCommandDetails(), i));
-			} 	
-		} 
-		dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
+	public boolean isSkipNextWord() {
+		return isSkipNextWord;
 	}
 
-	public String removeDetails(String details, int i) {
-		int last = details.length()-(parts[i-1].length());
-		details = details.substring(0, last);
-		return details.trim();
-	}
-
-	public String addDetails(String details, String checkWord) {
-		details += " " + checkWord;
-		return details.trim();
-	}
-	
-	private boolean isValidPartsLength() {
-		if (parts.length == 0) {
-			return false;
-		}
-		return true;
+	public void setSkipNextWord(boolean isSkipNextWord) {
+		this.isSkipNextWord = isSkipNextWord;
 	}
 
 }
