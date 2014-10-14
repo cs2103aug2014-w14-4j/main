@@ -341,9 +341,10 @@ public class TDTParser implements ITDTParser {
 	}
 
 	private void completeMonthDetails(int i) {
-		if ((i>0) && parts[i-1].contains("\\d+")) {
-			if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
-				dateAndTimeParts = parts[i-1] + "~"+ parts[i] +"~"+ parts[i+1];
+		if ((i>0) && parts[i-1].matches("\\d+")) {
+			dateAndTimeParts += " "+parts[i-1] + "~"+ parts[i];
+			if ((i+1 < parts.length) && (parts[i+1].matches("\\d+"))) {
+				dateAndTimeParts += "~"+ parts[i+1];
 				setCommandDetails(removeDetails(getCommandDetails(), i));
 			}
 		}
