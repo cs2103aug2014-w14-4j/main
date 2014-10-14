@@ -39,7 +39,8 @@ public class TDTParser implements ITDTParser {
 		this.setTaskID(-1);
 		this.setPrepositionWords();
 		dateAndTimeParts = "";
-		
+		setValidEdit(false);
+
 		this.setCommandType(determineCommandType(getFirstWord(userCommand)));
 		this.setRemainingWords(removeFirstWord(userCommand));
 		
@@ -65,10 +66,10 @@ public class TDTParser implements ITDTParser {
 				return new SearchCommand(commandDetails);
 			case DISPLAY :
 				display();
-				return new DisplayCommand(labelName);
+				return new DisplayCommand(commandDetails);
 			case HIDE :
-				display();
-				return new HideCommand(labelName);
+				hide();
+				return new HideCommand(commandDetails);
 			case DONE :
 				done();
 				return new DoneCommand(labelName, taskID);
@@ -79,19 +80,6 @@ public class TDTParser implements ITDTParser {
 				break;
 		}
 		return null;
-	}
-
-	public void display() {
-		String checkHide[] = getRemainingWords().split(" ");
-		setLabelName(checkHide[0]);
-	}
-
-	public void search() {
-		setCommandDetails(getRemainingWords());
-	}
-
-	public void label() {
-		setLabelName(getRemainingWords());
 	}
 	
 	/**
@@ -112,22 +100,21 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.LABEL;
 		} else if (commandTypeString.equalsIgnoreCase("edit")) {
 			return COMMANDTYPE.EDIT;
-		} else if (commandTypeString.equalsIgnoreCase("sort")) {
-			return COMMANDTYPE.SORT;
+		} else if (commandTypeString.equalsIgnoreCase("add")) {
+			return COMMANDTYPE.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("search")) {
 			return COMMANDTYPE.SEARCH;
 		} else if (commandTypeString.equalsIgnoreCase("undo")) {
 			return COMMANDTYPE.UNDO;
 		} else if (commandTypeString.equalsIgnoreCase("done")) {
 			return COMMANDTYPE.DONE;
+		} else if (commandTypeString.equalsIgnoreCase("redo")) {
+			return COMMANDTYPE.REDO;
 		} else {
 			return COMMANDTYPE.ADD;
 		}
 	}
 	
-	/**
-	 * ADD
-	 */
 	public void add(String userCommand) {
 		this.setRemainingWords(userCommand);
 		isPriority(getRemainingWords());
@@ -148,7 +135,6 @@ public class TDTParser implements ITDTParser {
 		setDateAndTime(new TDTDateAndTime(dateAndTimeParts));
 	}
 	
-
 	public void done() {
 		parts = remainingWords.split(" ");
 		if (isValidPartsLength()) {
@@ -181,7 +167,7 @@ public class TDTParser implements ITDTParser {
 				setTaskID(Integer.parseInt(parts[0]));
 				if (parts.length > 1) {
 					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
-					isValidEdit = true;
+					setValidEdit(true);
 				}
 			// [labelname][taskID][commandDetails]
 			} else if (parts.length > 1) {
@@ -190,11 +176,11 @@ public class TDTParser implements ITDTParser {
 					setLabelName(parts[0]);
 					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
 					setRemainingWords(getRemainingWords().substring(parts[1].length()).trim());
-					isValidEdit = true;
+					setValidEdit(true);
 				}
 			}
 		}	
-		if(isValidEdit) {
+		if (isValidEdit()) {
 			add(getRemainingWords());
 		}
 	}
@@ -221,6 +207,30 @@ public class TDTParser implements ITDTParser {
 				}
 			}
 		}
+	}
+	
+	public void display() {
+		/*
+		String checkHide[] = getRemainingWords().split(" ");
+		setLabelName(checkHide[0]);
+		*/
+		setCommandDetails(getRemainingWords());
+	}
+	
+	public void hide() {
+		/*
+		String checkHide[] = getRemainingWords().split(" ");
+		setLabelName(checkHide[0]);
+		*/
+		setCommandDetails(getRemainingWords());
+	}
+
+	public void search() {
+		setCommandDetails(getRemainingWords());
+	}
+
+	public void label() {
+		setLabelName(getRemainingWords());
 	}
 
 	private static String removeFirstWord(String userCommand) {
@@ -268,7 +278,6 @@ public class TDTParser implements ITDTParser {
 	public void setIsHighPriority(boolean isHighPriority) {
 		this.isHighPriority = isHighPriority;
 	}
-
 
 	public boolean isValidEdit() {
 		return isValidEdit;
@@ -331,7 +340,6 @@ public class TDTParser implements ITDTParser {
 		this.remainingWords = remainingWords;
 	}
 
-	
 	private void completeMonthDetails(int i) {
 		if ((i>0) && parts[i-1].contains("\\d+")) {
 			if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
@@ -365,7 +373,7 @@ public class TDTParser implements ITDTParser {
 	}
 	
 	private boolean isValidPartsLength() {
-		if(parts.length == 0) {
+		if (parts.length == 0) {
 			return false;
 		}
 		return true;
