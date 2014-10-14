@@ -11,14 +11,16 @@ public class UndoCommand extends Command {
 
 	@Override
 	public String execute(TDTStorage storage) {
+		storage.getRedoStack().push(storage.getUndoStack().pop());
+		storage.getRedoLabelPointerStack().push(storage.getLabelPointerStack().pop());
 		if(!storage.getUndoStack().isEmpty()) {
-			storage.getLabelPointerStack().pop();
-			storage.getUndoStack().pop();
-			
 			storage.setLabelMap(storage.getUndoStack().pop());
 			storage.setCurrLabel(storage.getLabelPointerStack().pop());
+			
 			return "Undo success!";
 		} else {
+			storage.getRedoStack().clear();
+			storage.getRedoLabelPointerStack().clear();
 			return "No command to undo.";
 		}
 	}

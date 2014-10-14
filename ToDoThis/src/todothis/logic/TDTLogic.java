@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import todothis.command.Command;
+import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 
@@ -21,8 +22,15 @@ public class TDTLogic implements ITDTLogic {
 	
 	@Override
 	public String executeCommand(Command command) {
+		if(command.getCommandType() != COMMANDTYPE.UNDO &&
+				command.getCommandType() != COMMANDTYPE.REDO) {
+			storage.getRedoStack().clear();
+			storage.getRedoLabelPointerStack().clear();
+		}
+
 		storage.getLabelPointerStack().push(storage.getCurrLabel());
 		storage.getUndoStack().push(storage.copyLabelMap());
+
 		String feedback = command.execute(storage);
 		storage.write();
 		return feedback;

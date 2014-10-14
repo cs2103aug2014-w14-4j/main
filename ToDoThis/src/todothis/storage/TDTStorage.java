@@ -23,12 +23,16 @@ public class TDTStorage implements ITDTStorage {
 	private Stack<HashMap<String, ArrayList<Task>>> undoStack;
 	private Stack<String> labelPointerStack;
 	private BufferedWriter bw;
+	private Stack<HashMap<String, ArrayList<Task>>> redoStack;
+	private Stack<String> redoLabelPointerStack;
 	
 	public TDTStorage(String fileName) {
 		this.setFileName(fileName);
 		setLabelMap(new HashMap<String, ArrayList<Task>>());
 		setUndoStack(new Stack<HashMap<String, ArrayList<Task>>>());
 		setLabelPointerStack(new Stack<String>());
+		setRedoStack(new Stack<HashMap<String, ArrayList<Task>>>());
+		setRedoLabelPointerStack(new Stack<String>());
 		labelMap.put(currLabel, new ArrayList<Task>());
 	}
 	
@@ -172,6 +176,42 @@ public class TDTStorage implements ITDTStorage {
 	public void setLabelPointerStack(Stack<String> labelPointerStack) {
 		this.labelPointerStack = labelPointerStack;
 	}
+
+
+
+
+
+
+
+	public Stack<HashMap<String, ArrayList<Task>>> getRedoStack() {
+		return redoStack;
+	}
+
+
+	public void setRedoStack(Stack<HashMap<String, ArrayList<Task>>> redoStack) {
+		this.redoStack = redoStack;
+	}
+
+
+
+
+
+
+
+	public Stack<String> getRedoLabelPointerStack() {
+		return redoLabelPointerStack;
+	}
+
+
+	public void setRedoLabelPointerStack(Stack<String> redoLabelPointerStack) {
+		this.redoLabelPointerStack = redoLabelPointerStack;
+	}
+
+
+
+
+
+
 
 	//-------------------------------------------------------------------------------
 	private class TaskIterator implements Iterator<Task>{

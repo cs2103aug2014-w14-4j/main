@@ -1,6 +1,5 @@
 package todothis.command;
 
-import todothis.parser.ITDTParser;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 

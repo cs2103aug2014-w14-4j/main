@@ -10,6 +10,7 @@ import todothis.command.DoneCommand;
 import todothis.command.EditCommand;
 import todothis.command.HideCommand;
 import todothis.command.LabelCommand;
+import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
 import todothis.logic.TDTDateAndTime;
@@ -61,6 +62,8 @@ public class TDTParser implements ITDTParser {
 				return new LabelCommand(labelName);
 			case UNDO :
 				return new UndoCommand();
+			case REDO :
+				return new RedoCommand();
 			case SEARCH :
 				search();
 				return new SearchCommand(commandDetails);

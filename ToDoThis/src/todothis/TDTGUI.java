@@ -18,12 +18,13 @@ import javax.swing.JViewport;
 import javax.swing.text.html.HTMLEditorKit;
 
 import todothis.command.Command;
+import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
-import todothis.parser.TDTParser;
 import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.parser.TDTParser;
 
 public class TDTGUI extends JFrame {
 	/**
@@ -176,6 +177,11 @@ public class TDTGUI extends JFrame {
 					String feedback = undo.execute(logic.getStorage());
 					updateGUI(feedback, displayTask());
 				} 
+				if(arg0.isControlDown() && keyCode == KeyEvent.VK_X) {
+					RedoCommand redo = new RedoCommand();
+					String feedback = logic.executeCommand(redo);
+					updateGUI(feedback, displayTask());
+				}
 			}
 
 			@Override
@@ -203,8 +209,10 @@ public class TDTGUI extends JFrame {
 					updateGUI(feedback, displayTask());
 				} 
 				
-				if(arg0.isControlDown() && keyCode == KeyEvent.VK_UP) {
-					
+				if(arg0.isControlDown() && keyCode == KeyEvent.VK_X) {
+					RedoCommand redo = new RedoCommand();
+					String feedback = logic.executeCommand(redo);
+					updateGUI(feedback, displayTask());
 				} else {
 					switch(keyCode) {
 					case KeyEvent.VK_ENTER :
