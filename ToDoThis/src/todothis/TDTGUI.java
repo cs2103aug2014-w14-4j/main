@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,7 +17,13 @@ import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.text.html.HTMLEditorKit;
 
-import todothis.ITDTParser.COMMANDTYPE;
+import todothis.command.Command;
+import todothis.command.SearchCommand;
+import todothis.command.UndoCommand;
+import todothis.logic.TDTLogic;
+import todothis.logic.Task;
+import todothis.parser.TDTParser;
+import todothis.parser.ITDTParser.COMMANDTYPE;
 
 public class TDTGUI extends JFrame {
 	/**
@@ -27,7 +32,6 @@ public class TDTGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	public static final String FILENAME = "todothis.txt";
 	public static final String DEFAULT_LABEL = "TODAY";
-	private TDTStorage storage;
 	private TDTLogic logic;
 	private TDTParser parser;
 	private String userCommand;
@@ -56,7 +60,7 @@ public class TDTGUI extends JFrame {
 					frame.setVisible(true);
 					
 					frame.taskPane.setText(frame.displayTask());
-					frame.taskLabel.setText("Adding task to: " + frame.storage.getCurrLabel());
+					frame.taskLabel.setText("Adding task to: " + frame.logic.getCurrLabel());
 					
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -67,13 +71,12 @@ public class TDTGUI extends JFrame {
 	
 	private String displayTask() {
 		StringBuilder sb = new StringBuilder();
-		Set<String> labelSet = storage.getLabelMap().keySet();
-		Iterator<String> labelIter = labelSet.iterator();
+		Iterator<String> labelIter = logic.getLabelIterator();
 		ArrayList<Task> array;
 		
 		while(labelIter.hasNext()) {
 			String currLabel = labelIter.next();
-			array = storage.getLabelMap().get(currLabel);
+			array = logic.getTaskListFromLabel(currLabel);
 			sb.append("------------------------------------------------------------<br>");
 			sb.append("<span color = \"blue\"><b>" + currLabel + "</b></span>: <br>");
 			for(int i = 0 ; i < array.size(); i++) {
@@ -169,7 +172,8 @@ public class TDTGUI extends JFrame {
 			public void keyPressed(KeyEvent arg0) {
 				int keyCode = arg0.getKeyCode();
 				if(arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
-					String feedback = logic.doUndo();
+					UndoCommand undo = new UndoCommand();
+					String feedback = undo.execute(logic.getStorage());
 					updateGUI(feedback, displayTask());
 				} 
 			}
@@ -194,7 +198,8 @@ public class TDTGUI extends JFrame {
 			public void keyPressed(KeyEvent arg0) {
 				int keyCode = arg0.getKeyCode();
 				if(arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
-					String feedback = logic.doUndo();
+					UndoCommand undo = new UndoCommand();
+					String feedback = logic.executeCommand(undo);
 					updateGUI(feedback, displayTask());
 				} 
 				
@@ -214,9 +219,8 @@ public class TDTGUI extends JFrame {
 							String feedback = logic.executeCommand(command);
 							updateGUI(feedback, displayTask());
 						} else {
-							ArrayList<Task> searched = logic.doSearch(command);
-							String feedback = searched.size() + " result(s) found for \"" 
-									+ command.getCommandDetails() + "\".";
+							String feedback = logic.executeCommand(command);
+							ArrayList<Task> searched = ((SearchCommand)command).getSearchedResult();
 							updateGUI(feedback, displaySearch(searched));
 						}
 						break;
@@ -262,18 +266,16 @@ public class TDTGUI extends JFrame {
 	}
 	
 	private void updateGUI(String feedback, String text) {
-		taskLabel.setText("Adding task to: " + storage.getCurrLabel());
+		taskLabel.setText("Adding task to: " + logic.getCurrLabel());
 		feedbackArea.setText(feedback);
 		taskPane.setText(text);
 	}
 	
 	private String doInit() {
-		
-		storage = new TDTStorage(FILENAME);
 		parser = new TDTParser();
-		logic = new TDTLogic(storage);
+		logic = new TDTLogic(FILENAME);
 		try {
-			storage.readInitialise();
+			logic.readAndInitialize();
 		} catch (Exception e) {
 			return "Unable to create todothis.txt";
 		}
