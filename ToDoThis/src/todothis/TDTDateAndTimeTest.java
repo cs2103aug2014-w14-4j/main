@@ -1,8 +1,10 @@
 package todothis;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
+
+import todothis.logic.TDTDateAndTime;
 
 public class TDTDateAndTimeTest {
 

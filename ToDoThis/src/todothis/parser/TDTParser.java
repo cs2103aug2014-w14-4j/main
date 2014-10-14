@@ -15,227 +15,64 @@ import todothis.command.UndoCommand;
 import todothis.logic.TDTDateAndTime;
 
 public class TDTParser implements ITDTParser {
-	private String[] parts;
 	
-	// anything with !!!  added doesnt appear until reopened.
+	String[] parts;
+	String dateAndTimeParts = "";
 	
+	COMMANDTYPE commandType = COMMANDTYPE.INVALID;
+	String labelName;
+	boolean isHighPriority;
+	boolean isValidEdit;
+	String commandDetails;
+	String remainingWords;
+	int taskID;
+	TDTDateAndTime dateAndTime;
+	ArrayList<String> prepositionWordsArr;
+
 	@Override
 	public Command parse(String userCommand) {
-		COMMANDTYPE commandType = COMMANDTYPE.INVALID;
-		String labelName = "";
-		boolean isHighPriority = false;
-		boolean completeDetails = false;
-		boolean isValidEdit = false;
-		String commandDetails = "";
-		int taskID = -1;
-		TDTDateAndTime dateAndTime = new TDTDateAndTime();
-		String dateAndTimeParts = "";
 		
-		ArrayList<String> prepositionWords = new ArrayList<String>();
-		prepositionWords.add("on");
-		prepositionWords.add("at");
-		prepositionWords.add("by");
-		prepositionWords.add("from");
-		prepositionWords.add("about");
-		prepositionWords.add("to");
-		prepositionWords.add("-");
-		prepositionWords.add("until");
-		prepositionWords.add("till");
-		prepositionWords.add("next");
-		prepositionWords.add("following");
-
-		commandType = determineCommandType(getFirstWord(userCommand));
-		String remainingWords = removeFirstWord(userCommand);
+		this.setCommandType(COMMANDTYPE.INVALID);
+		this.setLabelName("");
+		this.setIsHighPriority(false);
+		this.setCommandDetails("");
+		this.setTaskID(-1);
+		this.setPrepositionWords();
+		dateAndTimeParts = "";
 		
-		switch(commandType) {
+		this.setCommandType(determineCommandType(getFirstWord(userCommand)));
+		this.setRemainingWords(removeFirstWord(userCommand));
+		
+		switch(getCommandType()) {
 			case ADD :
-				remainingWords = userCommand;
-				isHighPriority = isPriority(remainingWords);
-				if (isHighPriority) {
-					remainingWords = remainingWords.replace("!", "");
-				}
-				parts = remainingWords.split(" ");
-				for (int i = 0; i < parts.length; i++) {
-					String checkWord = parts[i];
-					if (TDTDateAndTime.checkDate(checkWord)) {
-						completeDetails = true;
-					} else if (TDTDateAndTime.checkTime(checkWord)) {
-						completeDetails = true;
-					} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
-						completeDetails = true;
-					} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
-						if ((i>0) && parts[i-1].contains("\\d+")) {
-							if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
-								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
-								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
-								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i+1]);
-								commandDetails = removeDetails(commandDetails, i);
-								checkWord = "";
-								i++;
-							}
-						}
-					}
-
-					if (completeDetails) {
-						if (i>0) {
-							if (prepositionWords.contains(parts[i-1])) {
-								dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
-								commandDetails = removeDetails(commandDetails, i);
-							} 
-								
-						} 
-						dateAndTimeParts = addDetails(dateAndTimeParts, checkWord);
-						completeDetails = false;
-					} else {
-						commandDetails = addDetails(commandDetails, checkWord);
-					}
-				}
-				dateAndTime = new TDTDateAndTime(dateAndTimeParts);
-				return new AddCommand(labelName,taskID,commandDetails,dateAndTime, 
+				add(userCommand);
+				return new AddCommand(labelName, taskID,commandDetails, dateAndTime, 
 						isHighPriority);
 			case DELETE :
-				parts = remainingWords.split(" ");
-				if (!isValidPartsLength()) {
-					break;
-				}
-				// delete [label] / delete [taskID]
-				if (parts.length == 1) {
-					if (parts[0].matches("\\d+")) {
-						taskID = getTaskID(0);
-					} else {
-						labelName = getLabelName(0);
-					}
-				}
-				// delete [label][taskID] or delete [taskID][label] (assumes label to be one word)
-				if (parts.length == 2) {
-					if (parts[1].matches("\\d+")) {
-						taskID = getTaskID(1);
-						labelName = getLabelName(0);
-					} else {
-						taskID = getTaskID(0);
-						labelName = getLabelName(1);
-					}
-				}
+				delete();
 				return new DeleteCommand(labelName, taskID);
 			case EDIT :
-				parts = remainingWords.split(" ");
-				if (!isValidPartsLength()) {
-					break;
-				}
-				// [taskID][commandDetails]
-				if (parts[0].matches("\\d+")) {
-					taskID = getTaskID(0);
-					if (parts.length > 1) {
-						remainingWords = remainingWords.substring(parts[0].length()).trim();
-						isValidEdit = true;
-					}
-				// [labelname][taskID][commandDetails]
-				} else if (parts.length > 1) {
-					if (parts[1].matches("\\d+")) {
-						taskID = getTaskID(1);
-						labelName = getLabelName(0);
-						remainingWords = remainingWords.substring(parts[0].length()).trim();
-						remainingWords = remainingWords.substring(parts[1].length()).trim();
-						isValidEdit = true;
-					}
-				}
-				
-				if (isValidEdit) {
-					// same as ADD
-					remainingWords = remainingWords.trim();
-					isHighPriority = isPriority(remainingWords);
-					if (isHighPriority) {
-						remainingWords.replace("!", "");
-					}
-					parts = remainingWords.split(" ");
-					for (int i = 0; i < parts.length; i++) {
-						String checkWord = parts[i];
-						if (TDTDateAndTime.checkDate(checkWord)) {
-							completeDetails = true;
-						} else if (TDTDateAndTime.checkTime(checkWord)) {
-							completeDetails = true;
-						} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
-							completeDetails = true;
-						} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
-							if ((i>0) && parts[i-1].contains("\\d+")) {
-								if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
-									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
-									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
-									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i+1]);
-									commandDetails = removeDetails(commandDetails, i);
-									checkWord = "";
-									i++;
-								}
-							}
-						}
-
-						if (completeDetails) {
-							if (i>0) {
-								if (prepositionWords.contains(parts[i-1])) {
-									dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
-									commandDetails = removeDetails(commandDetails, i);
-								} 
-									
-							} 
-							dateAndTimeParts = addDetails(dateAndTimeParts, checkWord);
-							completeDetails = false;
-						} else {
-							commandDetails = addDetails(commandDetails, checkWord);
-						}
-					}
-					dateAndTime = new TDTDateAndTime(dateAndTimeParts);
-				}
-				return new EditCommand(labelName,taskID,commandDetails,dateAndTime, 
+				edit(userCommand);	
+				return new EditCommand(labelName, taskID,commandDetails, dateAndTime, 
 						isHighPriority);
 			case LABEL :
-				commandType = COMMANDTYPE.LABEL;
-				labelName = remainingWords;
+				label();
 				return new LabelCommand(labelName);
-			case SORT :
-				commandType = COMMANDTYPE.SORT;
-				break;
 			case UNDO :
-				commandType = COMMANDTYPE.UNDO;
 				return new UndoCommand();
 			case SEARCH :
-				commandType = COMMANDTYPE.SEARCH;
-				commandDetails = remainingWords;
+				search();
 				return new SearchCommand(commandDetails);
 			case DISPLAY :
-				String checkDisplay[] = remainingWords.split(" ");
-				commandType = COMMANDTYPE.DISPLAY;
-				labelName = checkDisplay[0];
+				display();
 				return new DisplayCommand(labelName);
 			case HIDE :
-				String checkHide[] = remainingWords.split(" ");
-				commandType = COMMANDTYPE.HIDE;
-				labelName = checkHide[0];
+				display();
 				return new HideCommand(labelName);
 			case DONE :
-				commandType = COMMANDTYPE.DONE;
-				parts = remainingWords.split(" ");
-				if (!isValidPartsLength()) {
-					break;
-				}
-				if (parts.length == 1) {
-					if (parts[0].matches("\\d+")) {
-						taskID = getTaskID(0);
-					} else {
-						labelName = getLabelName(0);
-					}
-				}
-				if (parts.length == 2) {
-					if (parts[1].matches("\\d+")) {
-						taskID = getTaskID(1);
-						labelName = getLabelName(0);
-					} else {
-						taskID = getTaskID(0);
-						labelName = getLabelName(1);	
-					}
-				}
+				done();
 				return new DoneCommand(labelName, taskID);
 			case INVALID :
-				commandType = COMMANDTYPE.INVALID;
 				break;
 			default:
 				//Will not reach here
@@ -244,42 +81,17 @@ public class TDTParser implements ITDTParser {
 		return null;
 	}
 
-	public String removeDetails(String commandDetails, int i) {
-		int last = commandDetails.length()-(parts[i-1].length());
-		commandDetails = commandDetails.substring(0, last);
-		return commandDetails.trim();
+	public void display() {
+		String checkHide[] = getRemainingWords().split(" ");
+		setLabelName(checkHide[0]);
 	}
 
-	public String addDetails(String commandDetails, String checkWord) {
-		commandDetails += " " + checkWord;
-		return commandDetails.trim();
+	public void search() {
+		setCommandDetails(getRemainingWords());
 	}
 
-	public String getLabelName(int i) {
-		return parts[i];
-	}
-
-	public int getTaskID(int i) {
-		int taskID;
-		taskID = Integer.parseInt(parts[i]);
-		return taskID;
-	}
-
-	private boolean isValidPartsLength() {
-		if(parts.length == 0) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * This function checks if the task added is of priority.
-	 */
-	public boolean isPriority(String commandDetails) {
-		if (commandDetails.contains("!")) {
-			return true;
-		}
-		return false;
+	public void label() {
+		setLabelName(getRemainingWords());
 	}
 	
 	/**
@@ -312,6 +124,104 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.ADD;
 		}
 	}
+	
+	/**
+	 * ADD
+	 */
+	public void add(String userCommand) {
+		this.setRemainingWords(userCommand);
+		isPriority(getRemainingWords());
+		parts = getRemainingWords().split(" ");
+		for (int i = 0; i < parts.length; i++) {
+			String checkWord = parts[i];
+			if (TDTDateAndTime.checkDate(checkWord) || TDTDateAndTime.checkTime(checkWord) || 
+					TDTDateAndTime.checkDay(checkWord)!=0) {
+				completeTimeDateDayDetails(i);
+			} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
+				completeMonthDetails(i);
+				i++;
+				checkWord = "";
+			} else {
+				setCommandDetails(addDetails(commandDetails, checkWord));
+			}
+		}
+		setDateAndTime(new TDTDateAndTime(dateAndTimeParts));
+	}
+	
+
+	public void done() {
+		parts = remainingWords.split(" ");
+		if (isValidPartsLength()) {
+			
+			if (parts.length == 1) {
+				if (parts[0].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[0]));
+				} else {
+					setLabelName(parts[0]);
+				}
+			}
+			if (parts.length == 2) {
+				if (parts[1].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[1]));
+					setLabelName(parts[0]);
+				} else {
+					setTaskID(Integer.parseInt(parts[0]));
+					setLabelName(parts[1]);
+				}
+			}
+		}
+	}
+
+	public void edit(String userCommand) {
+		parts = remainingWords.split(" ");
+		if (isValidPartsLength()) {
+			
+			// [taskID][commandDetails]
+			if (parts[0].matches("\\d+")) {
+				setTaskID(Integer.parseInt(parts[0]));
+				if (parts.length > 1) {
+					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
+					isValidEdit = true;
+				}
+			// [labelname][taskID][commandDetails]
+			} else if (parts.length > 1) {
+				if (parts[1].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[1]));
+					setLabelName(parts[0]);
+					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
+					setRemainingWords(getRemainingWords().substring(parts[1].length()).trim());
+					isValidEdit = true;
+				}
+			}
+		}	
+		if(isValidEdit) {
+			add(getRemainingWords());
+		}
+	}
+
+	public void delete() {
+		parts = remainingWords.split(" ");
+		if (isValidPartsLength()) {
+			// delete [label] / delete [taskID]
+			if (parts.length == 1) {
+				if (parts[0].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[0]));
+				} else {
+					setLabelName(parts[0]);
+				}
+			}
+			// delete [label][taskID] or delete [taskID][label] (assumes label to be one word)
+			if (parts.length == 2) {
+				if (parts[1].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[1]));
+					setLabelName(parts[0]);
+				} else {
+					setTaskID(Integer.parseInt(parts[0]));
+					setLabelName(parts[1]);
+				}
+			}
+		}
+	}
 
 	private static String removeFirstWord(String userCommand) {
 		return userCommand.replaceFirst(getFirstWord(userCommand), "").trim();
@@ -326,6 +236,139 @@ public class TDTParser implements ITDTParser {
 			userWord = userWord.replaceAll(("\\W"), "");
 			return userWord;
 		}
+	}
+
+	public COMMANDTYPE getCommandType() {
+		return commandType;
+	}
+
+	public void setCommandType(COMMANDTYPE commandType) {
+		this.commandType = commandType;
+	}
+
+	public String getLabelName() {
+		return labelName;
+	}
+
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
+	}
+
+	private void isPriority(String remainingWordsTemp) {
+		if (remainingWordsTemp.contains("!")) {
+			remainingWordsTemp = remainingWordsTemp.replace("!", "");
+			setIsHighPriority(true);
+		}
+	}
+
+	public boolean getIsHighPriority() {
+		return isHighPriority;
+	}
+
+	public void setIsHighPriority(boolean isHighPriority) {
+		this.isHighPriority = isHighPriority;
+	}
+
+
+	public boolean isValidEdit() {
+		return isValidEdit;
+	}
+
+	public void setValidEdit(boolean isValidEdit) {
+		this.isValidEdit = isValidEdit;
+	}
+
+	public String getCommandDetails() {
+		return commandDetails;
+	}
+
+	public void setCommandDetails(String commandDetails) {
+		this.commandDetails = commandDetails;
+	}
+
+	public int getTaskID() {
+		return taskID;
+	}
+
+	public void setTaskID(int taskID) {
+		this.taskID = taskID;
+	}
+
+	public TDTDateAndTime getDateAndTime() {
+		return dateAndTime;
+	}
+
+	public void setDateAndTime(TDTDateAndTime dateAndTime) {
+		this.dateAndTime = dateAndTime;
+	}
+
+	public ArrayList<String> getPrepositionWords() {
+		return prepositionWordsArr;
+	}
+
+	public void setPrepositionWords() {
+		ArrayList<String> prepositionWords = new ArrayList<String>();
+		prepositionWords.add("on");
+		prepositionWords.add("at");
+		prepositionWords.add("by");
+		prepositionWords.add("from");
+		prepositionWords.add("about");
+		prepositionWords.add("to");
+		prepositionWords.add("-");
+		prepositionWords.add("until");
+		prepositionWords.add("till");
+		prepositionWords.add("next");
+		prepositionWords.add("following");
+		prepositionWords.add("this");
+		this.prepositionWordsArr = prepositionWords;
+	}
+
+	public String getRemainingWords() {
+		return remainingWords;
+	}
+
+	public void setRemainingWords(String remainingWords) {
+		this.remainingWords = remainingWords;
+	}
+
+	
+	private void completeMonthDetails(int i) {
+		if ((i>0) && parts[i-1].contains("\\d+")) {
+			if ( (i+1 < parts.length) && (parts[i+1].contains("\\d+"))) {
+				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
+				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
+				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i+1]);
+				setCommandDetails(removeDetails(getCommandDetails(), i));
+			}
+		}
+	}
+	
+	private void completeTimeDateDayDetails(int i) {
+		if (i>0) {
+			if (getPrepositionWords().contains(parts[i-1])) {
+				dateAndTimeParts = addDetails(dateAndTimeParts, parts[i-1]);
+				setCommandDetails(removeDetails(getCommandDetails(), i));
+			} 	
+		} 
+		dateAndTimeParts = addDetails(dateAndTimeParts, parts[i]);
+	}
+
+	public String removeDetails(String details, int i) {
+		int last = details.length()-(parts[i-1].length());
+		details = details.substring(0, last);
+		return details.trim();
+	}
+
+	public String addDetails(String details, String checkWord) {
+		details += " " + checkWord;
+		return details.trim();
+	}
+	
+	private boolean isValidPartsLength() {
+		if(parts.length == 0) {
+			return false;
+		}
+		return true;
 	}
 
 }
