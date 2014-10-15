@@ -20,8 +20,8 @@ public class UndoCommand extends Command {
 			
 			return "Undo success!";
 		} else {
-			storage.getRedoStack().clear();
-			storage.getRedoLabelPointerStack().clear();
+			storage.getRedoStack().pop();
+			storage.getRedoLabelPointerStack().pop();
 			return "No command to undo.";
 		}
 	}

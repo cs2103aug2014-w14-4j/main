@@ -177,7 +177,7 @@ public class TDTGUI extends JFrame {
 					String feedback = undo.execute(logic.getStorage());
 					updateGUI(feedback, displayTask());
 				} 
-				if(arg0.isControlDown() && keyCode == KeyEvent.VK_X) {
+				if(arg0.isControlDown() && keyCode == KeyEvent.VK_Y) {
 					RedoCommand redo = new RedoCommand();
 					String feedback = logic.executeCommand(redo);
 					updateGUI(feedback, displayTask());
@@ -209,7 +209,7 @@ public class TDTGUI extends JFrame {
 					updateGUI(feedback, displayTask());
 				} 
 				
-				if(arg0.isControlDown() && keyCode == KeyEvent.VK_X) {
+				if(arg0.isControlDown() && keyCode == KeyEvent.VK_Y) {
 					RedoCommand redo = new RedoCommand();
 					String feedback = logic.executeCommand(redo);
 					updateGUI(feedback, displayTask());

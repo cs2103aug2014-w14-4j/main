@@ -178,11 +178,6 @@ public class TDTStorage implements ITDTStorage {
 	}
 
 
-
-
-
-
-
 	public Stack<HashMap<String, ArrayList<Task>>> getRedoStack() {
 		return redoStack;
 	}
@@ -193,11 +188,6 @@ public class TDTStorage implements ITDTStorage {
 	}
 
 
-
-
-
-
-
 	public Stack<String> getRedoLabelPointerStack() {
 		return redoLabelPointerStack;
 	}
@@ -206,11 +196,6 @@ public class TDTStorage implements ITDTStorage {
 	public void setRedoLabelPointerStack(Stack<String> redoLabelPointerStack) {
 		this.redoLabelPointerStack = redoLabelPointerStack;
 	}
-
-
-
-
-
 
 
 	//-------------------------------------------------------------------------------
