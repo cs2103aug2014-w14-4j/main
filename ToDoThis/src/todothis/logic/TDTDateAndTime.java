@@ -39,7 +39,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			"(1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
 	// 2359am 230pm 1250hr 1250h ------------------------------ 
 	private static final String TIME_PATTERN_5 = 
-			"(0?[0-9]|1[0-9]|2[0-3])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH])";
+			"(0?[0-9]|1[0-9]|2[0-3])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
 
 	
 	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
@@ -71,7 +71,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("by 12~aug~14000");
+		TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
 		System.out.println(test2.display());
 	
 		
@@ -154,7 +154,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			}else if(checkTime(parts[a])){
 				String [] timeParts = new String[2];
 				if ((parts[a].substring(parts[a].length()-2, parts[a].length()).equals("am")) || 
-						(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm"))) {
+						(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm") ||
+								(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("hr")))){
 					if(parts[a].length() > 4){
 						if(parts[a].charAt(parts[a].length()-5) == ':' || 
 								parts[a].charAt(parts[a].length()-5) == '.'){
@@ -185,11 +186,17 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 						}
 						timeParts[0] = Integer.toString(temp);
 					}
-					else{
+					else if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("am")){
 						if(temp == 12){
 							timeParts[0] = "00";
 						}
 					}
+				}else if(parts[a].substring(parts[a].length()-1, parts[a].length()).equals("h")){
+					timeParts[0] = parts[a].substring(0,parts[a].length()-3);
+					timeParts[1] = parts[a].substring(parts[a].length()-3, parts[a].length()-1);
+				}else if(parts[a].substring(parts[a].length()-3, parts[a].length()).equals("hrs")){
+					timeParts[0] = parts[a].substring(0,parts[a].length()-5);
+					timeParts[1] = parts[a].substring(parts[a].length()-5, parts[a].length()-3);
 				}else{
 					if(parts[a].length() > 2){
 						if(parts[a].charAt(parts[a].length()-3) == ':' || 
@@ -202,6 +209,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 						}
 					}
 				}
+
 				if(endTimeDate == true){
 					endTime = timeParts[0] + ":" + timeParts[1];				
 				}else{
@@ -430,7 +438,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 		
 		
-		 if ((year >= 1900) && (year <= 2099)) {
+		 if ((year >= 2014) && (year <= 2099)) {
 			 if ((month >= 1) && (month <= 12)) {
 				 if ((day >= 1) && (day <= getNumOfDaysFromMonth(month, year))) {
 					 return true;
@@ -544,7 +552,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	//----------------------CHECK TIME--------------------------------
 	
 	public static boolean checkTime(String time) {
-		
+		time = time.replaceAll("[.!,]", "");
 		pattern = new Pattern[6]; 
 		pattern[1] = Pattern.compile(TIME_PATTERN_1);
 		pattern[2] = Pattern.compile(TIME_PATTERN_2);
