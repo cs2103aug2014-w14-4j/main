@@ -17,8 +17,6 @@ import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
 import todothis.logic.TDTDateAndTime;
 
-// somerset 313 how. 313 is time. 
-
 public class TDTParser implements ITDTParser {
 	
 	String[] parts;
@@ -33,16 +31,18 @@ public class TDTParser implements ITDTParser {
 	int taskID;
 	TDTDateAndTime dateAndTime;
 	ArrayList<String> prepositionWordsArr;
-	private Logger logger = Logger.getLogger("TDTParser");
-
+	ArrayList<String> dayWordsArr;
+	//private Logger logger = Logger.getLogger("TDTParser");
+	
 	public Command parse(String userCommand) {
-		logger.log(Level.INFO, "start parsing");
+	//	logger.log(Level.INFO, "start parsing");
 		this.setCommandType(COMMANDTYPE.INVALID);
 		this.setLabelName("");
 		this.setIsHighPriority(false);
 		this.setCommandDetails("");
 		this.setTaskID(-1);
 		this.setPrepositionWords();
+		this.setDayWordsArr();
 		dateAndTimeParts = "";
 		setValidEdit(false);
 
@@ -84,7 +84,7 @@ public class TDTParser implements ITDTParser {
 			default:
 				break;
 		}
-		logger.log(Level.INFO, "end of parsing");
+	//logger.log(Level.INFO, "end of parsing");
 		return null;
 	}
 	
@@ -254,6 +254,7 @@ public class TDTParser implements ITDTParser {
 		if ((i>0) && parts[i-1].matches("\\d+")) {
 			if ((i>1) && getPrepositionWords().contains(parts[i-2])) {
 				removeDetails(getCommandDetails(), i-2);
+				dateAndTimeParts += " "+parts[i-2];
 			}
 			dateAndTimeParts += " "+parts[i-1] + "~"+ parts[i];
 			if ((i+1 < parts.length) && (parts[i+1].matches("\\d+"))) {
@@ -271,17 +272,43 @@ public class TDTParser implements ITDTParser {
 	private void completeTimeDateDayDetails(int i) {
 		if (i>0) {
 			if (getPrepositionWords().contains(parts[i-1])) {
-				dateAndTimeParts += (" " + parts[i-1]);
-				removeDetails(getCommandDetails(), i-1);
+				if (getDayWordsArr().contains(parts[i-1])) {
+					completeFurtherDayDetails(i);
+				} else {
+					dateAndTimeParts += (" " + parts[i-1]);
+					removeDetails(getCommandDetails(), i-1);
+				}
 			} 	
 		} 
 		dateAndTimeParts += (" " + parts[i]);
 	}
 	
 	/**
+	 * This function completes the commandDetails for an input that contains 
+	 * this/next/following day. 
+	 */
+	public void completeFurtherDayDetails(int i) {
+		ArrayList<String> tempParts = new ArrayList<String>();
+		tempParts.add(parts[i-1]);
+		removeDetails(getCommandDetails(), i-1);
+		if ((i>1) && getPrepositionWords().contains(parts[i-2])) {
+			tempParts.add(parts[i-2]);
+			removeDetails(getCommandDetails(), i-2);
+		}
+		if ((i>2) && getPrepositionWords().contains(parts[i-3])) {
+			tempParts.add(parts[i-3]);
+			removeDetails(getCommandDetails(), i-3);
+		}
+		for (int j=tempParts.size()-1; j>=0; j--) {
+			dateAndTimeParts += (" " + tempParts.get(j));
+		}
+	}
+	
+	/**
 	 * This function removes the preposition word from the commandDetails.
 	 */
 	public void removeDetails(String details, int i) {
+		details = details.trim();
 		int last = details.length()-(parts[i].length());
 		details = details.substring(0, last);
 		setCommandDetails(details.trim());
@@ -320,9 +347,22 @@ public class TDTParser implements ITDTParser {
 		prepositionWords.add("next");
 		prepositionWords.add("following");
 		prepositionWords.add("this");
+		prepositionWords.add("the");
 		this.prepositionWordsArr = prepositionWords;
 	}
+	
+	public ArrayList<String> getDayWordsArr() {
+		return dayWordsArr;
+	}
 
+	public void setDayWordsArr() {
+		ArrayList<String> dayWordsArr = new ArrayList<String>();
+		dayWordsArr.add("this");
+		dayWordsArr.add("next");
+		dayWordsArr.add("following");
+		this.dayWordsArr = dayWordsArr;
+	}
+	
 	public String getRemainingWords() {
 		return remainingWords;
 	}
