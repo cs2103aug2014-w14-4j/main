@@ -3,6 +3,8 @@ package todothis.logic;
 import java.util.Calendar;
 import java.util.TimeZone;
 //import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
@@ -18,6 +20,26 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	private boolean isTimedTask = false;
 	
 	//private Logger logger = Logger.getLogger("TDTDateAndTime");
+	
+
+	private static Pattern[] pattern;
+	private static Matcher matcher;
+	
+	// 2am 11pm --
+	private static final String TIME_PATTERN_1 = 
+			"(0?[1-9]|1[12])([aA][Mm]|[pP][mM])";
+	// 2:00 12:15 2.00 23:30 ----------
+	private static final String TIME_PATTERN_2 = 
+			"(0?[1-9]|1[0-9]|2[0-3])(0?[:.])(0?[0-5][0-9])";
+	// 2:00pm 12:15pm 2.00pm 12.15pm --
+	private static final String TIME_PATTERN_3 = 
+			"(0?[1-9]|1[12])(0?[:.])(0?[0-5][0-9])([aA][Mm]|[pP][mM])";
+	// 13:00pm 12:01pm
+	private static final String TIME_PATTERN_4 = 
+			"(1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
+	// 2359am 230pm 1250hr 1250h ------------------------------ 
+	private static final String TIME_PATTERN_5 = 
+			"(0?[0-9]|1[0-9]|2[0-3])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH])";
 
 	
 	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
@@ -521,7 +543,24 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 	//----------------------CHECK TIME--------------------------------
 	
-	public static boolean checkTime(String nextWord) {
+	public static boolean checkTime(String time) {
+		
+		pattern = new Pattern[6]; 
+		pattern[1] = Pattern.compile(TIME_PATTERN_1);
+		pattern[2] = Pattern.compile(TIME_PATTERN_2);
+		pattern[3] = Pattern.compile(TIME_PATTERN_3);
+		pattern[4] = Pattern.compile(TIME_PATTERN_4);
+		pattern[5] = Pattern.compile(TIME_PATTERN_5);
+		
+		 for (int i=1; i<=5; i++) {
+			 matcher = pattern[i].matcher(time);
+			 if(matcher.matches()){
+				 return true;
+			 }
+		 }
+	return false;
+
+		/* previous one.
 		// check time possible cases
 		// 2am 11pm --
 		// 2:00 12:15 2.00 --
@@ -553,18 +592,21 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			}
 		}
 		return false;
+		
+		*/
 	}
-	
+/*	
 	public static boolean isValidTimeLengthRange(String nextWord) {
 		if(nextWord.length() > 2 && nextWord.length() <= 7) {
 			return true;
 		}
 		return false;
 	}
-	
+*/	
 	/**
 	 * This function checks if the time input is of am or pm format.
 	 */
+/*
 	public static boolean isAMorPM(String nextWord) {
 		if ((nextWord.substring(nextWord.length()-2, nextWord.length()).equals("am")) || 
 				(nextWord.substring(nextWord.length()-2, nextWord.length()).equals("pm"))) {
@@ -572,10 +614,11 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 		return false;
 	}
-	
+*/
 	/**
 	 * This function checks if the time input of AM or PM is of valid format
 	 */
+/*
 	public static boolean isValidTimeTypeAMPM(String nextWord) {
 		if ((nextWord.charAt(nextWord.length()-5) == ':') || (nextWord.charAt(nextWord.length()-5) == '.')) {
 			String temp = nextWord.replace(nextWord.charAt(nextWord.length()-5) + "", "");
@@ -586,24 +629,28 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 		return false;
 	}
-	
+*/
+
 	/**
 	 * This function checks if the time input (not of AM or PM) is of valid format
 	 * eg 2:00 12:15 2.00
 	 */
+/*
 	public static boolean isValidTimeType(String nextWord) {
 		if (((nextWord.charAt(nextWord.length()-3)) == ':') ||((nextWord.charAt(nextWord.length()-3)) == '.')) {
 			return true;
 		}
 		return false;
 	}
-	
+*/
+	/*
 	public static boolean isDigits(String temp) {
 		if(temp.matches("\\d+")) {
 			return true;
 		}
 		return false;
 	}
+	*/
 
 
 	//---------------------------CHECK DATE------------------------------------------
