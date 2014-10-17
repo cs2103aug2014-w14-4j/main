@@ -30,7 +30,6 @@ public class LabelCommand extends Command {
 		} else {
 			storage.getLabelMap().put(label[0], new ArrayList<Task>());
 			storage.setCurrLabel(label[0]);
-			storage.write();
 			return "Label created";
 		}
 	}

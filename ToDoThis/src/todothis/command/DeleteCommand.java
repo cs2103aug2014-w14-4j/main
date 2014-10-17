@@ -28,6 +28,7 @@ public class DeleteCommand extends Command {
 		if(label.equals("") && taskId == -1) {
 			storage.setLabelMap(new HashMap<String, ArrayList<Task>>());
 			storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
+			storage.setCurrLabel(TDTGUI.DEFAULT_LABEL);
 			return storage.getFileName() + " is cleared!";
 		}
 		

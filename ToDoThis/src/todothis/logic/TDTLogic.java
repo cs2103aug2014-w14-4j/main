@@ -64,7 +64,7 @@ public class TDTLogic implements ITDTLogic {
 	}
 	
 	public ArrayList<Task> getTaskListFromLabel(String label) {
-		return storage.getLabelMap().get(label);
+		return storage.getLabelMap().get(label.toUpperCase());
 	}
 	
 	public TDTStorage getStorage() {
