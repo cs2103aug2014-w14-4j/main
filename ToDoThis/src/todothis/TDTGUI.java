@@ -24,6 +24,7 @@ import todothis.command.Command;
 import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
@@ -293,11 +294,13 @@ public class TDTGUI extends JFrame {
 								int id = Integer.parseInt(words[1]);
 								if(id > 0 && id <= logic.getTaskListFromLabel(logic.getCurrLabel()).size()) {
 									Task task = logic.getTaskListFromLabel(logic.getCurrLabel()).get(id-1);
-									commandField.setText(userCommand  +task.getDetails());
+									TDTDateAndTime dat = task.getDateAndTime();
+									String datString = getDateTimeStringForEdit(dat);
+									commandField.setText(userCommand + " " +task.getDetails() + datString);
 									javax.swing.SwingUtilities.invokeLater(new Runnable() {
 										   public void run() { 
-											   commandField.select(userCommand.length()+ 1,
-													   commandField.getText().length());
+											   commandField.select(userCommand.length() + 1,
+													   commandField.getText().length() - 1);
 										   }
 										});
 								}
@@ -313,11 +316,13 @@ public class TDTGUI extends JFrame {
 								if(logic.getStorage().getLabelMap().containsKey(words[1].toUpperCase())) {
 									if(id > 0 && id <= logic.getTaskListFromLabel(words[1]).size()) {
 										Task task = logic.getTaskListFromLabel(words[1]).get(id-1);
-										commandField.setText(userCommand +task.getDetails());
+										TDTDateAndTime dat = task.getDateAndTime();
+										String datString = getDateTimeStringForEdit(dat);
+										commandField.setText(userCommand + " " + task.getDetails() + datString);
 										javax.swing.SwingUtilities.invokeLater(new Runnable() {
 											   public void run() { 
-												   commandField.select(userCommand.length()+ 1,
-														   commandField.getText().length());
+												   commandField.select(userCommand.length() + 1,
+														   commandField.getText().length() - 1);
 											   }
 											});
 									}
@@ -333,6 +338,38 @@ public class TDTGUI extends JFrame {
 				}
 
 				
+			}
+
+			private String getDateTimeStringForEdit(TDTDateAndTime dat) {
+				String datString = "";
+				if(dat.isTimedTask()) {
+					datString = " from";
+					if(!dat.getStartDate().equals("null")) {
+						datString = datString + " " + dat.getStartDate();
+					}
+					if(!dat.getStartTime().equals("null")) {
+						datString = datString + " " + dat.getStartTime();
+					}
+					if(!dat.getEndDate().equals("null") || !dat.getEndTime().equals("null") ) {
+						datString = datString + " to";
+						if(!dat.getEndDate().equals("null")) {
+							datString = datString + " " + dat.getEndDate();
+						}
+						if(!dat.getEndTime().equals("null")) {
+							datString = datString + " " + dat.getEndTime();
+						}
+					}
+				}
+				if(dat.isDeadlineTask()) {
+					datString = " by";
+					if(!dat.getEndDate().equals("null")) {
+						datString = datString + " " + dat.getEndDate();
+					}
+					if(!dat.getEndTime().equals("null")) {
+						datString = datString + " " +dat.getEndTime();
+					}
+				}
+				return datString;
 			}
 
 			@Override
