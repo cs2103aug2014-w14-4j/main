@@ -566,9 +566,10 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				 return true;
 			 }
 		 }
-	return false;
+		 return false;
+	}
 
-		/* previous one.
+/* previous one.
 		// check time possible cases
 		// 2am 11pm --
 		// 2:00 12:15 2.00 --
@@ -601,20 +602,16 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 		return false;
 		
-		*/
+		
 	}
-/*	
+	
 	public static boolean isValidTimeLengthRange(String nextWord) {
 		if(nextWord.length() > 2 && nextWord.length() <= 7) {
 			return true;
 		}
 		return false;
 	}
-*/	
-	/**
-	 * This function checks if the time input is of am or pm format.
-	 */
-/*
+	
 	public static boolean isAMorPM(String nextWord) {
 		if ((nextWord.substring(nextWord.length()-2, nextWord.length()).equals("am")) || 
 				(nextWord.substring(nextWord.length()-2, nextWord.length()).equals("pm"))) {
@@ -622,11 +619,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 		return false;
 	}
-*/
-	/**
-	 * This function checks if the time input of AM or PM is of valid format
-	 */
-/*
+
 	public static boolean isValidTimeTypeAMPM(String nextWord) {
 		if ((nextWord.charAt(nextWord.length()-5) == ':') || (nextWord.charAt(nextWord.length()-5) == '.')) {
 			String temp = nextWord.replace(nextWord.charAt(nextWord.length()-5) + "", "");
@@ -637,29 +630,21 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}
 		return false;
 	}
-*/
 
-	/**
-	 * This function checks if the time input (not of AM or PM) is of valid format
-	 * eg 2:00 12:15 2.00
-	 */
-/*
 	public static boolean isValidTimeType(String nextWord) {
 		if (((nextWord.charAt(nextWord.length()-3)) == ':') ||((nextWord.charAt(nextWord.length()-3)) == '.')) {
 			return true;
 		}
 		return false;
 	}
-*/
-	/*
+
 	public static boolean isDigits(String temp) {
 		if(temp.matches("\\d+")) {
 			return true;
 		}
 		return false;
 	}
-	*/
-
+*/
 
 	//---------------------------CHECK DATE------------------------------------------
 	public static boolean checkDate(String nextWord) {
@@ -700,6 +685,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				|| (day.equalsIgnoreCase("Tmw")) || (day.equalsIgnoreCase("Tmr")) 
 				|| (day.equalsIgnoreCase("2moro"))) {
 			return 9;
+		} else if (day.equalsIgnoreCase("Day")) {
+			return 10;
 		} else {
 			return 0;
 		}

@@ -119,7 +119,7 @@ public class TDTParser implements ITDTParser {
 		}
 	}
 	
-//---------------------------------- main command methods -------------------------------------
+//---------------------------------- Main Command Methods -------------------------------------
 	public void add(String userCommand) {
 		this.setRemainingWords(userCommand);
 		isPriority(getRemainingWords());
@@ -167,14 +167,12 @@ public class TDTParser implements ITDTParser {
 	public void edit(String userCommand) {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			// [taskID][commandDetails]
 			if (parts[0].matches("\\d+")) {
 				setTaskID(Integer.parseInt(parts[0]));
 				if (parts.length > 1) {
 					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
 					setValidEdit(true);
 				}
-			// [labelname][taskID][commandDetails]
 			} else if (parts.length > 1) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
@@ -193,7 +191,6 @@ public class TDTParser implements ITDTParser {
 	public void delete() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			// delete [label] / delete [taskID]
 			if (parts.length == 1) {
 				if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
@@ -201,7 +198,6 @@ public class TDTParser implements ITDTParser {
 					setLabelName(parts[0]);
 				}
 			}
-			// delete [label][taskID] or delete [taskID][label]
 			if (parts.length == 2) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
@@ -230,11 +226,17 @@ public class TDTParser implements ITDTParser {
 		setLabelName(getRemainingWords());
 	}
 
-//------------------------------ other methods -----------------------------------------------
+//------------------------------ Other Methods -----------------------------------------------
+	/**
+	 * This function removes the first word of the userCommand. 
+	 */
 	private static String removeFirstWord(String userCommand) {
 		return userCommand.replaceFirst(getFirstWord(userCommand), "").trim();
 	}
 
+	/**
+	 * This function gets the first word / Command word of the userCommand
+	 */
 	private static String getFirstWord(String userCommand) {
 		if(userCommand.indexOf(" ") == -1) {
 			userCommand = userCommand.replaceAll(("\\W"), "");
@@ -314,6 +316,9 @@ public class TDTParser implements ITDTParser {
 		setCommandDetails(details.trim());
 	}
 	
+	/**
+	 * This function checks if the array parts is of valid length (!=0)
+	 */
 	private boolean isValidPartsLength() {
 		if (parts.length == 0) {
 			return false;
@@ -321,6 +326,10 @@ public class TDTParser implements ITDTParser {
 		return true;
 	}
 	
+	/**
+	 * This function checks if the command input is of priority
+	 * Presence of '!' shows priority. 
+	 */
 	private void isPriority(String remainingWordsTemp) {
 		if (remainingWordsTemp.contains("!")) {
 			remainingWordsTemp = remainingWordsTemp.replace("!", "");
@@ -328,11 +337,15 @@ public class TDTParser implements ITDTParser {
 		}
 	}
 	
-//--------------------------------- getter and setter -----------------------------------------
+//--------------------------------- Getters and Setters -----------------------------------------
 	public ArrayList<String> getPrepositionWords() {
 		return prepositionWordsArr;
 	}
 
+	/**
+	 * This function sets the list of 'Preposition' words used in
+	 * day, date, time checking.
+	 */
 	public void setPrepositionWords() {
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
@@ -355,6 +368,9 @@ public class TDTParser implements ITDTParser {
 		return dayWordsArr;
 	}
 
+	/**
+	 * This function sets the list of words used in the checking of days.
+	 */
 	public void setDayWordsArr() {
 		ArrayList<String> dayWordsArr = new ArrayList<String>();
 		dayWordsArr.add("this");
@@ -434,5 +450,4 @@ public class TDTParser implements ITDTParser {
 	public void setSkipNextWord(boolean isSkipNextWord) {
 		this.isSkipNextWord = isSkipNextWord;
 	}
-
 }
