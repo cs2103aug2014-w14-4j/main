@@ -64,7 +64,7 @@ public class TDTStorage implements ITDTStorage {
 				if(params[3].equals("true")) {
 					task.setDone(true);
 				}
-				this.addTask(task);	
+				this.addTask(task, task.getLabelName());	
 			}
 			br.close();
 		} catch(Exception e) {
@@ -122,8 +122,8 @@ public class TDTStorage implements ITDTStorage {
 		return this.getLabelMap().get(labelName).size();
 	}
 	
-	public void addTask(Task task) {
-		this.getLabelMap().get(task.getLabelName()).add(task);
+	public void addTask(Task task, String label) {
+		this.getLabelMap().get(label).add(task);
 	}
 	
 	public HashMap<String, ArrayList<Task>> copyLabelMap() {
