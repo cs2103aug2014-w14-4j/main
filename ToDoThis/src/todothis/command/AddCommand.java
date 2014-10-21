@@ -1,6 +1,5 @@
 package todothis.command;
 
-import todothis.TDTGUI;
 import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
@@ -56,8 +55,7 @@ public class AddCommand extends Command {
 				return "Invalid end time! End Time should be after start time!";
 			}
 		}
-		storage.addTask(task, task.getLabelName());
-		storage.addTask(task, TDTGUI.DEFAULT_LABEL);
+		storage.addTask(task);
 		TDTLogic.sort(storage.getLabelMap());
 		storage.write();
 		return "Add success";
