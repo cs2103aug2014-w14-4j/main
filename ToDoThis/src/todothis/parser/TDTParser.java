@@ -347,7 +347,7 @@ public class TDTParser implements ITDTParser {
 	 */
 	private void isPriority(String remainingWordsTemp) {
 		if (remainingWordsTemp.contains("!")) {
-			remainingWordsTemp = remainingWordsTemp.replace("!", "");
+			remainingWords = remainingWordsTemp.replace("!", "");
 			setIsHighPriority(true);
 		}
 	}

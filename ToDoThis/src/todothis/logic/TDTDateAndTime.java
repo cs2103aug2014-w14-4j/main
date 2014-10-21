@@ -701,6 +701,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 
 	public static int checkDay(String day) {
+		day = replaceEndStringPunctuation(day);
+		
 		if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
 			return 1;
 		}else if ((day.equalsIgnoreCase("Monday")) || (day.equalsIgnoreCase("Mon"))) {
