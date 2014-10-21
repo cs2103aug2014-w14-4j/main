@@ -55,7 +55,8 @@ public class TDTGUI extends JFrame {
 			+ ".datagrid table td  { text-align: center; padding: 3px 10px;color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }"
 			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table th{ background: #BDBDBD}"
-			+ ".datagrid table .priority td{ background: #DF0101; color: \"white\" }"
+			+ ".datagrid table .overdue td{ background: #DF0101; color: \"white\" }"
+			+ ".datagrid table .priority td{ background: #F781D8; color: \"white\" }"
 			+ ".datagrid table .done td{ background: #04B404; text-decoration: line-through}"
 			+ ".label{ color: \"blue\"; font-size:15px}";
 
@@ -152,7 +153,7 @@ public class TDTGUI extends JFrame {
 			sb.append("</table></div>");
 		}
 	}
-
+	/*
 	private String displaySearch(ArrayList<Task> searched) {
 		Iterator<Task> iter = searched.iterator();
 		StringBuilder res = new StringBuilder();
@@ -173,8 +174,29 @@ public class TDTGUI extends JFrame {
 			res.append("------------------------------------------------------------<br>");
 		}
 		return res.toString();
+	}*/
+	private String displaySearch(ArrayList<Task> searched) {
+		Iterator<Task> iter = searched.iterator();
+		StringBuilder res = new StringBuilder();
+		int i = 0;
+		res.append("<span class = \"label\"><b>SEARCH RESULTS</b></span>: <br>");
+		res.append("<div class=\"datagrid\"><table>");
+		res.append("<tr><th>Label</th><th>TaskID</th><th>TaskDetails</th><th>Date/Time</th>");
+		while(iter.hasNext()){
+			Task next = iter.next();
+			if(next.isDone()) {
+				res.append("<tr class = \"done\"><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>" );
+			} else if(next.isHighPriority()) {
+				res.append("<tr class = \"priority\"><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>" );
+			} else if(i % 2 == 0) {
+				res.append("<tr class = \"alt\"><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>" );
+			} else {
+				res.append("<tr><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>");
+			}
+			i++;
+		}
+		return res.toString();
 	}
-	
 	
 
 	/**

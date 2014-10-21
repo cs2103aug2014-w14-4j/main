@@ -26,7 +26,7 @@ public class DoneCommand extends Command {
 			Iterator<Task> iter = storage.getTaskIterator();
 			while(iter.hasNext()) {
 				Task next = iter.next();
-				next.setDone(true);
+				next.setDone(!next.isDone());
 			}
 			return "All tasks are done!";
 		}
@@ -36,7 +36,8 @@ public class DoneCommand extends Command {
 			if(storage.getLabelMap().containsKey(label)) {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
 				for(int i = 0 ; i < array.size(); i ++) {
-					array.get(i).setDone(true);
+					Task task = array.get(i);
+					task.setDone(!task.isDone());
 				}
 				return "Tasks under " + label + "are done.";
 			} else {
@@ -48,7 +49,8 @@ public class DoneCommand extends Command {
 		if(label.equals("") && taskId != -1) {
 			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
 			if(taskId <= array.size() && getTaskID() > 0) {
-				array.get(taskId - 1).setDone(true);
+				Task task = array.get(taskId - 1);
+				task.setDone(!task.isDone());
 				return "Task done";
 			} else {
 				return "error. Invalid task number.";
@@ -60,7 +62,8 @@ public class DoneCommand extends Command {
 			if(storage.getLabelMap().containsKey(label)) {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
-					array.get(taskId - 1).setDone(true);
+					Task task = array.get(taskId - 1);
+					task.setDone(!task.isDone());
 					return "Task done";
 				} else {
 					return "error. Invalid task number.";
