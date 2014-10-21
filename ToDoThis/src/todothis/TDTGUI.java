@@ -52,11 +52,12 @@ public class TDTGUI extends JFrame {
 	JViewport vp;
 	String css = ".datagrid table {background: \"white\"; border: 3px solid; border-radius: 20px; text-align: center; width: 100%; } "
 			+ ".datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: \"white\"; overflow: hidden; border: 4px solid #006699; border-radius: 100px;}"
-			+ ".datagrid table td  { text-align: center; padding: 3px 10px;color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }"
+			+ ".datagrid table td  { text-align: center; padding: 3px 10px;color: #00496B; border-left: 1px solid #5882FA;font-size: 12px;font-weight: normal; }"
 			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table th{ background: #BDBDBD}"
 			+ ".datagrid table .overdue td{ background: #DF0101; color: \"white\" }"
 			+ ".datagrid table .priority td{ background: #F781D8; color: \"white\" }"
+			+ ".datagrid table tr .datetime{ font-size:10px }"
 			+ ".datagrid table .done td{ background: #04B404; text-decoration: line-through}"
 			+ ".label{ color: \"blue\"; font-size:15px}";
 
@@ -106,31 +107,6 @@ public class TDTGUI extends JFrame {
 		}
 		return sb.toString();
 	}
-	/*
-	private void displayFormat(StringBuilder sb, String currLabel,
-			ArrayList<Task> array) {
-		if(array != null) {
-			sb.append("------------------------------------------------------------<br>");
-			sb.append("<span color = \"blue\"><b>" + currLabel + "</b></span>: <br>");
-			for(int i = 0 ; i < array.size(); i++) {
-				Task task = array.get(i);
-				if(!task.isHide()){
-					if(task.isDone()){
-						sb.append("<span color = #606060><strike>");
-					} else if(task.isHighPriority()) {
-						sb.append("<span color = \"red\">");
-					}
-					//"<img src=\"file:taeyeon.jpg\" height=\"420\" width=\"420\"/>"+
-					sb.append("[" + task.getTaskID() + "] " + task.getDateAndTime().display() 
-							+ "<br>");
-					sb.append(task.getDetails()+ "</span><br><br>");
-				}
-			}
-		} else {
-			sb.append("------------------------------------------------------------<br>");
-			sb.append("<span color = \"blue\"><b>" + currLabel + "</b></span>: <br>");
-		}
-	}*/
 	
 	private void displayFormat(StringBuilder sb, String currLabel,
 			ArrayList<Task> array) {
@@ -140,41 +116,34 @@ public class TDTGUI extends JFrame {
 			sb.append("<tr><th>TaskID</th><th>TaskDetails</th><th>Date/Time</th>");
 			for(int i = 0 ; i < array.size(); i++) {
 				Task task = array.get(i);
-				if(task.isDone()) {
-					sb.append("<tr class = \"done\"><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>" );
-				} else if(task.isHighPriority()) {
-					sb.append("<tr class = \"priority\"><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>" );
-				} else if(i % 2 == 0) {
-					sb.append("<tr class = \"alt\"><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>" );
-				} else {
-					sb.append("<tr><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>");
+				if(!task.isHide()) {
+					if(task.isDone()) {
+						sb.append("<tr class = \"done\"><td>" + task.getTaskID() + "</td><td>" 
+								+ task.getDetails() + "</td><td class = \"datetime\">" 
+								+ task.getDateAndTime().display() + "</td></tr>" );
+					} else if(task.getDateAndTime().checkIfOverdue()) {
+						sb.append("<tr class = \"overdue\"><td>" + task.getTaskID() + "</td><td>" 
+								+ task.getDetails() + "</td><td class = \"datetime\">" 
+								+ task.getDateAndTime().display() + "</td></tr>" );
+					}else if(task.isHighPriority()) {
+						sb.append("<tr class = \"priority\"><td>" + task.getTaskID() + "</td><td>" 
+								+ task.getDetails() + "</td><td class = \"datetime\">" 
+								+ task.getDateAndTime().display() + "</td></tr>" );
+					} else if(i % 2 == 0) {
+						sb.append("<tr class = \"alt\"><td>" + task.getTaskID() + "</td><td>" 
+								+ task.getDetails() + "</td><td class = \"datetime\">" 
+								+ task.getDateAndTime().display() + "</td></tr>" );
+					} else {
+						sb.append("<tr><td>" + task.getTaskID() + "</td><td>" + task.getDetails() 
+								+ "</td><td class = \"datetime\">" + task.getDateAndTime().display() 
+								+ "</td></tr>");
+					}
 				}
 			}
 			sb.append("</table></div>");
 		}
 	}
-	/*
-	private String displaySearch(ArrayList<Task> searched) {
-		Iterator<Task> iter = searched.iterator();
-		StringBuilder res = new StringBuilder();
-		res.append("<b>SEARCH RESULTS:</b><br>");
-		res.append("------------------------------------------------------------<br>");
-		while(iter.hasNext()){
-			Task next = iter.next();
-
-			if(next.isDone()){
-				res.append("<span color = #606060><strike>");
-			} else if(next.isHighPriority()) {
-				res.append("<span color = \"red\">");
-			}
-			res.append("<span color = \"blue\">  Label: " + next.getLabelName() 
-					+"       TaskID: "+ next.getTaskID() + "</span><br>");
-			res.append(next.getDateAndTime().display()+ "<br>");
-			res.append(next.getDetails()+ "</span><br>");
-			res.append("------------------------------------------------------------<br>");
-		}
-		return res.toString();
-	}*/
+	
 	private String displaySearch(ArrayList<Task> searched) {
 		Iterator<Task> iter = searched.iterator();
 		StringBuilder res = new StringBuilder();
@@ -185,13 +154,21 @@ public class TDTGUI extends JFrame {
 		while(iter.hasNext()){
 			Task next = iter.next();
 			if(next.isDone()) {
-				res.append("<tr class = \"done\"><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>" );
+				res.append("<tr class = \"done\"><td>" + next.getLabelName() + "</td><td>" 
+						+ next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td class = \"datetime\">" 
+						+ next.getDateAndTime().display() + "</td></tr>" );
 			} else if(next.isHighPriority()) {
-				res.append("<tr class = \"priority\"><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>" );
+				res.append("<tr class = \"priority\"><td>" + next.getLabelName() + "</td><td>" 
+						+ next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td class = \"datetime\">" 
+						+ next.getDateAndTime().display() + "</td></tr>" );
 			} else if(i % 2 == 0) {
-				res.append("<tr class = \"alt\"><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>" );
+				res.append("<tr class = \"alt\"><td>" + next.getLabelName() + "</td><td>" 
+						+ next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td class = \"datetime\">" 
+						+ next.getDateAndTime().display() + "</td></tr>" );
 			} else {
-				res.append("<tr><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td>" + next.getDateAndTime().display() + "</td></tr>");
+				res.append("<tr><td>" + next.getLabelName() + "</td><td>" + next.getTaskID() 
+						+ "</td><td>" + next.getDetails() + "</td><td class = \"datetime\">" 
+						+ next.getDateAndTime().display() + "</td></tr>");
 			}
 			i++;
 		}

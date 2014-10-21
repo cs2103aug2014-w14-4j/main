@@ -773,7 +773,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		int currentMinute = time.getMinutes();
 	
 		String currentDate = currentDay + "/" + currentMonth + "/" + currentYear;
-		String currentTime = currentHour + "/" + currentMinute;
+		String currentTime = currentHour + ":" + currentMinute;
 		
 		String checkDate = "null";
 		String checkTime = "null";
