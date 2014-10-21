@@ -18,7 +18,6 @@ import todothis.command.UndoCommand;
 import todothis.logic.TDTDateAndTime;
 
 public class TDTParser implements ITDTParser {
-	
 	String[] parts;
 	String dateAndTimeParts = "";
 	COMMANDTYPE commandType = COMMANDTYPE.INVALID;
@@ -128,7 +127,11 @@ public class TDTParser implements ITDTParser {
 			String checkWord = parts[i];
 			if (TDTDateAndTime.checkDate(checkWord) || TDTDateAndTime.checkTime(checkWord) || 
 					TDTDateAndTime.checkDay(checkWord)!=0) {
-				completeTimeDateDayDetails(i);
+				if (TDTDateAndTime.checkDay(checkWord) == 10) {
+					completeDayDetails(i, checkWord);
+				} else {
+					completeTimeDateDayDetails(i);
+				}
 			} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
 				setSkipNextWord(false);
 				completeMonthDetails(i);
@@ -280,7 +283,7 @@ public class TDTParser implements ITDTParser {
 					dateAndTimeParts += (" " + parts[i-1]);
 					removeDetails(getCommandDetails(), i-1);
 				}
-			} 	
+			}
 		} 
 		dateAndTimeParts += (" " + parts[i]);
 	}
@@ -303,6 +306,18 @@ public class TDTParser implements ITDTParser {
 		}
 		for (int j=tempParts.size()-1; j>=0; j--) {
 			dateAndTimeParts += (" " + tempParts.get(j));
+		}
+	}
+	
+	/**
+	 * This function checks for the words 'next' and 'following' before the word
+	 * 'day' and completes the commandDetails.
+	 */
+	public void completeDayDetails(int i, String checkWord) {
+		if (parts[i-1].equals("next") || parts[i-1].equals("following")) {
+			completeTimeDateDayDetails(i);
+		} else {
+			setCommandDetails(getCommandDetails() + " " +checkWord);
 		}
 	}
 	
@@ -374,6 +389,7 @@ public class TDTParser implements ITDTParser {
 	public void setDayWordsArr() {
 		ArrayList<String> dayWordsArr = new ArrayList<String>();
 		dayWordsArr.add("this");
+		dayWordsArr.add("the");
 		dayWordsArr.add("next");
 		dayWordsArr.add("following");
 		this.dayWordsArr = dayWordsArr;
