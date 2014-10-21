@@ -6,7 +6,6 @@ public class Task implements Comparable<Task> {
 	private TDTDateAndTime dateAndTime;
 	private String details;
 	private boolean isHighPriority;
-	private boolean hide;
 	private boolean isDone;
 	
 //---------------------Task constructor---------------------------------------
@@ -14,7 +13,6 @@ public class Task implements Comparable<Task> {
 		this.setDetails(details);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName);
-		this.setHide(false);
 		this.setDone(false);
 		this.setHighPriority(p);
 		this.setDateAndTime(dateAndTime);
@@ -23,11 +21,10 @@ public class Task implements Comparable<Task> {
 	
 	public Task(int taskID, String labelName, String details,
 			TDTDateAndTime dateAndTime, boolean p,
-			boolean done, boolean hide) {
+			boolean done) {
 		this.setDetails(details);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName);
-		this.setHide(hide);
 		this.setDone(done);
 		this.setHighPriority(p);
 		this.setDateAndTime(dateAndTime);
@@ -84,12 +81,7 @@ public class Task implements Comparable<Task> {
 	public void setHighPriority(boolean isHighPriority) {
 		this.isHighPriority = isHighPriority;
 	}
-	public boolean isHide() {
-		return hide;
-	}
-	public void setHide(boolean hide) {
-		this.hide = hide;
-	}
+
 	public boolean isDone() {
 		return isDone;
 	}

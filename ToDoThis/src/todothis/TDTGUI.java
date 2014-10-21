@@ -36,7 +36,7 @@ public class TDTGUI extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	public static final String FILENAME = "todothis.txt";
-	public static final String DEFAULT_LABEL = "TODAY";
+	public static final String DEFAULT_LABEL = "TODOTHIS";
 	private TDTLogic logic;
 	private TDTParser parser;
 	private String userCommand;
@@ -110,13 +110,16 @@ public class TDTGUI extends JFrame {
 	
 	private void displayFormat(StringBuilder sb, String currLabel,
 			ArrayList<Task> array) {
-		sb.append("<span class = \"label\"><b>" + currLabel + "</b></span>: <br>");
 		if(array != null) {
-			sb.append("<div class=\"datagrid\"><table>");
-			sb.append("<tr><th>TaskID</th><th>TaskDetails</th><th>Date/Time</th>");
-			for(int i = 0 ; i < array.size(); i++) {
-				Task task = array.get(i);
-				if(!task.isHide()) {
+			sb.append("<span class = \"label\"><b>" + currLabel + "("
+					+ array.size() + ")" + "</b></span>: <br>");
+			if(!logic.isHideLabel(currLabel)) {
+				for(int i = 0 ; i < array.size(); i++) {
+					Task task = array.get(i);
+					if(i == 0) {
+						sb.append("<div class=\"datagrid\"><table>");
+						sb.append("<tr><th>TaskID</th><th>TaskDetails</th><th>Date/Time</th>");
+					}
 					if(task.isDone()) {
 						sb.append("<tr class = \"done\"><td>" + task.getTaskID() + "</td><td>" 
 								+ task.getDetails() + "</td><td class = \"datetime\">" 
@@ -139,9 +142,10 @@ public class TDTGUI extends JFrame {
 								+ "</td></tr>");
 					}
 				}
+				sb.append("</table></div>");
 			}
-			sb.append("</table></div>");
 		}
+		
 	}
 	
 	private String displaySearch(ArrayList<Task> searched) {

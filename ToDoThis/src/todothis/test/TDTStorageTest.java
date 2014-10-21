@@ -1,14 +1,5 @@
 package todothis.test;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.junit.Test;
-
 public class TDTStorageTest {
 
 	/*

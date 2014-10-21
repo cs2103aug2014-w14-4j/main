@@ -52,6 +52,10 @@ public class TDTLogic implements ITDTLogic {
 			renumberTaskID(next);
 		}
 	}
+	
+	public boolean isHideLabel(String label) {
+		return storage.getHideList().contains(label);
+	}
 
 	@Override
 	public Iterator<Task> getTaskIterator() {

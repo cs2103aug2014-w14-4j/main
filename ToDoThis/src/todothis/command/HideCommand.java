@@ -2,7 +2,6 @@ package todothis.command;
 
 import java.util.Iterator;
 
-import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
@@ -13,7 +12,7 @@ public class HideCommand extends Command {
 		super(COMMANDTYPE.HIDE);
 		this.setLabelName(labelName);
 	}
-
+	/*
 	@Override
 	public String execute(TDTStorage storage) {
 		String[] labelNames = getLabelName().split(" ");
@@ -36,6 +35,28 @@ public class HideCommand extends Command {
 		}
 		
 		return "";
+	}*/
+	
+	@Override
+	public String execute(TDTStorage storage) {
+		String[] labelNames = getLabelName().split(" ");
+		Iterator<String> iter = storage.getLabelIterator();
+
+		if(labelNames[0].equals("")){
+			while(iter.hasNext()){
+				String temp = iter.next();
+				storage.insertToHideList(temp);
+			}
+		}else {
+			while(iter.hasNext()){
+				String temp = iter.next();
+				if(containInArray(temp, labelNames)){
+					storage.insertToHideList(temp);
+				}
+			}
+		}
+		
+		return "Hide selected labels.";
 	}
 	
 	private static boolean containInArray(String label, String[] labelNames) {

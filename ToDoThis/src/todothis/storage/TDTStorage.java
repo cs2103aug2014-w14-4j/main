@@ -25,6 +25,7 @@ public class TDTStorage implements ITDTStorage {
 	private BufferedWriter bw;
 	private Stack<HashMap<String, ArrayList<Task>>> redoStack;
 	private Stack<String> redoLabelPointerStack;
+	private ArrayList<String> hideList;
 	
 	public TDTStorage(String fileName) {
 		this.setFileName(fileName);
@@ -33,6 +34,7 @@ public class TDTStorage implements ITDTStorage {
 		setLabelPointerStack(new Stack<String>());
 		setRedoStack(new Stack<HashMap<String, ArrayList<Task>>>());
 		setRedoLabelPointerStack(new Stack<String>());
+		setHideList(new ArrayList<String>());
 		labelMap.put(currLabel, new ArrayList<Task>());
 	}
 	
@@ -51,8 +53,7 @@ public class TDTStorage implements ITDTStorage {
 				String[] params = line.split("\t");
 				TDTDateAndTime date = new TDTDateAndTime(params[4], params[5], 
 						params[6], params[7] );
-				Task task = new Task(0, params[0], params[1] , date,false, false,
-						false);
+				Task task = new Task(0, params[0], params[1] , date,false, false);
 				if(!labelMap.containsKey(params[0])) {
 					labelMap.put(params[0], new ArrayList<Task>());
 				}
@@ -107,7 +108,15 @@ public class TDTStorage implements ITDTStorage {
 		return new TaskIterator(this.getLabelMap());
 	}
 
+	public Iterator<String> getLabelIterator() {
+		return labelMap.keySet().iterator();
+	}	
 	
+	public void insertToHideList(String label) {
+		if(!hideList.contains(label)) {
+			hideList.add(label);
+		}
+	}
 	
 	public int getLabelSize(String labelName) {
 		return this.getLabelMap().get(labelName).size();
@@ -130,7 +139,7 @@ public class TDTStorage implements ITDTStorage {
 			Task task =  taskIter.next();
 			hmap.get(task.getLabelName()).add(new Task(task.getTaskID(), task.getLabelName(),
 					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
-					 task.isDone(), task.isHide()));
+					 task.isDone()));
 		}
 		return hmap;
 	}
@@ -195,6 +204,16 @@ public class TDTStorage implements ITDTStorage {
 
 	public void setRedoLabelPointerStack(Stack<String> redoLabelPointerStack) {
 		this.redoLabelPointerStack = redoLabelPointerStack;
+	}
+
+
+	public ArrayList<String> getHideList() {
+		return hideList;
+	}
+
+
+	public void setHideList(ArrayList<String> hideList) {
+		this.hideList = hideList;
 	}
 
 
