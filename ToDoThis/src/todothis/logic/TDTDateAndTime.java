@@ -260,6 +260,13 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 					//numofdaystoadd already 0;
 				}else if (checkDay(parts[a]) == 9){
 					numOfDaysToAdd++;
+				}else if (checkDay(parts[a]) == 10){
+					if(thisOrNextOrFollowing == 2){//next
+						numOfDaysToAdd = numOfDaysToAdd + 1;
+						
+					}else if(thisOrNextOrFollowing == 3){//following
+						numOfDaysToAdd = numOfDaysToAdd + 2;
+					}
 				}
 				
 				if((currentDay + numOfDaysToAdd) > numOfDaysCurrentMonth){
