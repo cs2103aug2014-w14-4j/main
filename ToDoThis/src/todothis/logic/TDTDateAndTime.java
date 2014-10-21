@@ -1,6 +1,7 @@
 package todothis.logic;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 //import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -19,6 +20,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	private boolean isTimedTask = false;
 	private boolean isDeadlineTask = false;
+	
 	
 	//private Logger logger = Logger.getLogger("TDTDateAndTime");
 	
@@ -759,8 +761,53 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			return 0;
 		}
 	}
+	//-----------------------------------CHECK FOR OVERDUE TASK----------------------------
+	//NEED TESTING
+	@SuppressWarnings("deprecation")
+	public boolean checkIfOverdue(){
+		int currentDay = cal.get(Calendar.DATE);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentYear = cal.get(Calendar.YEAR);
+		Date time = cal.getTime();
+		int currentHour = time.getHours();
+		int currentMinute = time.getMinutes();
+	
+		String currentDate = currentDay + "/" + currentMonth + "/" + currentYear;
+		String currentTime = currentHour + "/" + currentMinute;
+		
+		String checkDate = "null";
+		String checkTime = "null";
+		if(isDeadlineTask){
+			checkDate = getEndDate();
+			checkTime = getEndTime();
+		}else if(isTimedTask){
+			if(getEndDate().equals("null") && !getEndTime().equals("null")){
+				checkDate = getStartDate();
+				checkTime = getEndTime();
+			}else if(!getEndDate().equals("null")){
+				checkDate = getEndDate();
+				checkTime = getEndTime();
+			}else{
+				checkDate = getStartDate();
+				checkTime = getStartTime();
+			}
+		}
+		
+		if(!checkDate.equals("null")){
+			if(compareToDate(currentDate, checkDate) == -1){
+				return true;
+			}else if(compareToDate(currentDate, checkDate) == 0){
+				if(!checkTime.equals("null")){
+					if(compareToTime(currentTime, checkTime) == -1){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
 	//------------------------------------CHECK FOR CLASHES-------------------------------
-	//NEED TEST
 	public boolean isClash(TDTDateAndTime arg0){
 		if(arg0.isTimedTask() == true){
 			if(!this.getStartDate().equals("null") && !this.getStartTime().equals("null")){
@@ -847,7 +894,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	
 	//------------------------------------COMPARABLE----------------------------------------
-	//NEEDS TESTING!
 	@Override
 	public int compareTo(TDTDateAndTime arg0) {
 		String thisDate = "null";
