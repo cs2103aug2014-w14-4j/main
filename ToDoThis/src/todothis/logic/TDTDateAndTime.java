@@ -18,6 +18,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	private String details = "null";
 	
 	private boolean isTimedTask = false;
+	private boolean isDeadlineTask = false;
 	
 	//private Logger logger = Logger.getLogger("TDTDateAndTime");
 	
@@ -54,6 +55,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		decodeDetails(dateAndTime_details);
 		if(!getStartDate().equals("null") || !getStartTime().equals("null")){
 			isTimedTask = true;
+		}else if(!getEndDate().equals("null") || !getEndTime().equals("null")){
+			isDeadlineTask = true;
 		}
 		
 	}
@@ -64,6 +67,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		this.endTime = endTime;
 		if(!getStartDate().equals("null") || !getStartTime().equals("null")){
 			isTimedTask = true;
+		}else if(!getEndDate().equals("null") || !getEndTime().equals("null")){
+			isDeadlineTask = true;
 		}
 	}
 	public TDTDateAndTime(){
@@ -347,6 +352,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	}
 	public boolean isTimedTask(){
 		return isTimedTask;
+	}
+	public boolean isDeadlineTask(){
+		return isDeadlineTask;
 	}
 	
 	//-------------------------------------------DISPLAY------------------------------------------------
