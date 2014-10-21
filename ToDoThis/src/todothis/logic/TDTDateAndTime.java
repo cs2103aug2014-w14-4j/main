@@ -347,23 +347,23 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		String dateAndTimeContents = "";
 		if(deadline == true){
 			if(!getEndDate().equals("null")){
-				dateAndTimeContents = dateAndTimeContents + "  Due Date: " + getEndDate();
+				dateAndTimeContents = dateAndTimeContents + "  Due Date: " + getEndDate()+"<br>";
 			}
 			if(!getEndTime().equals("null")){
-				dateAndTimeContents = dateAndTimeContents + "  Due Time: " + getEndTime();
+				dateAndTimeContents = dateAndTimeContents + "  Due Time: " + getEndTime()+"<br>";
 			}
 		}else{
 			if(!getStartDate().equals("null")){
-				dateAndTimeContents = dateAndTimeContents + "  Start Date: " + getStartDate();
+				dateAndTimeContents = dateAndTimeContents + "  Start Date: " + getStartDate()+"<br>";
 			}
 			if(!getStartTime().equals("null")){
-				dateAndTimeContents = dateAndTimeContents + "  Start Time: " + getStartTime();
+				dateAndTimeContents = dateAndTimeContents + "  Start Time: " + getStartTime()+"<br>";
 			}
 			if(!getEndDate().equals("null")){
-				dateAndTimeContents = dateAndTimeContents + "  End Date: " + getEndDate();
+				dateAndTimeContents = dateAndTimeContents + "  End Date: " + getEndDate()+"<br>";
 			}
 			if(!getEndTime().equals("null")){
-				dateAndTimeContents = dateAndTimeContents + "  End Time: " + getEndTime();
+				dateAndTimeContents = dateAndTimeContents + "  End Time: " + getEndTime()+"<br>";
 			}
 		}
 		return dateAndTimeContents;
@@ -379,7 +379,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		}else{
 			displayString = "(FLOATING TASK)";
 		}
-		displayString = displayString + displayDateTime(isDeadline);
+		displayString = displayString +"<br>"+ displayDateTime(isDeadline);
 		return displayString;
 	}
 //-------------------------------Time Related Methods------------------------------------------

@@ -16,7 +16,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JViewport;
+import javax.swing.border.MatteBorder;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 import todothis.command.Command;
 import todothis.command.RedoCommand;
@@ -26,9 +28,6 @@ import todothis.logic.TDTLogic;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.parser.TDTParser;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 
 public class TDTGUI extends JFrame {
 	/**
@@ -50,7 +49,15 @@ public class TDTGUI extends JFrame {
 	JLabel taskLabel = new JLabel();
 	JScrollPane scrollPane = new JScrollPane();
 	JViewport vp;
-	
+	String css = ".datagrid table {background: \"white\"; border: 3px solid; border-radius: 20px; text-align: center; width: 100%; } "
+			+ ".datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: \"white\"; overflow: hidden; border: 4px solid #006699; border-radius: 100px;}"
+			+ ".datagrid table td  { text-align: center; padding: 3px 10px;color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }"
+			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
+			+ ".datagrid table th{ background: #BDBDBD}"
+			+ ".datagrid table .priority td{ background: #DF0101; color: \"white\" }"
+			+ ".datagrid table .done td{ background: #04B404; text-decoration: line-through}"
+			+ ".label{ color: \"blue\"; font-size:15px}";
+
 
 	/**
 	 * Launch the application.
@@ -60,12 +67,17 @@ public class TDTGUI extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TDTGUI frame = new TDTGUI();
+					final TDTGUI frame = new TDTGUI();
 					frame.feedbackArea.setText(frame.doInit());
 					frame.setVisible(true);
 					
 					frame.taskPane.setText(frame.displayTask());
 					frame.taskLabel.setText("Adding task to: " + frame.logic.getCurrLabel());
+					javax.swing.SwingUtilities.invokeLater(new Runnable() {
+						   public void run() { 
+						       frame.scrollPane.getVerticalScrollBar().setValue(0);
+						   }
+						});
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -92,7 +104,7 @@ public class TDTGUI extends JFrame {
 		}
 		return sb.toString();
 	}
-
+	/*
 	private void displayFormat(StringBuilder sb, String currLabel,
 			ArrayList<Task> array) {
 		if(array != null) {
@@ -115,6 +127,28 @@ public class TDTGUI extends JFrame {
 		} else {
 			sb.append("------------------------------------------------------------<br>");
 			sb.append("<span color = \"blue\"><b>" + currLabel + "</b></span>: <br>");
+		}
+	}*/
+	
+	private void displayFormat(StringBuilder sb, String currLabel,
+			ArrayList<Task> array) {
+		sb.append("<span class = \"label\"><b>" + currLabel + "</b></span>: <br>");
+		if(array != null) {
+			sb.append("<div class=\"datagrid\"><table>");
+			sb.append("<tr><th>TaskID</th><th>TaskDetails</th><th>Date/Time</th>");
+			for(int i = 0 ; i < array.size(); i++) {
+				Task task = array.get(i);
+				if(task.isDone()) {
+					sb.append("<tr class = \"done\"><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>" );
+				} else if(task.isHighPriority()) {
+					sb.append("<tr class = \"priority\"><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>" );
+				} else if(i % 2 == 0) {
+					sb.append("<tr class = \"alt\"><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>" );
+				} else {
+					sb.append("<tr><td>" + task.getTaskID() + "</td><td>" + task.getDetails() + "</td><td>" + task.getDateAndTime().display() + "</td></tr>");
+				}
+			}
+			sb.append("</table></div>");
 		}
 	}
 
@@ -149,12 +183,13 @@ public class TDTGUI extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(300, 100, 800, 600);
 		contentPane = new JPanel();
+		contentPane.setBorder(new MatteBorder(3, 3, 3, 3, (Color) new Color(0, 0, 0)));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		commandLabel.setBounds(0, 3, 576, 14);
+		commandLabel.setBounds(10, 3, 526, 17);
 		commandLabel.setFocusable(false);
 		contentPane.add(commandLabel);
-		commandField.setBounds(55, 0, 521, 20);
+		commandField.setBounds(61, 3, 713, 20);
 		commandField.setColumns(10);
 		commandField.setFocusable(true);
 		contentPane.add(commandField);
@@ -176,7 +211,7 @@ public class TDTGUI extends JFrame {
 					updateGUI(feedback, displayTask());
 				}
 				
-				/*
+				
 				if(arg0.isControlDown() && keyCode == KeyEvent.VK_DOWN) {
 					Rectangle rec = getBounds();
 					rec.setSize((int)rec.getWidth(), (int)rec.getHeight() + 10);
@@ -205,7 +240,7 @@ public class TDTGUI extends JFrame {
 					rec.setSize((int)rec.getWidth(), (int)rec.getHeight() - 10);
 					rec.setLocation((int)rec.getX(), (int)rec.getY() - 10);
 					feedbackArea.setBounds(rec);
-				}*/
+				}
 				
 				switch(keyCode) {
 				case KeyEvent.VK_ENTER :
@@ -224,12 +259,12 @@ public class TDTGUI extends JFrame {
 						ArrayList<Task> searched = ((SearchCommand)command).getSearchedResult();
 						updateGUI(feedback, displaySearch(searched));
 					}
-					/*
+					
 					javax.swing.SwingUtilities.invokeLater(new Runnable() {
 						   public void run() { 
 						       scrollPane.getVerticalScrollBar().setValue(0);
 						   }
-						});*/
+						});
 					break;
 				case KeyEvent.VK_UP :
 					historyPointer--;
@@ -313,9 +348,9 @@ public class TDTGUI extends JFrame {
 			}
 			
 		});
-		taskLabel.setBounds(0, 25, 576, 14);
+		taskLabel.setBounds(10, 25, 566, 14);
 		contentPane.add(taskLabel);
-		scrollPane.setBounds(0, 42, 576, 380);
+		scrollPane.setBounds(10, 42, 764, 427);
 		scrollPane.setRowHeaderView(taskPane);
 		scrollPane.setFocusable(true);
 		scrollPane.getViewport().setView(taskPane);
@@ -324,7 +359,10 @@ public class TDTGUI extends JFrame {
 		
 		//Task Pane
 		taskPane.setBackground(Color.LIGHT_GRAY);
-		taskPane.setEditorKit(new HTMLEditorKit());
+		 HTMLEditorKit kit = new HTMLEditorKit();
+		taskPane.setEditorKit(kit);
+		StyleSheet styleSheet = kit.getStyleSheet();
+		styleSheet.addRule(css);
 		taskPane.setFocusable(false);
 		taskPane.setEditable(false);
 		
@@ -360,7 +398,7 @@ public class TDTGUI extends JFrame {
 			}
 			
 		});
-		feedbackArea.setBounds(0, 433, 576, 128);
+		feedbackArea.setBounds(10, 480, 764, 70);
 		
 		//Feedback Area
 		feedbackArea.setEditable(false);
