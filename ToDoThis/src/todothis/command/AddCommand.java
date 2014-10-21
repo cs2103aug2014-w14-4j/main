@@ -33,17 +33,32 @@ public class AddCommand extends Command {
 		Task task = new Task(taskId, labelName, getCommandDetails(),
 				getDateAndTime(), isHighPriority());
 		TDTDateAndTime dnt = getDateAndTime();
-		if(TDTDateAndTime.isValidDateRange(dnt.getStartDate()) && 
-				TDTDateAndTime.isValidDateRange(dnt.getEndDate()) &&
-				TDTDateAndTime.isValidTimeRange(dnt.getStartTime()) &&
-				TDTDateAndTime.isValidTimeRange(dnt.getEndTime())) {
-			storage.addTask(task);
-			TDTLogic.sort(storage.getLabelMap());
-			storage.write();
-			return "Add success";
-		} else {
+		if(!TDTDateAndTime.isValidDateRange(dnt.getStartDate()) || 
+				!TDTDateAndTime.isValidDateRange(dnt.getEndDate()) ||
+				!TDTDateAndTime.isValidTimeRange(dnt.getStartTime()) ||
+				!TDTDateAndTime.isValidTimeRange(dnt.getEndTime())) {
 			return "Invalid date/time format.";
 		}
+		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")){
+			if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1){
+				return "Invalid end date! End date should be after start date!";
+			}else if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0){
+				if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
+					if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
+						return "Invalid end time! End Time should be after start time!";
+					}
+				}
+			}
+		}else if(dnt.getStartDate().equals("null") && dnt.getEndDate().equals("null") && 
+				!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
+			if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
+				return "Invalid end time! End Time should be after start time!";
+			}
+		}
+		storage.addTask(task);
+		TDTLogic.sort(storage.getLabelMap());
+		storage.write();
+		return "Add success";
 	}
 
 	public int getTaskID() {

@@ -27,20 +27,25 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	// 2am 11pm --
 	private static final String TIME_PATTERN_1 = 
-			"(0?[1-9]|1[12])([aA][Mm]|[pP][mM])";
+			"(0?[1-9]|1[012])([aA][Mm]|[pP][mM])";
 	// 2:00 12:15 2.00 23:30 ----------
 	private static final String TIME_PATTERN_2 = 
-			"(0?[1-9]|1[0-9]|2[0-3])(0?[:.])(0?[0-5][0-9])";
+			"(0?[0-9]|1[0-9]|2[0-3])(0?[:.])(0?[0-5][0-9])";
 	// 2:00pm 12:15pm 2.00pm 12.15pm --
 	private static final String TIME_PATTERN_3 = 
-			"(0?[1-9]|1[12])(0?[:.])(0?[0-5][0-9])([aA][Mm]|[pP][mM])";
+			"(0?[0-9]|1[012])(0?[:.])(0?[0-5][0-9])([aA][Mm]|[pP][mM])";
 	// 13:00pm 12:01pm
 	private static final String TIME_PATTERN_4 = 
-			"(1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
-	// 2359am 230pm 1250hr 1250h ------------------------------ 
+			"(0?1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
+	// 1200am to 1259pm 
 	private static final String TIME_PATTERN_5 = 
-			"(0?[0-9]|1[0-9]|2[0-3])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
-
+			"(0?[1-9]|1[012])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
+	// 1300pm onwards
+	private static final String TIME_PATTERN_6 = 
+			"(0?1[3-9]|2[0-3])(0?[0-5][0-9])([pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
+	// 000am 0000am
+	private static final String TIME_PATTERN_7 = 
+			"(0?0)(0?[0-5][0-9])([aA][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
 	
 	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 	//constructor
@@ -71,10 +76,22 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
-		System.out.println(test2.display());
+		//TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
+		//System.out.println(test2.display());
 	
 		
+	}
+	public static String replaceEndStringPunctuation(String word){
+		int length = word.length();
+		String replacedWord = word;
+		for(int i = length - 1; i >= 0; i--){
+			if(word.charAt(i) == '.' || word.charAt(i) == '!' || word.charAt(i) == ','){
+				replacedWord = word.substring(0,i);
+			}else {
+				return replacedWord;
+			}
+		}
+		return replacedWord;
 	}
 	
 	public void decodeDetails(String details){
@@ -93,8 +110,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
 			int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
 			
-			parts[a] = parts[a].replaceAll("[.!,]", "");
-
+			parts[a] = replaceEndStringPunctuation(parts[a]);
+			
 			if(parts[a].equals("to") || parts[a].equals("till") || 
 					parts[a].equals("by") || parts[a].equals("until") ||
 					parts[a].equals("-") ){
@@ -552,15 +569,18 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	//----------------------CHECK TIME--------------------------------
 	
 	public static boolean checkTime(String time) {
-		time = time.replaceAll("[.!,]", "");
-		pattern = new Pattern[6]; 
+
+		time = replaceEndStringPunctuation(time);
+		
+		pattern = new Pattern[8]; 
 		pattern[1] = Pattern.compile(TIME_PATTERN_1);
 		pattern[2] = Pattern.compile(TIME_PATTERN_2);
 		pattern[3] = Pattern.compile(TIME_PATTERN_3);
 		pattern[4] = Pattern.compile(TIME_PATTERN_4);
 		pattern[5] = Pattern.compile(TIME_PATTERN_5);
-		
-		 for (int i=1; i<=5; i++) {
+		pattern[6] = Pattern.compile(TIME_PATTERN_6);
+		pattern[7] = Pattern.compile(TIME_PATTERN_7);
+		 for (int i=1; i<=7; i++) {
 			 matcher = pattern[i].matcher(time);
 			 if(matcher.matches()){
 				 return true;
@@ -648,7 +668,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 
 	//---------------------------CHECK DATE------------------------------------------
 	public static boolean checkDate(String nextWord) {
-		nextWord = nextWord.replaceAll("[.!,]", "");
+		
+		nextWord = replaceEndStringPunctuation(nextWord);
 		
 		if ((nextWord.split("/").length == 3) || (nextWord.split("/").length == 2)) {
 			return true;
