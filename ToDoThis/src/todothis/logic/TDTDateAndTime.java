@@ -766,7 +766,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	//-----------------------------------CHECK FOR OVERDUE TASK----------------------------
 	//NEED TESTING
 	@SuppressWarnings("deprecation")
-	public boolean checkIfOverdue(){
+	public boolean isOverdue(){
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);

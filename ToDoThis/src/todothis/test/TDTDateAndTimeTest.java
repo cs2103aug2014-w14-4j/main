@@ -1,11 +1,56 @@
 package todothis.test;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import todothis.logic.TDTDateAndTime;
 
 public class TDTDateAndTimeTest {
+	
+	@Test
+	public void testOverDue(){
+		ArrayList<TDTDateAndTime> taskList = new ArrayList<TDTDateAndTime>();
+		// TDTDateAndTime(String startDate, String endDate, String startTime, String endTime)
+		//Test Done on 22/10/2014 5pm
+		
+		//Testing deadline task
+		taskList.add(new TDTDateAndTime("null", "22/10/2014", "null", "16:59")); 
+		assertTrue(taskList.get(0).isOverdue()); //This is the boundary case for dueTime before currentTime partition
+		taskList.add(new TDTDateAndTime("null", "22/10/2014", "null", "17:01")); 
+		assertFalse(taskList.get(1).isOverdue()); //This is the boundary case for dueTime after currentTime partition
+		taskList.add(new TDTDateAndTime("null", "22/10/2014", "null", "17:00")); 
+		assertFalse(taskList.get(2).isOverdue()); //This is the boundary case for dueTime on currentTime partition
+		
+		taskList.add(new TDTDateAndTime("null", "21/10/2014", "null", "null")); 
+		assertTrue(taskList.get(3).isOverdue()); //This is the boundary case for dueDate before currentDate partition
+		taskList.add(new TDTDateAndTime("null", "23/10/2014", "null", "null")); 
+		assertFalse(taskList.get(4).isOverdue()); //This is the boundary case for dueDate after currentDate partition
+		taskList.add(new TDTDateAndTime("null", "22/10/2014", "null", "null")); 
+		assertFalse(taskList.get(5).isOverdue()); //This is the boundary case for dueDate on currentDate partition
+		
+		taskList.add(new TDTDateAndTime("null", "null", "null", "15:00")); 
+		assertFalse(taskList.get(6).isOverdue()); //This is the case where only dueTime is keyed, taken care the whole partition
+		
+		
+		//Testing timed task Eg: on a single day with a start and end time
+		taskList.add(new TDTDateAndTime("22/10/2014", "null", "11:00", "16:59")); 
+		assertTrue(taskList.get(7).isOverdue()); //This is the boundary case for endTime before currentTime partition
+		taskList.add(new TDTDateAndTime("22/10/2014", "null", "11:00", "17:01")); 
+		assertFalse(taskList.get(8).isOverdue()); //This is the boundary case for endTime after currentTime partition
+		taskList.add(new TDTDateAndTime("22/10/2014", "null", "11:00", "17:00")); 
+		assertFalse(taskList.get(9).isOverdue()); //This is the boundary case for endTime on currentTime partition
+		
+		//Testing timed task Eg: a span of more than 1 day with a start and end time
+		taskList.add(new TDTDateAndTime("20/10/2014", "21/10/2014", "11:00", "16:59")); 
+		assertTrue(taskList.get(7).isOverdue()); //This is the boundary case for endDate before currentDate partition
+		taskList.add(new TDTDateAndTime("20/10/2014", "22/10/2014", "11:00", "16.59")); 
+		assertTrue(taskList.get(8).isOverdue()); //This is the boundary case for endDate same currentDate partition, endTime is checked
+		taskList.add(new TDTDateAndTime("20/10/2014", "23/10/2014", "11:00", "17:00")); 
+		assertFalse(taskList.get(9).isOverdue()); //This is the boundary case for endDate after currentDate partition
+		
+	}
 
 	@Test
 	public void testClash() {

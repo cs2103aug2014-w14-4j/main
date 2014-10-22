@@ -124,7 +124,7 @@ public class TDTGUI extends JFrame {
 						sb.append("<tr class = \"done\"><td>" + task.getTaskID() + "</td><td>" 
 								+ task.getDetails() + "</td><td class = \"datetime\">" 
 								+ task.getDateAndTime().display() + "</td></tr>" );
-					} else if(task.getDateAndTime().checkIfOverdue()) {
+					} else if(task.getDateAndTime().isOverdue()) {
 						sb.append("<tr class = \"overdue\"><td>" + task.getTaskID() + "</td><td>" 
 								+ task.getDetails() + "</td><td class = \"datetime\">" 
 								+ task.getDateAndTime().display() + "</td></tr>" );
