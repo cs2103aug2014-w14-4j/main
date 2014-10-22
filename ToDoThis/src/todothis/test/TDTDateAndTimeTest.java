@@ -8,8 +8,42 @@ import org.junit.Test;
 import todothis.logic.TDTDateAndTime;
 
 public class TDTDateAndTimeTest {
+	@Test
+	public void testValidTimeRange(){
+		//24 hrs format
+		assertFalse(TDTDateAndTime.isValidTimeRange("24:00"));//This is boundary case for hours above value 23 partition
+		assertTrue(TDTDateAndTime.isValidTimeRange("10:00"));//This is boundary case for hours within the range partition
+		assertFalse(TDTDateAndTime.isValidTimeRange("-1:00"));//This is boundary case for hours in negative value partition
+		
+		assertFalse(TDTDateAndTime.isValidTimeRange("23:60"));//This is boundary case for minutes above value 59 partition
+		assertTrue(TDTDateAndTime.isValidTimeRange("23:34"));//This is boundary case for minutes within the range partition
+		assertFalse(TDTDateAndTime.isValidTimeRange("23:-1"));//This is boundary case for minutes in negative value partition
+		
+		assertTrue(TDTDateAndTime.isValidTimeRange("null"));//This is case when start or end time is not intialised
+	}
 	
 	@Test
+	public void testValidDateRange(){
+		
+		assertFalse(TDTDateAndTime.isValidDateRange("12/12/2013"));//This is boundary case for year lesser than 2014 partition
+		assertTrue(TDTDateAndTime.isValidDateRange("12/12/2050"));//This is boundary case for year within range partition
+		assertFalse(TDTDateAndTime.isValidDateRange("12/12/2100"));//This is boundary case for year more than 2099 partition
+		
+		assertFalse(TDTDateAndTime.isValidDateRange("12/0/2014"));//This is boundary case for month lesser than 1 partition
+		assertTrue(TDTDateAndTime.isValidDateRange("12/8/2014"));//This is boundary case for month within range partition
+		assertFalse(TDTDateAndTime.isValidDateRange("12/13/2014"));//This is boundary case for month more than 12 partition
+		
+		assertFalse(TDTDateAndTime.isValidDateRange("0/8/2014"));//This is boundary case for day lesser than 1 partition
+		assertTrue(TDTDateAndTime.isValidDateRange("12/8/2014"));//This is boundary case for day within range partition
+		assertFalse(TDTDateAndTime.isValidDateRange("32/8/2014"));//This is boundary case for day more than 31 partition
+		
+		assertTrue(TDTDateAndTime.isValidDateRange("null"));//This is case when date is not intialised
+		
+		assertFalse(TDTDateAndTime.isValidDateRange("a31/8/2014")); //This is case when date has unwanted non digits
+		
+	}
+	
+	//@Test
 	public void testOverDue(){
 		ArrayList<TDTDateAndTime> taskList = new ArrayList<TDTDateAndTime>();
 		// TDTDateAndTime(String startDate, String endDate, String startTime, String endTime)
@@ -44,11 +78,11 @@ public class TDTDateAndTimeTest {
 		
 		//Testing timed task Eg: a span of more than 1 day with a start and end time
 		taskList.add(new TDTDateAndTime("20/10/2014", "21/10/2014", "11:00", "16:59")); 
-		assertTrue(taskList.get(7).isOverdue()); //This is the boundary case for endDate before currentDate partition
+		assertTrue(taskList.get(10).isOverdue()); //This is the boundary case for endDate before currentDate partition
 		taskList.add(new TDTDateAndTime("20/10/2014", "22/10/2014", "11:00", "16.59")); 
-		assertTrue(taskList.get(8).isOverdue()); //This is the boundary case for endDate same currentDate partition, endTime is checked
+		assertTrue(taskList.get(11).isOverdue()); //This is the boundary case for endDate same currentDate partition, endTime is checked
 		taskList.add(new TDTDateAndTime("20/10/2014", "23/10/2014", "11:00", "17:00")); 
-		assertFalse(taskList.get(9).isOverdue()); //This is the boundary case for endDate after currentDate partition
+		assertFalse(taskList.get(12).isOverdue()); //This is the boundary case for endDate after currentDate partition
 		
 	}
 
