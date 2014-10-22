@@ -120,7 +120,11 @@ public class TDTParser implements ITDTParser {
 	
 //---------------------------------- Main Command Methods -------------------------------------
 	public void add(String userCommand) {
-		this.setRemainingWords(userCommand);
+		if (getFirstWord(userCommand).equalsIgnoreCase("add")) {
+			setRemainingWords(removeFirstWord(userCommand));
+		} else {
+			this.setRemainingWords(userCommand);
+		}
 		isPriority(getRemainingWords());
 		parts = getRemainingWords().split(" ");
 		for (int i = 0; i < parts.length; i++) {
