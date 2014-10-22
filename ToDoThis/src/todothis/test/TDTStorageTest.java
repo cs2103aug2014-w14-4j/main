@@ -1,5 +1,18 @@
 package todothis.test;
 
+import static org.junit.Assert.*;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.junit.Test;
+
+import todothis.logic.TDTDateAndTime;
+import todothis.logic.Task;
+import todothis.storage.TDTStorage;
+
 public class TDTStorageTest {
 
 	/*
@@ -23,38 +36,76 @@ public class TDTStorageTest {
 			total++;
 		}
 		assertEquals(total, ans.size());
-	}
+	}*/
 	
+	
+	
+	//Normal case of writing 2 labels to file.
 	@Test
-	public void testWrite() throws Exception {
+	public void testWrite1() throws Exception {
 		TDTStorage storage = new TDTStorage("TestStorage.txt");
-		storage.getLabelMap().put("Today", new ArrayList<Task>());
-		storage.getLabelMap().put("Ytd", new ArrayList<Task>());
-		storage.addTask(new Task(1, "Today", "Buy egg", new TDTDateAndTime("","","",""), true));
-		storage.addTask(new Task(2, "Today", "Buy rice",new TDTDateAndTime("","","",""), false));
-		storage.addTask(new Task(3, "Today", "Buy rice", new TDTDateAndTime("","","",""), false));
-		storage.addTask(new Task(1, "Ytd", "Buy nothing", new TDTDateAndTime("","","",""), true));
+		storage.getLabelMap().put("TODAY", new ArrayList<Task>());
+		storage.getLabelMap().put("YTD", new ArrayList<Task>());
 		storage.write();
 		
 		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
-		ArrayList<String[]> lines = new ArrayList<String[]>();
+		ArrayList<String> lines = new ArrayList<String>();
 		while(br.ready()) {
-			lines.add(br.readLine().split("\t"));
+			lines.add(br.readLine());
 		}
 		br.close();
 		
-		assertEquals(4, lines.size());
-		for(int i = 0; i < lines.size(); i++) {
-			String[] params = lines.get(i);
-			boolean p = false;
-			Task task = storage.getLabelMap().get(params[0]).get(i%3);
-			assertEquals(task.getLabelName(), params[0]);
-			assertEquals(task.getDetails(), params[1]);
-			if(params[4].equals("true")) {
-				p = true;
-			}
-			assertEquals(task.isHighPriority(), p);
+		assertEquals("3", lines.get(0));
+		assertEquals("TODOTHIS", lines.get(1));
+		assertEquals("TODAY", lines.get(2));
+		assertEquals("YTD", lines.get(3));
+	}
+	
+	//Boundary case of writing no labels to file.
+	@Test
+	public void testWrite2() throws Exception {
+		TDTStorage storage = new TDTStorage("TestStorage.txt");
+		storage.write();
+
+		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
+		ArrayList<String> lines = new ArrayList<String>();
+		while(br.ready()) {
+			lines.add(br.readLine());
 		}
-		
-	}*/
+		br.close();
+
+		assertEquals("1", lines.get(0));
+		assertEquals("TODOTHIS", lines.get(1));
+
+	}
+	/*
+	//Normal case of writing tasks to file.
+		@Test
+		public void testWrite3() throws Exception {
+			TDTStorage storage = new TDTStorage("TestStorage.txt");
+			storage.write();
+
+			BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
+			ArrayList<String> lines = new ArrayList<String>();
+			while(br.ready()) {
+				lines.add(br.readLine());
+			}
+			br.close();
+
+			assertEquals("1", lines.get(0));
+			assertEquals("TODOTHIS", lines.get(1));
+			
+				for(int i = 0; i < lines.size(); i++) {
+					String[] params = lines.get(i);
+					boolean p = false;
+					Task task = storage.getLabelMap().get(params[0]).get(i%3);
+					assertEquals(task.getLabelName(), params[0]);
+					assertEquals(task.getDetails(), params[1]);
+					if(params[4].equals("true")) {
+						p = true;
+					}
+					assertEquals(task.isHighPriority(), p);
+				}
+
+		}*/
 }
