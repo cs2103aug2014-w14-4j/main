@@ -35,12 +35,18 @@ public class DeleteCommand extends Command {
 		//delete label
 		if(!label.equals("") && taskId == -1) {
 			if(storage.getLabelMap().containsKey(label)) {
-				storage.getLabelMap().remove(label);
-				storage.getAutoWords().remove(label);
-				if(label.equals(TDTGUI.DEFAULT_LABEL)) {
-					storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
+				//If label is empty, delete label
+				if(storage.getLabelSize(label) == 0) {
+					storage.getLabelMap().remove(label);
+					storage.getAutoWords().remove(label);
+					if(label.equals(TDTGUI.DEFAULT_LABEL)) {
+						storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
+					}
+					return "Label deleted.";
+				} else {
+					//label not empty, clear task in label
+					storage.getLabelMap().get(label).clear();
 				}
-				return "Label deleted.";
 			} else {
 				return "Error. Label does not exist.";
 			}
