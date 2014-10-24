@@ -21,10 +21,6 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	private boolean isTimedTask = false;
 	private boolean isDeadlineTask = false;
 	
-	
-	//private Logger logger = Logger.getLogger("TDTDateAndTime");
-	
-
 	private static Pattern[] pattern;
 	private static Matcher matcher;
 	
@@ -51,6 +47,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			"(0?0)(0?[0-5][0-9])([aA][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
 	
 	private static Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+	
 	//constructor
 	public TDTDateAndTime(String dateAndTime_details){
 		details = dateAndTime_details;
@@ -83,9 +80,9 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	public static void main(String args[]){
 		
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		//TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
-		//System.out.println(test2.display());
-		System.out.println(TDTDateAndTime.decodeSearchDetails("tml today monday"));
+		TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
+		System.out.println(test2.display());
+		//System.out.println(TDTDateAndTime.decodeSearchDetails("tml today monday"));
 	
 	}
 	public static String replaceEndStringPunctuation(String word){
@@ -103,238 +100,269 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	
 	public void decodeDetails(String details){
 		System.out.println(details);
-		String [] parts = details.toLowerCase().split(" ");
-		
 		boolean endTimeDate = false;
 		int thisOrNextOrFollowing = 0; //this = 1 next = 2 following = 3
-		
+		String decodedDate = "";
+		String decodedTime = "";
+		String [] parts = details.toLowerCase().split(" ");
+		int currentDay = cal.get(Calendar.DATE);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentYear = cal.get(Calendar.YEAR);
+		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
 		for(int a = 0; a < parts.length;a++){
-			int currentDay = cal.get(Calendar.DATE);
-			int currentMonth = cal.get(Calendar.MONTH) + 1;
-			int currentYear = cal.get(Calendar.YEAR);
-			int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-			//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-			//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-			int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
-			
 			parts[a] = replaceEndStringPunctuation(parts[a]);
 			
-			if(parts[a].equals("to") || parts[a].equals("till") || 
-					parts[a].equals("by") || parts[a].equals("until") ||
-					parts[a].equals("-") ){
+			if(isPrepositionTo(parts, a) ){
+				endTimeDate = true;
+			}
+			if(parts[a].equals("by")){
 				endTimeDate = true;
 			}
 			
 			if(parts[a].equals("this")){
 				thisOrNextOrFollowing = 1;
-			}else if(parts[a].equals("next")){
+			} else if(parts[a].equals("next")){
 				thisOrNextOrFollowing = 2;
-			}else if(parts[a].equals("following")){
+			} else if(parts[a].equals("following")){
 				thisOrNextOrFollowing = 3;
 			}
 			
 			if(checkDate(parts[a])){
-				String [] dateParts = new String[3];
-	 			String [] datePartsTemp = null;
-				// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
-				if ((parts[a].split("/").length == 3) || (parts[a].split("/").length == 2)) {
-					datePartsTemp = parts[a].split("/");
-				} else if ((parts[a].split("-").length == 3) || (parts[a].split("-").length == 2)) {
-					datePartsTemp = parts[a].split("-");
-				} 
-				/*else if ((parts[a].split(".").length == 3) || (parts[a].split(".").length == 2)) {
-					dateParts = parts[a].split(".");
-				}*/
-				else{
-					dateParts[0] = parts[a].substring(0, 2);
-					dateParts[1] = parts[a].substring(2, 4);
-					if(parts[a].length() == 6){
-						dateParts[2] = "20" + parts[a].substring(4, 6); //valid year 2014-2099
-					}else if(parts[a].length() == 8){
-						dateParts[2] = parts[a].substring(4, 8);
-					}
-				}
-				//if 9/12 entered, add on to 9/12/2014
-				if(datePartsTemp != null){
-					if(datePartsTemp.length == 2){
-						dateParts[0] = datePartsTemp[0];
-						dateParts[1] = datePartsTemp[1];
-						dateParts[2] = Integer.toString(currentYear);
-					}else{
-						dateParts = datePartsTemp;
-					}
-					if(datePartsTemp.length == 3){
-						if(datePartsTemp[2].length() == 2){
-							dateParts[2] = "20" + datePartsTemp[2];
-						}
-					}
-				}
+				decodedDate = decodeDate(parts, a, currentYear);
 
 				if(endTimeDate == true){
-					endDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
-				}else{
-					startDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
+					endDate = decodedDate;
+				} else {
+					startDate = decodedDate;
 				}
-			}else if(checkTime(parts[a])){
-				String [] timeParts = new String[2];
-				if ((parts[a].substring(parts[a].length()-2, parts[a].length()).equals("am")) || 
-						(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm") ||
-								(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("hr")))){
-					if(parts[a].length() > 4){
-						if(parts[a].charAt(parts[a].length()-5) == ':' || 
-								parts[a].charAt(parts[a].length()-5) == '.'){
-							if(parts[a].length() == 6){
-								timeParts[0] = parts[a].substring(0, 1);
-								timeParts[1] = parts[a].substring(2, 4);
-							}else{
-								timeParts[0] = parts[a].substring(0, 2);
-								timeParts[1] = parts[a].substring(3, 5);
-							}
-						}
-					}
-					if(parts[a].substring(0, parts[a].length()-2).matches("\\d+")){
-						if(parts[a].length() == 3 || parts[a].length() == 4){
-							timeParts[0] = parts[a].substring(0, parts[a].length()-2);
-							timeParts[1] = "00";
-						}else{
-							timeParts[0] = parts[a].substring(0,parts[a].length()-4);
-							timeParts[1] = parts[a].substring(parts[a].length()-4, parts[a].length()-2);
-						}
-					}
-				
-					int temp;
-					temp = Integer.parseInt(timeParts[0]);
-					if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm")){
-						if(temp < 12){
-							temp = temp + 12;  //convert to 24hrs format
-						}
-						timeParts[0] = Integer.toString(temp);
-					}
-					else if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("am")){
-						if(temp == 12){
-							timeParts[0] = "00";
-						}
-					}
-				}else if(parts[a].substring(parts[a].length()-1, parts[a].length()).equals("h")){
-					timeParts[0] = parts[a].substring(0,parts[a].length()-3);
-					timeParts[1] = parts[a].substring(parts[a].length()-3, parts[a].length()-1);
-				}else if(parts[a].substring(parts[a].length()-3, parts[a].length()).equals("hrs")){
-					timeParts[0] = parts[a].substring(0,parts[a].length()-5);
-					timeParts[1] = parts[a].substring(parts[a].length()-5, parts[a].length()-3);
-				}else{
-					if(parts[a].length() > 2){
-						if(parts[a].charAt(parts[a].length()-3) == ':' || 
-								parts[a].charAt(parts[a].length()-3) == '.'){
-							timeParts[0] = parts[a].substring(0,parts[a].length()-3);
-							timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
-						}else{
-							timeParts[0] = parts[a].substring(0,parts[a].length()-2);
-							timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
-						}
-					}
-				}
+			} else if(checkTime(parts[a])){
+				decodedTime = decodeTime(parts, a);
 
 				if(endTimeDate == true){
-					endTime = timeParts[0] + ":" + timeParts[1];				
-				}else{
-					startTime = timeParts[0] + ":" + timeParts[1];	
+					endTime = decodedTime;				
+				} else {
+					startTime = decodedTime;	
 				}
-			}else if(checkDay(parts[a]) != 0){
-				int numOfDaysToAdd = 0;
-				if(checkDay(parts[a]) <= 7 && checkDay(parts[a]) > 0){
-					if(thisOrNextOrFollowing == 0){ //None of the above
-						if(checkDay(parts[a]) <= currentDayOfWeek){
-							numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
-						}else{
-							numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
-						}
-					}else{//this
-						if(checkDay(parts[a]) == 1){//sunday
-							if(currentDayOfWeek != 0){
-								numOfDaysToAdd = 8 - currentDayOfWeek; 
-							}
-						}else{
-							numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
-						}
-					}
-					if(thisOrNextOrFollowing == 2){//next
-						numOfDaysToAdd = numOfDaysToAdd + 7;
-						
-					}else if(thisOrNextOrFollowing == 3){//following
-						numOfDaysToAdd = numOfDaysToAdd + 14;
-					}
-				}else if (checkDay(parts[a]) == 8){
-					//numofdaystoadd already 0;
-				}else if (checkDay(parts[a]) == 9){
-					numOfDaysToAdd++;
-				}else if (checkDay(parts[a]) == 10){
-					if(thisOrNextOrFollowing == 2){//next
-						numOfDaysToAdd = numOfDaysToAdd + 1;
-						
-					}else if(thisOrNextOrFollowing == 3){//following
-						numOfDaysToAdd = numOfDaysToAdd + 2;
-					}
-				}
+			} else if(checkDay(parts[a]) != 0){
+				int numOfDaysToAdd = determineDaysToBeAdded(
+						thisOrNextOrFollowing, parts, a, currentDayOfWeek);
 				
-				if((currentDay + numOfDaysToAdd) > numOfDaysCurrentMonth){
-					currentMonth++;
-					if(currentMonth > 12){
-						currentMonth = 1; //set to Jan
-						currentYear++;
-					}
-					currentDay = (currentDay + numOfDaysToAdd) - numOfDaysCurrentMonth;
-				}else if((currentDay + numOfDaysToAdd) <= 0){
-					currentMonth--;
-					if(currentMonth <= 0){
-						currentMonth = 12; //set to Dec
-						currentYear--;
-					}
-					currentDay = getNumOfDaysFromMonth(currentMonth, currentYear) 
-							+ (currentDay + numOfDaysToAdd);
-				}else{
-					currentDay = currentDay + numOfDaysToAdd;
-				}
-				
-				String toBeAddedDate = currentDay + "/" 
-										+ currentMonth + "/" 
-											+ currentYear;
+				String toBeAddedDate = addDaysToCurrentDate(currentDay, currentMonth,
+						currentYear, numOfDaysCurrentMonth, numOfDaysToAdd);
+				String [] toBeAddedDateParts = toBeAddedDate.split("/");
 				
 				if(endTimeDate == true){
 					if(!startDate.equals("null")){
 						if(compareToDate(startDate,toBeAddedDate) == -1 || 
 								compareToDate(startDate,toBeAddedDate) == 0 ){
-							currentDay = currentDay + 7;
+							//dayTemp = dayTemp + 7;
+							toBeAddedDateParts[0] = Integer.toString(
+									(Integer.parseInt(toBeAddedDateParts[0]) + 7));
 						}
 					}
-					endDate = currentDay + "/" 
-								+ currentMonth + "/" 
-								+ currentYear;
+					endDate = toBeAddedDateParts[0] + "/" 
+								+ toBeAddedDateParts[1] + "/" 
+								+ toBeAddedDateParts[2];
 				}else{
 					startDate = toBeAddedDate;
 				}
 			}else if(checkMonth(parts[a].replaceAll("[0-9~]", "")) != 0){
-				String[] tempParts = parts[a].split("~");
-				
-				int day = Integer.parseInt(tempParts[0]);
-				int month = checkMonth(tempParts[1]);
-				int year = 0;
-				
-				if(tempParts.length == 3){
-					if(tempParts[2].length() == 2){
-						tempParts[2] = "20" + tempParts[2];
-					}
-					year = Integer.parseInt(tempParts[2]);
-				}else{
-					year = currentYear;
-				}
+				decodedDate = decodeMonthFormat(parts, a, currentYear);
 				
 				if(endTimeDate == true){
-					endDate = day + "/" + month + "/" + year;
+					endDate = decodedDate;
 				}else{
-					startDate = day + "/" + month + "/" + year;
+					startDate = decodedDate;
 				}
 			}
 		}
+	}
+	private static String decodeMonthFormat(String [] parts, int a, int currentYear){
+		String[] tempParts = parts[a].split("~");
+		
+		int day = Integer.parseInt(tempParts[0]);
+		int month = checkMonth(tempParts[1]);
+		int year = 0;
+		
+		if(tempParts.length == 3){
+			if(tempParts[2].length() == 2){
+				tempParts[2] = "20" + tempParts[2];
+			}
+			year = Integer.parseInt(tempParts[2]);
+		}else{
+			year = currentYear;
+		}
+		return day + "/" + month + "/" + year;
+	}
+	private static String addDaysToCurrentDate(int currentDay, int currentMonth,
+			int currentYear, int numOfDaysCurrentMonth, int numOfDaysToAdd){
+		int dayTemp = currentDay;
+		int monthTemp = currentMonth;
+		int yearTemp = currentYear;
+		
+		if((dayTemp + numOfDaysToAdd) > numOfDaysCurrentMonth){
+			monthTemp++;
+			if(monthTemp > 12){
+				monthTemp = 1; //set to Jan
+				yearTemp++;
+			}
+			dayTemp = (dayTemp + numOfDaysToAdd) - numOfDaysCurrentMonth;
+		}else if((dayTemp + numOfDaysToAdd) <= 0){
+			monthTemp--;
+			if(monthTemp <= 0){
+				monthTemp = 12; //set to Dec
+				yearTemp--;
+			}
+			dayTemp = getNumOfDaysFromMonth(monthTemp, yearTemp) 
+					+ (dayTemp + numOfDaysToAdd);
+		}else{
+			dayTemp = dayTemp + numOfDaysToAdd;
+		}
+		return dayTemp + "/" + monthTemp + "/" + yearTemp;
+	}
+	private static int determineDaysToBeAdded(int thisOrNextOrFollowing,
+			String[] parts, int a, int currentDayOfWeek) {
+		int numOfDaysToAdd = 0;
+		if(checkDay(parts[a]) <= 7 && checkDay(parts[a]) > 0){
+			if(thisOrNextOrFollowing == 0){ //None of the above
+				if(checkDay(parts[a]) <= currentDayOfWeek){
+					numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
+				}else{
+					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+				}
+			}else{//this
+				if(checkDay(parts[a]) == 1){//sunday
+					if(currentDayOfWeek != 0){
+						numOfDaysToAdd = 8 - currentDayOfWeek; 
+					}
+				}else{
+					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
+				}
+			}
+			if(thisOrNextOrFollowing == 2){//next
+				numOfDaysToAdd = numOfDaysToAdd + 7;
+				
+			}else if(thisOrNextOrFollowing == 3){//following
+				numOfDaysToAdd = numOfDaysToAdd + 14;
+			}
+		}else if (checkDay(parts[a]) == 8){
+			//numofdaystoadd already 0;
+		}else if (checkDay(parts[a]) == 9){
+			numOfDaysToAdd++;
+		}else if (checkDay(parts[a]) == 10){
+			if(thisOrNextOrFollowing == 2){//next
+				numOfDaysToAdd = numOfDaysToAdd + 1;
+				
+			}else if(thisOrNextOrFollowing == 3){//following
+				numOfDaysToAdd = numOfDaysToAdd + 2;
+			}
+		}
+		return numOfDaysToAdd;
+	}
+	private String decodeTime(String[] parts, int a) {
+		String [] timeParts = new String[2];
+		int temp;
+		if ((parts[a].substring(parts[a].length()-2, parts[a].length()).equals("am")) || 
+				(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm") ||
+						(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("hr")))){
+			if(parts[a].length() > 4){
+				if(parts[a].charAt(parts[a].length()-5) == ':' || 
+						parts[a].charAt(parts[a].length()-5) == '.'){
+					if(parts[a].length() == 6){
+						timeParts[0] = parts[a].substring(0, 1);
+						timeParts[1] = parts[a].substring(2, 4);
+					}else{
+						timeParts[0] = parts[a].substring(0, 2);
+						timeParts[1] = parts[a].substring(3, 5);
+					}
+				}
+			}
+			if(parts[a].substring(0, parts[a].length()-2).matches("\\d+")){
+				if(parts[a].length() == 3 || parts[a].length() == 4){
+					timeParts[0] = parts[a].substring(0, parts[a].length()-2);
+					timeParts[1] = "00";
+				}else{
+					timeParts[0] = parts[a].substring(0,parts[a].length()-4);
+					timeParts[1] = parts[a].substring(parts[a].length()-4, parts[a].length()-2);
+				}
+			}
+		
+			temp = Integer.parseInt(timeParts[0]);
+			if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("pm")){
+				if(temp < 12){
+					temp = temp + 12;  //convert to 24hrs format
+				}
+				timeParts[0] = Integer.toString(temp);
+			}
+			else if(parts[a].substring(parts[a].length()-2, parts[a].length()).equals("am")){
+				if(temp == 12){
+					timeParts[0] = "00";
+				}
+			}
+		}else if(parts[a].substring(parts[a].length()-1, parts[a].length()).equals("h")){
+			timeParts[0] = parts[a].substring(0,parts[a].length()-3);
+			timeParts[1] = parts[a].substring(parts[a].length()-3, parts[a].length()-1);
+		}else if(parts[a].substring(parts[a].length()-3, parts[a].length()).equals("hrs")){
+			timeParts[0] = parts[a].substring(0,parts[a].length()-5);
+			timeParts[1] = parts[a].substring(parts[a].length()-5, parts[a].length()-3);
+		}else{
+			if(parts[a].length() > 2){
+				if(parts[a].charAt(parts[a].length()-3) == ':' || 
+						parts[a].charAt(parts[a].length()-3) == '.'){
+					timeParts[0] = parts[a].substring(0,parts[a].length()-3);
+					timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
+				}else{
+					timeParts[0] = parts[a].substring(0,parts[a].length()-2);
+					timeParts[1] = parts[a].substring(parts[a].length()-2, parts[a].length());
+				}
+			}
+		}
+		return timeParts[0] + ":" + timeParts[1];
+	}
+	private static String decodeDate(String[] parts, int a, int currentYear) {
+		String [] dateParts = new String[3];
+		String [] datePartsTemp = null;
+		// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
+		if ((parts[a].split("/").length == 3) || (parts[a].split("/").length == 2)) {
+			datePartsTemp = parts[a].split("/");
+		} else if ((parts[a].split("-").length == 3) || (parts[a].split("-").length == 2)) {
+			datePartsTemp = parts[a].split("-");
+		} 
+		/*else if ((parts[a].split(".").length == 3) || (parts[a].split(".").length == 2)) {
+			dateParts = parts[a].split(".");
+		}*/
+		else{
+			dateParts[0] = parts[a].substring(0, 2);
+			dateParts[1] = parts[a].substring(2, 4);
+			if(parts[a].length() == 6){
+				dateParts[2] = "20" + parts[a].substring(4, 6); //valid year 2014-2099
+			}else if(parts[a].length() == 8){
+				dateParts[2] = parts[a].substring(4, 8);
+			}
+		}
+		//if 9/12 entered, add on to 9/12/2014
+		if(datePartsTemp != null){
+			if(datePartsTemp.length == 2){
+				dateParts[0] = datePartsTemp[0];
+				dateParts[1] = datePartsTemp[1];
+				dateParts[2] = Integer.toString(currentYear);
+			}else{
+				dateParts = datePartsTemp;
+			}
+			if(datePartsTemp.length == 3){
+				if(datePartsTemp[2].length() == 2){
+					dateParts[2] = "20" + datePartsTemp[2];
+				}
+			}
+		}
+		return dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
+	}
+	private boolean isPrepositionTo(String[] parts, int a) {
+		return parts[a].equals("to") || parts[a].equals("till") || 
+				parts[a].equals("until") || parts[a].equals("-");
 	}
 	//-----------------------GETTER-------------------------------
 	public String getStartDate(){
@@ -770,15 +798,15 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		String decodedSearchString = "";
 		String decodedDate = "";
 		
+		int currentDay = cal.get(Calendar.DATE);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentYear = cal.get(Calendar.YEAR);
+		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
+		
 		for(int i = 0; i < searchParts.length; i++){
-			int currentDay = cal.get(Calendar.DATE);
-			int currentMonth = cal.get(Calendar.MONTH) + 1;
-			int currentYear = cal.get(Calendar.YEAR);
-			int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-			//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-			//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-			int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
-			
 			if(searchParts[i].equals("this")){
 				thisOrNextOrFollowing = 1;
 			}else if(searchParts[i].equals("next")){
@@ -788,99 +816,13 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			}
 			
 			if(checkDate(searchParts[i])){
-				String [] dateParts = new String[3];
-	 			String [] datePartsTemp = null;
-				// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
-				if ((searchParts[i].split("/").length == 3) || (searchParts[i].split("/").length == 2)) {
-					datePartsTemp = searchParts[i].split("/");
-				} else if ((searchParts[i].split("-").length == 3) || (searchParts[i].split("-").length == 2)) {
-					datePartsTemp = searchParts[i].split("-");
-				} 
-				else{
-					dateParts[0] = searchParts[i].substring(0, 2);
-					dateParts[1] = searchParts[i].substring(2, 4);
-					if(searchParts[i].length() == 6){
-						dateParts[2] = "20" + searchParts[i].substring(4, 6); //valid year 2014-2099
-					}else if(searchParts[i].length() == 8){
-						dateParts[2] = searchParts[i].substring(4, 8);
-					}
-				}
-				//if 9/12 entered, add on to 9/12/2014
-				if(datePartsTemp != null){
-					if(datePartsTemp.length == 2){
-						dateParts[0] = datePartsTemp[0];
-						dateParts[1] = datePartsTemp[1];
-						dateParts[2] = Integer.toString(currentYear);
-					}else{
-						dateParts = datePartsTemp;
-					}
-					if(datePartsTemp.length == 3){
-						if(datePartsTemp[2].length() == 2){
-							dateParts[2] = "20" + datePartsTemp[2];
-						}
-					}
-				}
-				decodedDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
+				decodedDate = decodeDate(searchParts, i, currentYear);
 				decodedSearchString = decodedSearchString + decodedDate + " ";
 			}else if(checkDay(searchParts[i]) != 0){
-				int numOfDaysToAdd = 0;
-				if(checkDay(searchParts[i]) <= 7 && checkDay(searchParts[i]) > 0){
-					if(thisOrNextOrFollowing == 0){ //None of the above
-						if(checkDay(searchParts[i]) <= currentDayOfWeek){
-							numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(searchParts[i]));
-						}else{
-							numOfDaysToAdd = checkDay(searchParts[i]) - currentDayOfWeek;
-						}
-					}else{//this
-						if(checkDay(searchParts[i]) == 1){//sunday
-							if(currentDayOfWeek != 0){
-								numOfDaysToAdd = 8 - currentDayOfWeek; 
-							}
-						}else{
-							numOfDaysToAdd = checkDay(searchParts[i]) - currentDayOfWeek;
-						}
-					}
-					if(thisOrNextOrFollowing == 2){//next
-						numOfDaysToAdd = numOfDaysToAdd + 7;
-						
-					}else if(thisOrNextOrFollowing == 3){//following
-						numOfDaysToAdd = numOfDaysToAdd + 14;
-					}
-				}else if (checkDay(searchParts[i]) == 8){
-					//numofdaystoadd already 0;
-				}else if (checkDay(searchParts[i]) == 9){
-					numOfDaysToAdd++;
-				}else if (checkDay(searchParts[i]) == 10){
-					if(thisOrNextOrFollowing == 2){//next
-						numOfDaysToAdd = numOfDaysToAdd + 1;
-						
-					}else if(thisOrNextOrFollowing == 3){//following
-						numOfDaysToAdd = numOfDaysToAdd + 2;
-					}
-				}
-				
-				if((currentDay + numOfDaysToAdd) > numOfDaysCurrentMonth){
-					currentMonth++;
-					if(currentMonth > 12){
-						currentMonth = 1; //set to Jan
-						currentYear++;
-					}
-					currentDay = (currentDay + numOfDaysToAdd) - numOfDaysCurrentMonth;
-				}else if((currentDay + numOfDaysToAdd) <= 0){
-					currentMonth--;
-					if(currentMonth <= 0){
-						currentMonth = 12; //set to Dec
-						currentYear--;
-					}
-					currentDay = getNumOfDaysFromMonth(currentMonth, currentYear) 
-							+ (currentDay + numOfDaysToAdd);
-				}else{
-					currentDay = currentDay + numOfDaysToAdd;
-				}
-				
-				decodedDate = currentDay + "/" 
-										+ currentMonth + "/" 
-											+ currentYear;
+				int numOfDaysToAdd = determineDaysToBeAdded(
+						thisOrNextOrFollowing, searchParts, i, currentDayOfWeek);
+				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
+						currentYear, numOfDaysCurrentMonth, numOfDaysToAdd);
 				decodedSearchString = decodedSearchString + decodedDate + " ";
 			}else if(checkMonth(searchParts[i]) != 0){
 				boolean isValidDayYear = true;
