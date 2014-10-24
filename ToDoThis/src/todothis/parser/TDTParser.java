@@ -127,28 +127,58 @@ public class TDTParser implements ITDTParser {
 		}
 		isPriority(getRemainingWords());
 		parts = getRemainingWords().split(" ");
+		int count = 0;
 		for (int i = 0; i < parts.length; i++) {
 			String checkWord = parts[i];
-			if (TDTDateAndTime.checkDate(checkWord) || TDTDateAndTime.checkTime(checkWord) || 
-					TDTDateAndTime.checkDay(checkWord)!=0) {
-				if (TDTDateAndTime.checkDay(checkWord) == 10) {
-					completeDayDetails(i, checkWord);
-				} else {
-					completeTimeDateDayDetails(i);
+			if (checkWord.contains("\"")) {
+				count ++;
+			}
+			if (count != 0) {
+				specialAdd(checkWord);
+				if (count == 2) {
+					count = 0;
 				}
-			} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
-				setSkipNextWord(false);
-				completeMonthDetails(i);
+			} else {
+				usualAdd(i, checkWord);
 				if (isSkipNextWord()) {
 					i++;
 				}
-			} else {
-				setCommandDetails(getCommandDetails() + " " +checkWord);
 			}
 		}
 		setDateAndTime(new TDTDateAndTime(dateAndTimeParts));
 	}
-	
+
+	/**
+	 * This function does the ADD for words contained inside the " " which will
+	 * all be inside commandDetails.
+	 */
+	public void specialAdd(String checkWord) {
+		if (checkWord.contains("\"")) {
+			checkWord = checkWord.replace("\"", "");
+		}
+		setCommandDetails(getCommandDetails() + " " +checkWord);
+	}
+
+	/**
+	 * This function does the ADD normally.
+	 */
+	public int usualAdd(int i, String checkWord) {
+		if (TDTDateAndTime.checkDate(checkWord) || TDTDateAndTime.checkTime(checkWord) || 
+				TDTDateAndTime.checkDay(checkWord)!=0) {
+			if (TDTDateAndTime.checkDay(checkWord) == 10) {
+				completeDayDetails(i, checkWord);
+			} else {
+				completeTimeDateDayDetails(i);
+			}
+		} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
+			setSkipNextWord(false);
+			completeMonthDetails(i);
+		} else {
+			setCommandDetails(getCommandDetails() + " " +checkWord);
+		}
+		return i;
+	}
+
 	public void done() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
