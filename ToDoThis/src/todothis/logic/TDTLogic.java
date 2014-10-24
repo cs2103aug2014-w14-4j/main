@@ -86,5 +86,10 @@ public class TDTLogic implements ITDTLogic {
 	public void write() {
 		storage.write();
 	}
+	
+	public ArrayList<String> getAutoWords() {
+		return storage.getAutoWords();
+	}
+
 
 }

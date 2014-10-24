@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ public class TDTStorage implements ITDTStorage {
 	private Stack<HashMap<String, ArrayList<Task>>> redoStack;
 	private Stack<String> redoLabelPointerStack;
 	private ArrayList<String> hideList;
+	private ArrayList<String> autoWords;
 	
 	public TDTStorage(String fileName) {
 		this.setFileName(fileName);
@@ -36,6 +38,16 @@ public class TDTStorage implements ITDTStorage {
 		setRedoLabelPointerStack(new Stack<String>());
 		setHideList(new ArrayList<String>());
 		labelMap.put(currLabel, new ArrayList<Task>());
+		setAutoWords(new ArrayList<String>());
+		autoWords.add("DELETE");
+		autoWords.add("DONE");
+		autoWords.add("REDO");
+		autoWords.add("UNDO");
+		autoWords.add("HIDE");
+		autoWords.add("DISPLAY");
+		autoWords.add("EDIT");
+		autoWords.add("LABEL");
+		autoWords.add("SEARCH");
 	}
 	
 	
@@ -47,7 +59,9 @@ public class TDTStorage implements ITDTStorage {
 			for(int i = 0; i < totalLabel; i ++) {
 				String label = br.readLine();
 				labelMap.put(label, new ArrayList<Task>());
+				autoWords.add(label);
 			}
+			Collections.sort(autoWords);
 			while(br.ready()) {
 				String line = br.readLine();
 				String[] params = line.split("\t");
@@ -145,6 +159,8 @@ public class TDTStorage implements ITDTStorage {
 	}
 	
 	
+	
+	
 	//-----------------------------GETTERS & SETTERS----------------------------------------------
 	public String getFileName() {
 		return fileName;
@@ -214,6 +230,16 @@ public class TDTStorage implements ITDTStorage {
 
 	public void setHideList(ArrayList<String> hideList) {
 		this.hideList = hideList;
+	}
+
+
+	public ArrayList<String> getAutoWords() {
+		return autoWords;
+	}
+
+
+	public void setAutoWords(ArrayList<String> autoWords) {
+		this.autoWords = autoWords;
 	}
 
 

@@ -1,6 +1,7 @@
 package todothis.command;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
@@ -29,6 +30,8 @@ public class LabelCommand extends Command {
 			return "Error. Label name cannot be blank or digits only.";
 		} else {
 			storage.getLabelMap().put(label[0], new ArrayList<Task>());
+			storage.getAutoWords().add(label[0]);
+			Collections.sort(storage.getAutoWords());
 			storage.setCurrLabel(label[0]);
 			return "Label created";
 		}

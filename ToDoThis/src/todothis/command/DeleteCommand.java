@@ -36,6 +36,7 @@ public class DeleteCommand extends Command {
 		if(!label.equals("") && taskId == -1) {
 			if(storage.getLabelMap().containsKey(label)) {
 				storage.getLabelMap().remove(label);
+				storage.getAutoWords().remove(label);
 				if(label.equals(TDTGUI.DEFAULT_LABEL)) {
 					storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
 				}

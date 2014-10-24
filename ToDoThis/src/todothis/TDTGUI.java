@@ -3,11 +3,16 @@ package todothis;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,7 +21,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
@@ -30,10 +40,14 @@ import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.parser.TDTParser;
 
-public class TDTGUI extends JFrame {
+public class TDTGUI extends JFrame implements DocumentListener{
 	/**
 	 * 
 	 */
+	private static final String COMMIT_ACTION = "commit";
+    private static enum Mode { INSERT, COMPLETION };
+    private Mode mode = Mode.INSERT;
+	
 	private static final long serialVersionUID = 1L;
 	public static final String FILENAME = "todothis.txt";
 	public static final String DEFAULT_LABEL = "TODOTHIS";
@@ -184,20 +198,32 @@ public class TDTGUI extends JFrame {
 	 * Create the frame.
 	 */
 	public TDTGUI() {
+		commandField.getDocument().addDocumentListener(this);
+        InputMap im = commandField.getInputMap();
+        ActionMap am = commandField.getActionMap();
+        im.put(KeyStroke.getKeyStroke("RIGHT"), COMMIT_ACTION);
+        am.put(COMMIT_ACTION, new CommitAction());
+		
+		//Content Pane
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(300, 100, 800, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new MatteBorder(3, 3, 3, 3, (Color) new Color(0, 0, 0)));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
+		//Command label
 		commandLabel.setBounds(10, 3, 526, 17);
 		commandLabel.setFocusable(false);
 		contentPane.add(commandLabel);
+		
+		//CommandField
+		
+		
+		
 		commandField.setBounds(61, 3, 713, 20);
 		commandField.setColumns(10);
 		commandField.setFocusable(true);
-		contentPane.add(commandField);
-		
 		commandField.addKeyListener(new KeyListener() {
 
 			@Override
@@ -339,75 +365,41 @@ public class TDTGUI extends JFrame {
 				default :
 					break;
 				}
-
-				
 			}
-
-			private String getDateTimeStringForEdit(TDTDateAndTime dat) {
-				String datString = "";
-				if(dat.isTimedTask()) {
-					datString = " from";
-					if(!dat.getStartDate().equals("null")) {
-						datString = datString + " " + dat.getStartDate();
-					}
-					if(!dat.getStartTime().equals("null")) {
-						datString = datString + " " + dat.getStartTime();
-					}
-					if(!dat.getEndDate().equals("null") || !dat.getEndTime().equals("null") ) {
-						datString = datString + " to";
-						if(!dat.getEndDate().equals("null")) {
-							datString = datString + " " + dat.getEndDate();
-						}
-						if(!dat.getEndTime().equals("null")) {
-							datString = datString + " " + dat.getEndTime();
-						}
-					}
-				}
-				if(dat.isDeadlineTask()) {
-					datString = " by";
-					if(!dat.getEndDate().equals("null")) {
-						datString = datString + " " + dat.getEndDate();
-					}
-					if(!dat.getEndTime().equals("null")) {
-						datString = datString + " " +dat.getEndTime();
-					}
-				}
-				return datString;
-			}
-
 			@Override
 			public void keyReleased(KeyEvent arg0) {
 				// TODO Auto-generated method stub
 				
 			}
-
 			@Override
 			public void keyTyped(KeyEvent arg0) {
 				// TODO Auto-generated method stub
 				
 			}
-			
 		});
+		contentPane.add(commandField);
+		
+		//Tasklabel
 		taskLabel.setBounds(10, 25, 566, 14);
 		contentPane.add(taskLabel);
-		scrollPane.setBounds(10, 42, 764, 427);
-		scrollPane.setRowHeaderView(taskPane);
-		scrollPane.setFocusable(true);
-		scrollPane.getViewport().setView(taskPane);
-		contentPane.add(scrollPane);
+		
 		
 		
 		//Task Pane
 		taskPane.setBackground(Color.LIGHT_GRAY);
-		 HTMLEditorKit kit = new HTMLEditorKit();
+		HTMLEditorKit kit = new HTMLEditorKit();
 		taskPane.setEditorKit(kit);
 		StyleSheet styleSheet = kit.getStyleSheet();
 		styleSheet.addRule(css);
 		taskPane.setFocusable(false);
 		taskPane.setEditable(false);
 		
-		//Listeners
-		
+		//Scroll PaneListeners
+		scrollPane.setBounds(10, 42, 764, 427);
+		scrollPane.setRowHeaderView(taskPane);
+		scrollPane.setFocusable(true);
+		scrollPane.getViewport().setView(taskPane);
+		contentPane.add(scrollPane);
 		scrollPane.addKeyListener(new KeyListener(){
 
 			@Override
@@ -438,12 +430,44 @@ public class TDTGUI extends JFrame {
 			}
 			
 		});
-		feedbackArea.setBounds(10, 480, 764, 70);
-		
+
 		//Feedback Area
+		feedbackArea.setBounds(10, 480, 764, 70);
 		feedbackArea.setEditable(false);
 		feedbackArea.setFocusable(false);
 		contentPane.add(feedbackArea);
+	}
+	
+	private String getDateTimeStringForEdit(TDTDateAndTime dat) {
+		String datString = "";
+		if(dat.isTimedTask()) {
+			datString = " from";
+			if(!dat.getStartDate().equals("null")) {
+				datString = datString + " " + dat.getStartDate();
+			}
+			if(!dat.getStartTime().equals("null")) {
+				datString = datString + " " + dat.getStartTime();
+			}
+			if(!dat.getEndDate().equals("null") || !dat.getEndTime().equals("null") ) {
+				datString = datString + " to";
+				if(!dat.getEndDate().equals("null")) {
+					datString = datString + " " + dat.getEndDate();
+				}
+				if(!dat.getEndTime().equals("null")) {
+					datString = datString + " " + dat.getEndTime();
+				}
+			}
+		}
+		if(dat.isDeadlineTask()) {
+			datString = " by";
+			if(!dat.getEndDate().equals("null")) {
+				datString = datString + " " + dat.getEndDate();
+			}
+			if(!dat.getEndTime().equals("null")) {
+				datString = datString + " " +dat.getEndTime();
+			}
+		}
+		return datString;
 	}
 	
 	private void updateGUI(String feedback, String text) {
@@ -479,4 +503,100 @@ public class TDTGUI extends JFrame {
 	public void setHistoryPointer(int historyPointer) {
 		this.historyPointer = historyPointer;
 	}
+	
+	//Document
+
+	@Override
+	public void changedUpdate(DocumentEvent arg0) {
+	}
+
+	@Override
+	public void insertUpdate(DocumentEvent ev) {
+		if (ev.getLength() != 1) {
+            return;
+        }
+         
+        int pos = ev.getOffset();
+        String content = null;
+        try {
+            content = commandField.getText(0, pos + 1);
+        } catch (BadLocationException e) {
+            System.out.println("Bad location.");
+        }
+         
+        // Find where the word starts
+        int w;
+        for (w = pos; w >= 0; w--) {
+            if (! Character.isLetter(content.charAt(w))) {
+                break;
+            }
+        }
+        if (pos - w < 2) {
+            // Too few chars
+            return;
+        }
+         
+        String prefix = content.substring(w + 1).toUpperCase();
+        int n = Collections.binarySearch(logic.getAutoWords(), prefix);
+
+        if (n < 0  && -n <= logic.getAutoWords().size()) {
+            String match = logic.getAutoWords().get(-n - 1);
+            if (match.toLowerCase().startsWith(prefix.toLowerCase())) {
+                String completion = match.substring(pos - w).toLowerCase();
+                SwingUtilities.invokeLater(
+                        new CompletionTask(completion, pos + 1));
+            }
+        } else {
+            // Nothing found
+            mode = Mode.INSERT;
+        }
+		
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent arg0) {
+	}
+
+	
+	private class CompletionTask implements Runnable {
+        String completion;
+        int position;
+         
+        CompletionTask(String completion, int position) {
+            this.completion = completion;
+            this.position = position;
+        }
+         
+        public void run() {
+            try {
+				commandField.getDocument().insertString(position, completion, null);
+			} catch (BadLocationException e) {
+				System.out.println("Bad location error.");
+			}
+            commandField.setCaretPosition(position + completion.length());
+            commandField.moveCaretPosition(position);
+            mode = Mode.COMPLETION;
+        }
+    }
+	
+	private class CommitAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent ev) {
+            if (mode == Mode.COMPLETION) {
+                int pos = commandField.getSelectionEnd();
+                try {
+					commandField.getDocument().insertString(pos, " ", null);
+				} catch (BadLocationException e) {
+					System.out.println("Bad location error.");
+				}
+                commandField.setCaretPosition(pos + 1);
+                mode = Mode.INSERT;
+            } else {
+            	commandField.setCaretPosition(Math.min(commandField.getCaretPosition()+1,
+            			commandField.getText().length()));
+            }
+        }
+    }
+	
 }
