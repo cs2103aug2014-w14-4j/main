@@ -85,8 +85,8 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		//TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
 		//TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
 		//System.out.println(test2.display());
+		System.out.println(TDTDateAndTime.decodeSearchDetails("tml today monday"));
 	
-		
 	}
 	public static String replaceEndStringPunctuation(String word){
 		int length = word.length();
@@ -762,6 +762,154 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		} else {
 			return 0;
 		}
+	}
+	//-----------------------------------Decode Search Details-----------------------------
+	public static String decodeSearchDetails(String searchString){
+		String[] searchParts = searchString.toLowerCase().split(" ");
+		int thisOrNextOrFollowing = 0; //this = 1 next = 2 following = 3
+		String decodedSearchString = "";
+		String decodedDate = "";
+		
+		for(int i = 0; i < searchParts.length; i++){
+			int currentDay = cal.get(Calendar.DATE);
+			int currentMonth = cal.get(Calendar.MONTH) + 1;
+			int currentYear = cal.get(Calendar.YEAR);
+			int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+			//int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+			//int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+			int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth, currentYear);
+			
+			if(searchParts[i].equals("this")){
+				thisOrNextOrFollowing = 1;
+			}else if(searchParts[i].equals("next")){
+				thisOrNextOrFollowing = 2;
+			}else if(searchParts[i].equals("following")){
+				thisOrNextOrFollowing = 3;
+			}
+			
+			if(checkDate(searchParts[i])){
+				String [] dateParts = new String[3];
+	 			String [] datePartsTemp = null;
+				// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
+				if ((searchParts[i].split("/").length == 3) || (searchParts[i].split("/").length == 2)) {
+					datePartsTemp = searchParts[i].split("/");
+				} else if ((searchParts[i].split("-").length == 3) || (searchParts[i].split("-").length == 2)) {
+					datePartsTemp = searchParts[i].split("-");
+				} 
+				else{
+					dateParts[0] = searchParts[i].substring(0, 2);
+					dateParts[1] = searchParts[i].substring(2, 4);
+					if(searchParts[i].length() == 6){
+						dateParts[2] = "20" + searchParts[i].substring(4, 6); //valid year 2014-2099
+					}else if(searchParts[i].length() == 8){
+						dateParts[2] = searchParts[i].substring(4, 8);
+					}
+				}
+				//if 9/12 entered, add on to 9/12/2014
+				if(datePartsTemp != null){
+					if(datePartsTemp.length == 2){
+						dateParts[0] = datePartsTemp[0];
+						dateParts[1] = datePartsTemp[1];
+						dateParts[2] = Integer.toString(currentYear);
+					}else{
+						dateParts = datePartsTemp;
+					}
+					if(datePartsTemp.length == 3){
+						if(datePartsTemp[2].length() == 2){
+							dateParts[2] = "20" + datePartsTemp[2];
+						}
+					}
+				}
+				decodedDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
+				decodedSearchString = decodedSearchString + decodedDate + " ";
+			}else if(checkDay(searchParts[i]) != 0){
+				int numOfDaysToAdd = 0;
+				if(checkDay(searchParts[i]) <= 7 && checkDay(searchParts[i]) > 0){
+					if(thisOrNextOrFollowing == 0){ //None of the above
+						if(checkDay(searchParts[i]) <= currentDayOfWeek){
+							numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(searchParts[i]));
+						}else{
+							numOfDaysToAdd = checkDay(searchParts[i]) - currentDayOfWeek;
+						}
+					}else{//this
+						if(checkDay(searchParts[i]) == 1){//sunday
+							if(currentDayOfWeek != 0){
+								numOfDaysToAdd = 8 - currentDayOfWeek; 
+							}
+						}else{
+							numOfDaysToAdd = checkDay(searchParts[i]) - currentDayOfWeek;
+						}
+					}
+					if(thisOrNextOrFollowing == 2){//next
+						numOfDaysToAdd = numOfDaysToAdd + 7;
+						
+					}else if(thisOrNextOrFollowing == 3){//following
+						numOfDaysToAdd = numOfDaysToAdd + 14;
+					}
+				}else if (checkDay(searchParts[i]) == 8){
+					//numofdaystoadd already 0;
+				}else if (checkDay(searchParts[i]) == 9){
+					numOfDaysToAdd++;
+				}else if (checkDay(searchParts[i]) == 10){
+					if(thisOrNextOrFollowing == 2){//next
+						numOfDaysToAdd = numOfDaysToAdd + 1;
+						
+					}else if(thisOrNextOrFollowing == 3){//following
+						numOfDaysToAdd = numOfDaysToAdd + 2;
+					}
+				}
+				
+				if((currentDay + numOfDaysToAdd) > numOfDaysCurrentMonth){
+					currentMonth++;
+					if(currentMonth > 12){
+						currentMonth = 1; //set to Jan
+						currentYear++;
+					}
+					currentDay = (currentDay + numOfDaysToAdd) - numOfDaysCurrentMonth;
+				}else if((currentDay + numOfDaysToAdd) <= 0){
+					currentMonth--;
+					if(currentMonth <= 0){
+						currentMonth = 12; //set to Dec
+						currentYear--;
+					}
+					currentDay = getNumOfDaysFromMonth(currentMonth, currentYear) 
+							+ (currentDay + numOfDaysToAdd);
+				}else{
+					currentDay = currentDay + numOfDaysToAdd;
+				}
+				
+				decodedDate = currentDay + "/" 
+										+ currentMonth + "/" 
+											+ currentYear;
+				decodedSearchString = decodedSearchString + decodedDate + " ";
+			}else if(checkMonth(searchParts[i]) != 0){
+				boolean isValidDayYear = true;
+				if(i != 0 && i != searchParts.length - 1){
+					String before = searchParts[i - 1];
+					String after = searchParts[i + 1];
+					try{
+						Integer.parseInt(before);
+						Integer.parseInt(after);
+					}catch(NumberFormatException e) { 
+						isValidDayYear = false;
+					}
+					if(isValidDayYear){
+						int day = Integer.parseInt(before);
+						int month = checkMonth(searchParts[i]);
+						int year = 0;
+						
+						if(after.length() == 2){
+							after = "20" + after;
+						}
+						year = Integer.parseInt(after);
+	
+						decodedDate = day + "/" + month + "/" + year;
+						decodedSearchString = decodedSearchString + decodedDate + " ";
+					}
+				}
+			}
+		}
+		return decodedSearchString.trim();
 	}
 	//-----------------------------------CHECK FOR OVERDUE TASK----------------------------
 	//NEED TESTING
