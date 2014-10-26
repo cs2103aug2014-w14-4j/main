@@ -101,9 +101,11 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 	private void decodeDetails(String details){
 		System.out.println(details);
 		boolean endTimeDate = false;
+		boolean deadlineEndTimeDate = false;
 		int thisOrNextOrFollowing = 0; //this = 1 next = 2 following = 3
 		String decodedDate = "";
 		String decodedTime = "";
+		
 		String [] parts = details.toLowerCase().split(" ");
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
@@ -119,7 +121,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 				endTimeDate = true;
 			}
 			if(parts[a].equals("by")){
-				endTimeDate = true;
+				deadlineEndTimeDate = true;
 			}
 			
 			if(parts[a].equals("this")){
@@ -132,52 +134,74 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 			
 			if(checkDate(parts[a])){
 				decodedDate = decodeDate(parts, a, currentYear);
-
-				if(endTimeDate == true){
-					endDate = decodedDate;
-				} else {
-					startDate = decodedDate;
-				}
+				
+				storeDecodedDate(endTimeDate, deadlineEndTimeDate, decodedDate);
 			} else if(checkTime(parts[a])){
 				decodedTime = decodeTime(parts, a);
 
-				if(endTimeDate == true){
-					endTime = decodedTime;				
-				} else {
-					startTime = decodedTime;	
-				}
+				storeDecodedTime(endTimeDate, deadlineEndTimeDate, decodedTime);
 			} else if(checkDay(parts[a]) != 0){
 				int numOfDaysToAdd = determineDaysToBeAdded(
 						thisOrNextOrFollowing, parts, a, currentDayOfWeek);
 				
-				String toBeAddedDate = addDaysToCurrentDate(currentDay, currentMonth,
+				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
 						currentYear, numOfDaysCurrentMonth, numOfDaysToAdd);
-				String [] toBeAddedDateParts = toBeAddedDate.split("/");
 				
-				if(endTimeDate == true){
-					if(!startDate.equals("null")){
-						if(compareToDate(startDate,toBeAddedDate) == -1 || 
-								compareToDate(startDate,toBeAddedDate) == 0 ){
-							//dayTemp = dayTemp + 7;
-							toBeAddedDateParts[0] = Integer.toString(
-									(Integer.parseInt(toBeAddedDateParts[0]) + 7));
-						}
-					}
-					endDate = toBeAddedDateParts[0] + "/" 
-								+ toBeAddedDateParts[1] + "/" 
-								+ toBeAddedDateParts[2];
-				}else{
-					startDate = toBeAddedDate;
-				}
-			}else if(checkMonth(parts[a].replaceAll("[0-9~]", "")) != 0){
+				decodedDate = adjustmentToDate(endTimeDate, decodedDate, parts,
+						a);
+				
+				storeDecodedDate(endTimeDate, deadlineEndTimeDate, decodedDate);
+			} else if(checkMonth(parts[a].replaceAll("[0-9~]", "")) != 0){
 				decodedDate = decodeMonthFormat(parts, a, currentYear);
 				
-				if(endTimeDate == true){
-					endDate = decodedDate;
-				}else{
-					startDate = decodedDate;
+				storeDecodedDate(endTimeDate, deadlineEndTimeDate, decodedDate);
+			}
+		}
+	}
+	private String adjustmentToDate(boolean endTimeDate, String decodedDate,
+			String[] parts, int a) {
+		String [] toBeAddedDateParts = decodedDate.split("/");
+		if(endTimeDate == true){
+			if(!startDate.equals("null") && checkDay(parts[a]) != 8){ // enddate != today
+				if(compareToDate(startDate,decodedDate) == -1 || 
+						compareToDate(startDate,decodedDate) == 0 ){
+					int dayTemp = Integer.parseInt(toBeAddedDateParts[0]);
+					int mthTemp = Integer.parseInt(toBeAddedDateParts[1]);
+					int yearTemp = Integer.parseInt(toBeAddedDateParts[2]);
+
+					decodedDate = addDaysToCurrentDate(dayTemp, mthTemp, yearTemp,
+							getNumOfDaysFromMonth(mthTemp, yearTemp), 7);	
 				}
 			}
+		}
+		return decodedDate;
+	}
+	private void storeDecodedTime(boolean endTimeDate,
+			boolean deadlineEndTimeDate, String decodedTime) {
+		if(deadlineEndTimeDate == true){
+			endTime = decodedTime;
+		} else if (endTimeDate == true){
+			if(startTime.equals("null")){
+				startTime = decodedTime;
+			}else{
+				endTime = decodedTime;
+			}
+		} else {
+			startTime = decodedTime;
+		}
+	}
+	private void storeDecodedDate(boolean endTimeDate,
+			boolean deadlineEndTimeDate, String decodedDate) {
+		if(deadlineEndTimeDate == true){
+			endDate = decodedDate;
+		} else if (endTimeDate == true){
+			if(startDate.equals("null")){
+				startDate = decodedDate;
+			}else{
+				endDate = decodedDate;
+			}
+		} else{
+			startDate = decodedDate;
 		}
 	}
 	private static String decodeMonthFormat(String [] parts, int a, int currentYear){

@@ -49,7 +49,7 @@ public class AddCommand extends Command {
 					}
 				}
 			}
-		}else if(dnt.getStartDate().equals("null") && dnt.getEndDate().equals("null") && 
+		}else if((dnt.getStartDate().equals("null") || dnt.getEndDate().equals("null")) && 
 				!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
 			if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
 				return "Invalid end time! End Time should be after start time!";
