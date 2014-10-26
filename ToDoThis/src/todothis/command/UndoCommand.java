@@ -8,7 +8,7 @@ public class UndoCommand extends Command {
 	public UndoCommand() {
 		super(COMMANDTYPE.UNDO);
 	}
-
+	/*
 	@Override
 	public String execute(TDTStorage storage) {
 		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
@@ -24,6 +24,26 @@ public class UndoCommand extends Command {
 			storage.getRedoLabelPointerStack().pop();
 			return "No command to undo.";
 		}
+	}*/
+	
+	@Override
+	public String execute(TDTStorage storage) {
+		
+		if(!storage.getUndoStack().isEmpty()) {
+			
+			Command comd = storage.getUndoStack().pop();
+			storage.getRedoStack().push(comd);
+			
+			return comd.undo(storage);
+		} else {
+			return "No command to undo.";
+		}
+	}
+
+	@Override
+	public String undo(TDTStorage storage) {
+		
+		return null;
 	}
 
 }

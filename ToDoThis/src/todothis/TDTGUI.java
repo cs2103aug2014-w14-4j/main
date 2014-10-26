@@ -142,7 +142,7 @@ public class TDTGUI extends JFrame implements DocumentListener{
 						sb.append("<tr class = \"overdue\"><td>" + task.getTaskID() + "</td><td>" 
 								+ task.getDetails() + "</td><td class = \"datetime\">" 
 								+ task.getDateAndTime().display() + "</td></tr>" );
-					}else if(task.isHighPriority()) {
+					} else if(task.isHighPriority()) {
 						sb.append("<tr class = \"priority\"><td>" + task.getTaskID() + "</td><td>" 
 								+ task.getDetails() + "</td><td class = \"datetime\">" 
 								+ task.getDateAndTime().display() + "</td></tr>" );
@@ -163,6 +163,7 @@ public class TDTGUI extends JFrame implements DocumentListener{
 	}
 	
 	private String displaySearch(ArrayList<Task> searched) {
+		Collections.sort(searched);
 		Iterator<Task> iter = searched.iterator();
 		StringBuilder res = new StringBuilder();
 		int i = 0;
@@ -174,6 +175,11 @@ public class TDTGUI extends JFrame implements DocumentListener{
 			if(next.isDone()) {
 				res.append("<tr class = \"done\"><td>" + next.getLabelName() + "</td><td>" 
 						+ next.getTaskID() + "</td><td>" + next.getDetails() + "</td><td class = \"datetime\">" 
+						+ next.getDateAndTime().display() + "</td></tr>" );
+			} else if(next.getDateAndTime().isOverdue()) {
+				res.append("<tr class = \"overdue\"><td>" + next.getLabelName() + "</td><td>" 
+						+ next.getTaskID() + "</td><td>" 
+						+ next.getDetails() + "</td><td class = \"datetime\">" 
 						+ next.getDateAndTime().display() + "</td></tr>" );
 			} else if(next.isHighPriority()) {
 				res.append("<tr class = \"priority\"><td>" + next.getLabelName() + "</td><td>" 

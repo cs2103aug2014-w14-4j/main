@@ -3,6 +3,7 @@ package todothis.command;
 import java.util.ArrayList;
 
 import todothis.logic.TDTDateAndTime;
+import todothis.logic.TDTLogic;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
@@ -13,6 +14,10 @@ public class EditCommand extends Command {
 	private String commandDetails;
 	private TDTDateAndTime dateAndTime;
 	private boolean isHighPriority;
+	private String prevDetails;
+	private TDTDateAndTime prevDNT;
+	private boolean prevPriority;
+
 	
 	public EditCommand(String labelName, int taskID,
 			String commandDetails, TDTDateAndTime dateAndTime, 
@@ -35,12 +40,19 @@ public class EditCommand extends Command {
 
 		//edit task from current label
 		if(label.equals("") && taskId != -1) {
-			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
+			setLabelName(storage.getCurrLabel());
+			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
+				prevDetails = task.getDetails();
+				prevDNT = task.getDateAndTime();
+				prevPriority = task.isHighPriority();
 				task.setDetails(commandDetails);
 				task.setDateAndTime(dateAndTime);
 				task.setHighPriority(isHighPriority);
+				
+				//setTaskID(TDTLogic.sort(array, task));
+				storage.insertToUndoStack(this);
 				return "Task edited";
 			} else {
 				return "error. Invalid task number.";
@@ -53,9 +65,15 @@ public class EditCommand extends Command {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
+					prevDetails = task.getDetails();
+					prevDNT = task.getDateAndTime();
+					prevPriority = task.isHighPriority();
 					task.setDetails(commandDetails);
 					task.setDateAndTime(dateAndTime);
 					task.setHighPriority(isHighPriority);
+					
+					//setTaskID(TDTLogic.sort(array, task));
+					storage.insertToUndoStack(this);
 					return "Task edited";
 				} else {
 					return "error. Invalid task number.";
@@ -67,7 +85,18 @@ public class EditCommand extends Command {
 		
 		return "Error. Invalid edit command.";
 	}
+	
 
+	@Override
+	public String undo(TDTStorage storage) {
+		EditCommand comd = new EditCommand(getLabelName(), getTaskID(), 
+								prevDetails, prevDNT, prevPriority);
+		comd.execute(storage);
+		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
+		storage.getUndoStack().pop();
+		return "Undo edit";
+	}
+	
 	public int getTaskID() {
 		return taskID;
 	}
@@ -107,5 +136,6 @@ public class EditCommand extends Command {
 	public void setHighPriority(boolean isHighPriority) {
 		this.isHighPriority = isHighPriority;
 	}
+
 
 }

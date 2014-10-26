@@ -12,6 +12,9 @@ import todothis.storage.TDTStorage;
 public class DeleteCommand extends Command {
 	private int taskID;
 	private String labelName;
+	private HashMap<String, ArrayList<Task>> prevState;
+	private String prevLabel;
+	private String undoFeedback;
 	
 	public DeleteCommand(String labelName, int taskID) {
 		super(COMMANDTYPE.DELETE);
@@ -21,14 +24,17 @@ public class DeleteCommand extends Command {
 
 	@Override
 	public String execute(TDTStorage storage) {
+		prevState = storage.copyLabelMap();
+		prevLabel = storage.getCurrLabel();
 		String label = getLabelName().toUpperCase();
 		int taskId = getTaskID();
 		
+		storage.insertToUndoStack(this);
 		//delete
 		if(label.equals("") && taskId == -1) {
-			storage.setLabelMap(new HashMap<String, ArrayList<Task>>());
-			storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
-			storage.setCurrLabel(TDTGUI.DEFAULT_LABEL);
+			deleteEverything(storage);
+			
+			setUndoFeedback("Undo delete");
 			return storage.getFileName() + " is cleared!";
 		}
 		
@@ -37,11 +43,9 @@ public class DeleteCommand extends Command {
 			if(storage.getLabelMap().containsKey(label)) {
 				//If label is empty, delete label
 				if(storage.getLabelSize(label) == 0) {
-					storage.getLabelMap().remove(label);
-					storage.getAutoWords().remove(label);
-					if(label.equals(TDTGUI.DEFAULT_LABEL)) {
-						storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
-					}
+					deleteLabel(storage, label);
+					
+					setUndoFeedback("Undo delete " + label);
 					return "Label deleted.";
 				} else {
 					//label not empty, clear task in label
@@ -57,7 +61,8 @@ public class DeleteCommand extends Command {
 			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				array.remove(taskId - 1);
-				TDTLogic.renumberTaskID(array);
+				TDTLogic.renumberTaskID(array, null);
+				
 				return "Task deleted";
 			} else {
 				return "error. Invalid task number.";
@@ -70,7 +75,7 @@ public class DeleteCommand extends Command {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					array.remove(taskId - 1);
-					TDTLogic.renumberTaskID(array);
+					TDTLogic.renumberTaskID(array, null);
 					return "Task deleted";
 				} else {
 					return "error. Invalid task number.";
@@ -83,6 +88,31 @@ public class DeleteCommand extends Command {
 		return "Error. Invalid delete.";
 	}
 
+	@Override
+	public String undo(TDTStorage storage) {
+		storage.setLabelMap(prevState);
+		storage.setCurrLabel(prevLabel);
+		return getUndoFeedback();
+	}
+	
+	private void deleteEverything(TDTStorage storage) {
+		storage.setLabelMap(new HashMap<String, ArrayList<Task>>());
+		storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
+		storage.setCurrLabel(TDTGUI.DEFAULT_LABEL);
+	}
+	
+
+	private void deleteLabel(TDTStorage storage, String label) {
+		storage.getLabelMap().remove(label);
+		storage.getAutoWords().remove(label);
+		if(label.equals(TDTGUI.DEFAULT_LABEL)) {
+			storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
+			storage.insertToAutoWords(TDTGUI.DEFAULT_LABEL);
+		}
+	}
+	
+	
+	
 	public String getLabelName() {
 		return labelName;
 	}
@@ -98,5 +128,15 @@ public class DeleteCommand extends Command {
 	public void setTaskID(int taskID) {
 		this.taskID = taskID;
 	}
+
+	public String getUndoFeedback() {
+		return undoFeedback;
+	}
+
+	public void setUndoFeedback(String undoFeedback) {
+		this.undoFeedback = undoFeedback;
+	}
+
+	
 
 }

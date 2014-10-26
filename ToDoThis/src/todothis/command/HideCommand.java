@@ -1,5 +1,6 @@
 package todothis.command;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import todothis.parser.ITDTParser.COMMANDTYPE;
@@ -7,6 +8,7 @@ import todothis.storage.TDTStorage;
 
 public class HideCommand extends Command {
 	private String labelName;
+	private ArrayList<String> prevHideList;
 	
 	public HideCommand(String labelName) {
 		super(COMMANDTYPE.HIDE);
@@ -39,6 +41,7 @@ public class HideCommand extends Command {
 	
 	@Override
 	public String execute(TDTStorage storage) {
+		prevHideList = storage.copyHideList();
 		String[] labelNames = getLabelName().split(" ");
 		Iterator<String> iter = storage.getLabelIterator();
 
@@ -56,7 +59,14 @@ public class HideCommand extends Command {
 			}
 		}
 		
+		storage.insertToUndoStack(this);
 		return "Hide selected labels.";
+	}
+	
+	@Override
+	public String undo(TDTStorage storage) {
+		storage.setHideList(prevHideList);
+		return "Undo hide";
 	}
 	
 	private static boolean containInArray(String label, String[] labelNames) {
@@ -75,5 +85,7 @@ public class HideCommand extends Command {
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
+
+	
 
 }

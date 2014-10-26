@@ -52,8 +52,7 @@ public class TDTParser implements ITDTParser {
 		switch(getCommandType()) {
 			case ADD :
 				add(userCommand);
-				return new AddCommand(getLabelName(), getTaskID(),getCommandDetails(), getDateAndTime(), 
-						getIsHighPriority());
+				return new AddCommand(getCommandDetails(), getDateAndTime(), getIsHighPriority());
 			case DELETE :
 				delete();
 				return new DeleteCommand(getLabelName(), getTaskID());
@@ -447,7 +446,7 @@ public class TDTParser implements ITDTParser {
 		this.remainingWords = remainingWords;
 	}
 
-	private COMMANDTYPE getCommandType() {
+	public COMMANDTYPE getCommandType() {
 		return commandType;
 	}
 
@@ -455,7 +454,7 @@ public class TDTParser implements ITDTParser {
 		this.commandType = commandType;
 	}
 
-	private String getLabelName() {
+	public String getLabelName() {
 		return labelName;
 	}
 
@@ -463,7 +462,7 @@ public class TDTParser implements ITDTParser {
 		this.labelName = labelName;
 	}
 
-	private boolean getIsHighPriority() {
+	public boolean getIsHighPriority() {
 		return isHighPriority;
 	}
 
@@ -471,7 +470,7 @@ public class TDTParser implements ITDTParser {
 		this.isHighPriority = isHighPriority;
 	}
 
-	private String getCommandDetails() {
+	public String getCommandDetails() {
 		return commandDetails;
 	}
 
@@ -479,7 +478,7 @@ public class TDTParser implements ITDTParser {
 		this.commandDetails = commandDetails;
 	}
 
-	private int getTaskID() {
+	public int getTaskID() {
 		return taskID;
 	}
 

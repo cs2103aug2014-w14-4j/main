@@ -31,7 +31,14 @@ public class SearchCommand extends Command {
 		}
 		String feedback = searchedResult.size() + " result(s) found for \"" 
 				+ searchedWords + "\".";
+		
+		storage.insertToUndoStack(this);
 		return feedback;
+	}
+	
+	@Override
+	public String undo(TDTStorage storage) {
+		return "";
 	}
 
 	private void searchByDate(Iterator<Task> iter) {
@@ -99,5 +106,7 @@ public class SearchCommand extends Command {
 	public void setSearchedResult(ArrayList<Task> searchedResult) {
 		this.searchedResult = searchedResult;
 	}
+
+	
 
 }

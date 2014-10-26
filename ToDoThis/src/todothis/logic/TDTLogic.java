@@ -3,7 +3,6 @@ package todothis.logic;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import todothis.command.Command;
@@ -25,11 +24,7 @@ public class TDTLogic implements ITDTLogic {
 		if(command.getCommandType() != COMMANDTYPE.UNDO &&
 				command.getCommandType() != COMMANDTYPE.REDO) {
 			storage.getRedoStack().clear();
-			storage.getRedoLabelPointerStack().clear();
 		}
-
-		storage.getLabelPointerStack().push(storage.getCurrLabel());
-		storage.getUndoStack().push(storage.copyLabelMap());
 
 		String feedback = command.execute(storage);
 		storage.write();
@@ -37,20 +32,21 @@ public class TDTLogic implements ITDTLogic {
 		
 	}
 	
-	public static void renumberTaskID(ArrayList<Task> array) {
+	public static int renumberTaskID(ArrayList<Task> array, Task t) {
+		int newNum = 0;
 		for(int i = 0; i < array.size(); i++) {
 			Task task = array.get(i);
 			task.setTaskID(i + 1);
+			if(task == t) {
+				newNum = i + 1;
+			}
 		}
+		return newNum;
 	}
 	
-	public static void sort(HashMap<String,ArrayList<Task>> hmap) {
-		Iterator<ArrayList<Task>> iter = hmap.values().iterator();
-		while(iter.hasNext()) {
-			ArrayList<Task> next = iter.next();
-			Collections.sort(next);
-			renumberTaskID(next);
-		}
+	public static int sort(ArrayList<Task> array, Task task) {
+		Collections.sort(array);
+		return renumberTaskID(array, task);
 	}
 	
 	public boolean isHideLabel(String label) {

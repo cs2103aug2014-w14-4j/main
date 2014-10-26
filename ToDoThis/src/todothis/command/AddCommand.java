@@ -15,52 +15,66 @@ public class AddCommand extends Command {
 	private TDTDateAndTime dateAndTime;
 	private boolean isHighPriority;
 
-	public AddCommand(String labelName, int taskID,
-			String commandDetails, TDTDateAndTime dateAndTime, 
-			boolean isHighPriority ) {
+	public AddCommand(String commandDetails, TDTDateAndTime dateAndTime, boolean isHighPriority ) {
 		super(COMMANDTYPE.ADD);
-		this.setTaskID(taskID);
 		this.setHighPriority(isHighPriority);
-		this.setLabelName(labelName);
 		this.setCommandDetails(commandDetails);
 		this.setDateAndTime(dateAndTime);
 	}
 
 	@Override
 	public String execute(TDTStorage storage) {
-		String labelName = storage.getCurrLabel();
-		int taskId = storage.getLabelSize(labelName) + 1;
-		Task task = new Task(taskId, labelName, getCommandDetails(),
+		setLabelName(storage.getCurrLabel());
+		setTaskID(storage.getLabelSize(getLabelName()) + 1);
+		Task task = new Task(getTaskID(), labelName, getCommandDetails(),
 				getDateAndTime(), isHighPriority());
 		TDTDateAndTime dnt = getDateAndTime();
-		if(!TDTDateAndTime.isValidDateRange(dnt.getStartDate()) || 
-				!TDTDateAndTime.isValidDateRange(dnt.getEndDate()) ||
-				!TDTDateAndTime.isValidTimeRange(dnt.getStartTime()) ||
-				!TDTDateAndTime.isValidTimeRange(dnt.getEndTime())) {
+		
+		if(!isValidDateTimeRange(dnt)) {
 			return "Invalid date/time format.";
 		}
-		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")){
-			if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1){
+		
+		//WTF???
+		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")) {
+			if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
 				return "Invalid end date! End date should be after start date!";
-			}else if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0){
+			} else if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
 				if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
 					if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
 						return "Invalid end time! End Time should be after start time!";
 					}
 				}
 			}
-		}else if((dnt.getStartDate().equals("null") || dnt.getEndDate().equals("null")) && 
+		} else if((dnt.getStartDate().equals("null") || dnt.getEndDate().equals("null")) && 
 				!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
 			if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
 				return "Invalid end time! End Time should be after start time!";
 			}
 		}
 		storage.addTask(task);
-		TDTLogic.sort(storage.getLabelMap());
-		storage.write();
+		setTaskID(TDTLogic.sort(storage.getLabelMap().get(getLabelName()), task));
+		storage.insertToUndoStack(this);
+		//Proper return statement!
 		return "Add success";
 	}
-
+	
+	@Override
+	public String undo(TDTStorage storage) {
+		DeleteCommand comd = new DeleteCommand(getLabelName(), getTaskID());
+		comd.execute(storage);
+		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
+		storage.getUndoStack().pop();
+		return "Undo add!";
+	}
+	
+	
+	private boolean isValidDateTimeRange(TDTDateAndTime dnt) {
+		return TDTDateAndTime.isValidDateRange(dnt.getStartDate()) && 
+			   TDTDateAndTime.isValidDateRange(dnt.getEndDate())   &&
+			   TDTDateAndTime.isValidTimeRange(dnt.getStartTime()) &&
+			   TDTDateAndTime.isValidTimeRange(dnt.getEndTime());
+	}
+	
 	public int getTaskID() {
 		return taskID;
 	}
@@ -100,5 +114,7 @@ public class AddCommand extends Command {
 	public void setHighPriority(boolean isHighPriority) {
 		this.isHighPriority = isHighPriority;
 	}
+
+	
 
 }

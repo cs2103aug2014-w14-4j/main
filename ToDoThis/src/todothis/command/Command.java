@@ -12,6 +12,7 @@ public abstract class Command {
 	}
 	
 	public abstract String execute(TDTStorage storage);
+	public abstract String undo(TDTStorage storage);
 	
 	public COMMANDTYPE getCommandType() {
 		return this.commandType;

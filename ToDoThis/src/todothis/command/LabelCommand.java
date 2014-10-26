@@ -1,7 +1,6 @@
 package todothis.command;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
@@ -9,6 +8,9 @@ import todothis.storage.TDTStorage;
 
 public class LabelCommand extends Command {
 	private String labelName;
+	private String prevLabel;
+	private String undoFeedback;
+	private boolean newLabelCreated = false;
 	
 	public LabelCommand(String labelName) {
 		super(COMMANDTYPE.LABEL);
@@ -17,6 +19,7 @@ public class LabelCommand extends Command {
 
 	@Override
 	public String execute(TDTStorage storage) {
+		prevLabel = storage.getCurrLabel();
 		String[] label = getLabelName().toUpperCase().split(" ");
 		
 		if(label.length > 1 || label.length <= 0) {
@@ -25,16 +28,34 @@ public class LabelCommand extends Command {
 		
 		if(storage.getLabelMap().containsKey(label[0])) {
 			storage.setCurrLabel(label[0]);
-			return "Current label changed.";
+			
+			setUndoFeedback("Current label change to: " + prevLabel);
+			storage.insertToUndoStack(this);
+			return "Current label change to: " + label[0];
 		} else if(label[0].equals("") || label[0].matches("\\d+")) {
 			return "Error. Label name cannot be blank or digits only.";
 		} else {
 			storage.getLabelMap().put(label[0], new ArrayList<Task>());
-			storage.getAutoWords().add(label[0]);
-			Collections.sort(storage.getAutoWords());
+			storage.insertToAutoWords(label[0]);
 			storage.setCurrLabel(label[0]);
-			return "Label created";
+			newLabelCreated = true;
+			
+			setUndoFeedback("Label " + label[0] + " deleted");
+			storage.insertToUndoStack(this);
+			return "Label " + label[0] + " created";
 		}
+	}
+	
+	@Override
+	public String undo(TDTStorage storage) {
+		storage.setCurrLabel(prevLabel);
+		if(newLabelCreated) {
+			DeleteCommand comd = new DeleteCommand(labelName, -1);
+			comd.execute(storage);
+			assert (storage.getUndoStack().size() > 0) : "undostack is empty";
+			storage.getUndoStack().pop();
+		}
+		return getUndoFeedback();
 	}
 
 	public String getLabelName() {
@@ -44,5 +65,15 @@ public class LabelCommand extends Command {
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
+
+	public String getUndoFeedback() {
+		return undoFeedback;
+	}
+
+	public void setUndoFeedback(String undoFeedback) {
+		this.undoFeedback = undoFeedback;
+	}
+
+	
 
 }

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import todothis.TDTGUI;
+import todothis.command.Command;
 import todothis.logic.TDTDateAndTime;
 import todothis.logic.Task;
 
@@ -21,10 +22,11 @@ public class TDTStorage implements ITDTStorage {
 	private String fileName;
 	private HashMap<String, ArrayList<Task>> labelMap;
 	private String currLabel = TDTGUI.DEFAULT_LABEL;
-	private Stack<HashMap<String, ArrayList<Task>>> undoStack;
+	//private Stack<HashMap<String, ArrayList<Task>>> undoStack;
+	private Stack<Command> undoStack;
 	private Stack<String> labelPointerStack;
 	private BufferedWriter bw;
-	private Stack<HashMap<String, ArrayList<Task>>> redoStack;
+	private Stack<Command> redoStack;
 	private Stack<String> redoLabelPointerStack;
 	private ArrayList<String> hideList;
 	private ArrayList<String> autoWords;
@@ -32,23 +34,16 @@ public class TDTStorage implements ITDTStorage {
 	public TDTStorage(String fileName) {
 		this.setFileName(fileName);
 		setLabelMap(new HashMap<String, ArrayList<Task>>());
-		setUndoStack(new Stack<HashMap<String, ArrayList<Task>>>());
+		setUndoStack(new Stack<Command>());
 		setLabelPointerStack(new Stack<String>());
-		setRedoStack(new Stack<HashMap<String, ArrayList<Task>>>());
+		setRedoStack(new Stack<Command>());
 		setRedoLabelPointerStack(new Stack<String>());
 		setHideList(new ArrayList<String>());
 		labelMap.put(currLabel, new ArrayList<Task>());
 		setAutoWords(new ArrayList<String>());
-		autoWords.add("DELETE");
-		autoWords.add("DONE");
-		autoWords.add("REDO");
-		autoWords.add("UNDO");
-		autoWords.add("HIDE");
-		autoWords.add("DISPLAY");
-		autoWords.add("EDIT");
-		autoWords.add("LABEL");
-		autoWords.add("SEARCH");
+		initializeWordsForAutoComplete();
 	}
+
 	
 	
 	@Override
@@ -140,6 +135,35 @@ public class TDTStorage implements ITDTStorage {
 		this.getLabelMap().get(task.getLabelName()).add(task);
 	}
 	
+	public void insertToAutoWords(String label) {
+		autoWords.add(label);
+		Collections.sort(autoWords);
+	}
+	
+	public void insertToUndoStack(Command comd) {
+		undoStack.add(comd);
+	}
+
+	private void initializeWordsForAutoComplete() {
+		autoWords.add("DELETE");
+		autoWords.add("DONE");
+		autoWords.add("REDO");
+		autoWords.add("UNDO");
+		autoWords.add("HIDE");
+		autoWords.add("DISPLAY");
+		autoWords.add("EDIT");
+		autoWords.add("LABEL");
+		autoWords.add("SEARCH");
+	}
+	
+	public ArrayList<String> copyHideList() {
+		ArrayList<String> list = new ArrayList<String>();
+		for(int i = 0 ; i < hideList.size(); i++) {
+			list.add(hideList.get(i));
+		}
+		return list;
+	}
+	
 	public HashMap<String, ArrayList<Task>> copyLabelMap() {
 		HashMap<String, ArrayList<Task>> hmap = new HashMap<String, ArrayList<Task>>();
 		Iterator<String> labelIter = labelMap.keySet().iterator();
@@ -185,11 +209,11 @@ public class TDTStorage implements ITDTStorage {
 		this.currLabel = currLabel;
 	}
 
-	public Stack<HashMap<String, ArrayList<Task>>> getUndoStack() {
+	public Stack<Command> getUndoStack() {
 		return undoStack;
 	}
 
-	public void setUndoStack(Stack<HashMap<String, ArrayList<Task>>> undoStack) {
+	public void setUndoStack(Stack<Command> undoStack) {
 		this.undoStack = undoStack;
 	}
 
@@ -203,12 +227,12 @@ public class TDTStorage implements ITDTStorage {
 	}
 
 
-	public Stack<HashMap<String, ArrayList<Task>>> getRedoStack() {
+	public Stack<Command> getRedoStack() {
 		return redoStack;
 	}
 
 
-	public void setRedoStack(Stack<HashMap<String, ArrayList<Task>>> redoStack) {
+	public void setRedoStack(Stack<Command> redoStack) {
 		this.redoStack = redoStack;
 	}
 

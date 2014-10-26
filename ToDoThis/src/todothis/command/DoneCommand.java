@@ -28,6 +28,8 @@ public class DoneCommand extends Command {
 				Task next = iter.next();
 				next.setDone(!next.isDone());
 			}
+			
+			storage.insertToUndoStack(this);
 			return "All tasks are done!";
 		}
 		
@@ -39,6 +41,8 @@ public class DoneCommand extends Command {
 					Task task = array.get(i);
 					task.setDone(!task.isDone());
 				}
+				
+				storage.insertToUndoStack(this);
 				return "Tasks under " + label + "are done.";
 			} else {
 				return "Error. Label does not exist.";
@@ -51,6 +55,8 @@ public class DoneCommand extends Command {
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
 				task.setDone(!task.isDone());
+				
+				storage.insertToUndoStack(this);
 				return "Task done";
 			} else {
 				return "error. Invalid task number.";
@@ -64,6 +70,8 @@ public class DoneCommand extends Command {
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
 					task.setDone(!task.isDone());
+					
+					storage.insertToUndoStack(this);
 					return "Task done";
 				} else {
 					return "error. Invalid task number.";
@@ -75,6 +83,18 @@ public class DoneCommand extends Command {
 		//Shouldnt reach here
 		return "Error. Invalid done.";
 	}
+	
+	@Override
+	public String undo(TDTStorage storage) {
+		DoneCommand comd = new DoneCommand(getLabelName(), getTaskID());
+		comd.execute(storage);
+		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
+		storage.getUndoStack().pop();
+		return "Undo done command";
+	}
+	
+	
+	
 	public int getTaskID() {
 		return taskID;
 	}
@@ -87,5 +107,6 @@ public class DoneCommand extends Command {
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
+	
 
 }
