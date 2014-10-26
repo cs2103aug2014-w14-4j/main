@@ -98,7 +98,7 @@ public class TDTDateAndTime implements Comparable <TDTDateAndTime>{
 		return replacedWord;
 	}
 	
-	public void decodeDetails(String details){
+	private void decodeDetails(String details){
 		System.out.println(details);
 		boolean endTimeDate = false;
 		int thisOrNextOrFollowing = 0; //this = 1 next = 2 following = 3
