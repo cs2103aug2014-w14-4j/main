@@ -42,8 +42,7 @@ public class DisplayCommand extends Command {
 	}*/
 	
 	public String execute(TDTStorage storage) {
-		prevHideList = storage.getHideList();
-		//prevHideList = storage.copyHideList();
+		prevHideList = storage.copyHideList();
 		String[] labelNames = getLabelName().split(" ");
 		Iterator<String> iter = storage.getLabelIterator();
 
