@@ -3,8 +3,6 @@ package todothis.parser;
 import java.util.ArrayList;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
-
-
 import todothis.command.AddCommand;
 import todothis.command.Command;
 import todothis.command.DeleteCommand;
@@ -20,19 +18,19 @@ import todothis.logic.TDTDateAndTime;
 
 public class TDTParser implements ITDTParser {
 
-	COMMANDTYPE commandType = COMMANDTYPE.INVALID;
-	String labelName;
-	boolean isHighPriority;
-	String commandDetails;
-	int taskID;
-	TDTDateAndTime dateAndTime;
-	boolean isSkipNextWord;
-	boolean[] isCommandDetails;
-	String remainingWords;
-	String[] parts;
-	String dateAndTimeParts = "";
-	ArrayList<String> prepositionWordsArr;
-	ArrayList<String> dayWordsArr;
+	private COMMANDTYPE commandType = COMMANDTYPE.INVALID;
+	private String labelName;
+	private boolean isHighPriority;
+	private String commandDetails;
+	private int taskID;
+	private TDTDateAndTime dateAndTime;
+	private boolean isSkipNextWord;
+	private boolean[] isCommandDetails;
+	private String remainingWords;
+	private String[] parts;
+	private String dateAndTimeParts = "";
+	private ArrayList<String> prepositionWordsArr;
+	private ArrayList<String> dayWordsArr;
 	//private Logger logger = Logger.getLogger("TDTParser");
 	
 	public Command parse(String userCommand) {
@@ -91,7 +89,7 @@ public class TDTParser implements ITDTParser {
 	/**
 	 * Default command is assumed to be ADD
 	 */
-	private static COMMANDTYPE determineCommandType(String commandTypeString) {
+	private COMMANDTYPE determineCommandType(String commandTypeString) {
 		if (commandTypeString == null) {
 			return COMMANDTYPE.INVALID;
 		} else if (commandTypeString.equalsIgnoreCase("hide")) {
@@ -120,7 +118,7 @@ public class TDTParser implements ITDTParser {
 	}
 	
 //---------------------------------- Main Command Methods -------------------------------------
-	public void add(String userCommand) {
+	private void add(String userCommand) {
 		if (getFirstWord(userCommand).equalsIgnoreCase("add")) {
 			setRemainingWords(removeFirstWord(userCommand));
 		} else {
@@ -152,7 +150,7 @@ public class TDTParser implements ITDTParser {
 		completeAllDetails();
 	}
 
-	public void done() {
+	private void done() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
 			if (parts.length == 1) {
@@ -174,7 +172,7 @@ public class TDTParser implements ITDTParser {
 		}
 	}
 
-	public void edit(String userCommand) {
+	private void edit(String userCommand) {
 		boolean isValidEdit = false;
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
@@ -199,7 +197,7 @@ public class TDTParser implements ITDTParser {
 		}
 	}
 
-	public void delete() {
+	private void delete() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
 			if (parts.length == 1) {
@@ -221,19 +219,19 @@ public class TDTParser implements ITDTParser {
 		}
 	}
 	
-	public void display() {
+	private void display() {
 		setCommandDetails(getRemainingWords());
 	}
 	
-	public void hide() {
+	private void hide() {
 		setCommandDetails(getRemainingWords());
 	}
 
-	public void search() {
+	private void search() {
 		setCommandDetails(getRemainingWords());
 	}
 
-	public void label() {
+	private void label() {
 		setLabelName(getRemainingWords());
 	}
 
@@ -254,7 +252,9 @@ public class TDTParser implements ITDTParser {
 			return userCommand;
 		} else {
 			String userWord = userCommand.substring(0, userCommand.indexOf(" "));
-			userWord = userWord.replaceAll(("\\W"), "");
+			if (!userWord.contains("\"")) { 
+				userWord = userWord.replaceAll(("\\W"), "");
+			}
 			return userWord;
 		}
 	}
