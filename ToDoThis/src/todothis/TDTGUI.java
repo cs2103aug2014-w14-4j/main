@@ -204,7 +204,11 @@ public class TDTGUI extends JFrame implements DocumentListener{
 	 * Create the frame.
 	 */
 	public TDTGUI() {
-		
+		commandField.getDocument().addDocumentListener(this);
+        InputMap im = commandField.getInputMap();
+        ActionMap am = commandField.getActionMap();
+        im.put(KeyStroke.getKeyStroke("RIGHT"), COMMIT_ACTION);
+        am.put(COMMIT_ACTION, new CommitAction());
 		
 		//Content Pane
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -221,11 +225,8 @@ public class TDTGUI extends JFrame implements DocumentListener{
 		
 		//CommandField
 		
-		commandField.getDocument().addDocumentListener(this);
-        InputMap im = commandField.getInputMap();
-        ActionMap am = commandField.getActionMap();
-        im.put(KeyStroke.getKeyStroke("RIGHT"), COMMIT_ACTION);
-        am.put(COMMIT_ACTION, new CommitAction());
+		
+		
 		commandField.setBounds(61, 3, 713, 20);
 		commandField.setColumns(10);
 		commandField.setFocusable(true);
