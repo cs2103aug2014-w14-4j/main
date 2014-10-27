@@ -49,6 +49,10 @@ public class TDTLogic implements ITDTLogic {
 		return renumberTaskID(array, task);
 	}
 	
+	public boolean isInLabelMap(String label) {
+		return storage.getLabelMap().containsKey(label.toUpperCase());
+	}
+	
 	public boolean isHideLabel(String label) {
 		return storage.getHideList().contains(label);
 	}

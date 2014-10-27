@@ -44,6 +44,12 @@ public class HelpCommand extends Command{
 		return "INVALID HELP COMMAND!";
 	}
 	
+	@Override
+	public String undo(TDTStorage storage) {
+		
+		return "";
+	}
+	
 	private String helpAdd(){
 		
 		return null;
@@ -122,5 +128,7 @@ public class HelpCommand extends Command{
 			return COMMANDTYPE.INVALID;
 		}
 	}
+
+	
 
 }
