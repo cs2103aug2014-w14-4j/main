@@ -1,5 +1,6 @@
 package todothis.logic;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -78,6 +79,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		// TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
 		// System.out.println(test2.display());
 		// System.out.println(TDTDateAndTime.decodeSearchDetails("tml today monday"));
+		
+		calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("today 3.30am"));
 
 	}
 
@@ -305,7 +308,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return numOfDaysToAdd;
 	}
 
-	private String decodeTime(String[] parts, int a) {
+	private static String decodeTime(String[] parts, int a) {
 		String[] timeParts = new String[2];
 		int temp;
 		if ((parts[a].substring(parts[a].length() - 2, parts[a].length())
@@ -407,10 +410,18 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		// if 9/12 entered, add on to 9/12/2014
 		if (datePartsTemp != null) {
 			if (datePartsTemp.length == 2) {
+				boolean isMonthInt = true;
 				dateParts[0] = datePartsTemp[0];
 				dateParts[1] = datePartsTemp[1];
-				if (currentMonth > Integer.parseInt(datePartsTemp[1])) {
-					dateParts[2] = Integer.toString(currentYear + 1);
+				try {
+					Integer.parseInt(dateParts[1]);
+				} catch (NumberFormatException e) {
+					isMonthInt = false;
+				}
+				if (isMonthInt) {
+					if (currentMonth > Integer.parseInt(datePartsTemp[1])) {
+						dateParts[2] = Integer.toString(currentYear + 1);
+					}
 				} else {
 					dateParts[2] = Integer.toString(currentYear);
 				}
@@ -867,8 +878,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		}
 	}
 
-	// -----------------------------------Decode Search
-	// Details-----------------------------
+	// -------------------------Decode Search Details------------
 	public static String decodeSearchDetails(String searchString) {
 		String[] searchParts = searchString.toLowerCase().split(" ");
 		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
@@ -935,8 +945,144 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return decodedSearchString.trim();
 	}
 
-	// -----------------------------------CHECK FOR OVERDUE
-	// TASK----------------------------
+	// ---------------CALCULATE REMAINING TIME FOR REMINDER--------------------
+	
+	@SuppressWarnings("deprecation")
+	public static String decodeReminderDetails(String reminderString) {
+		String[] reminderParts = reminderString.toLowerCase().split(" ");
+		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
+		String decodedReminderDate = "null";
+		String decodedReminderTime = "null";
+
+		cal = Calendar.getInstance(TimeZone.getDefault());
+		int currentDay = cal.get(Calendar.DATE);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentYear = cal.get(Calendar.YEAR);
+		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		// int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		// int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
+				currentYear);
+		Date time = cal.getTime();
+		int currentHour = time.getHours();
+		int currentMinute = time.getMinutes();
+
+		String currentTime = currentHour + ":" + currentMinute;
+		String currentDate = currentDay + "/" + currentMonth + "/"
+				+ currentYear;
+
+		for (int i = 0; i < reminderParts.length; i++) {
+			if (reminderParts[i].equals("this")) {
+				thisOrNextOrFollowing = 1;
+			} else if (reminderParts[i].equals("next")) {
+				thisOrNextOrFollowing = 2;
+			} else if (reminderParts[i].equals("following")) {
+				thisOrNextOrFollowing = 3;
+			}
+
+			if (checkDate(reminderParts[i])) {
+				decodedReminderDate = decodeDate(reminderParts, i, currentYear,
+						currentMonth);
+			} else if (checkDay(reminderParts[i]) != 0) {
+				int numOfDaysToAdd = determineDaysToBeAdded(
+						thisOrNextOrFollowing, reminderParts, i,
+						currentDayOfWeek);
+				decodedReminderDate = addDaysToCurrentDate(currentDay,
+						currentMonth, currentYear, numOfDaysCurrentMonth,
+						numOfDaysToAdd);
+			} else if (checkMonth(reminderParts[i]) != 0) {
+				boolean isValidDayYear = true;
+				if (i != 0 && i != reminderParts.length - 1) {
+					String before = reminderParts[i - 1];
+					int month = checkMonth(reminderParts[i]);
+					String after = reminderParts[i + 1];
+					try {
+						Integer.parseInt(before);
+						Integer.parseInt(after);
+					} catch (NumberFormatException e) {
+						isValidDayYear = false;
+					}
+					if (isValidDayYear) {
+						int day = Integer.parseInt(before);
+						int year = 0;
+
+						if (after.length() == 2) {
+							after = "20" + after;
+						}
+						year = Integer.parseInt(after);
+
+						decodedReminderDate = day + "/" + month + "/" + year;
+					} else {
+						decodedReminderDate = before + "/" + month + "/"
+								+ after;
+					}
+				}
+			} else if (checkTime(reminderParts[i])) {
+				decodedReminderTime = decodeTime(reminderParts, i);
+			}
+		}
+
+		if (decodedReminderTime.equals("null")) {
+			return "null";
+		} else if (decodedReminderDate.equals("null")) { // today
+			if (compareToTime(currentTime, decodedReminderTime) == 1) {
+				return currentDate + " " + decodedReminderTime;
+			}
+		} else {
+			if (isValidDateRange(decodedReminderDate)) {
+				if (compareToDate(currentDate, decodedReminderDate) == 0) {
+					if (compareToTime(currentTime, decodedReminderTime) == 1) {
+						return decodedReminderDate + " " + decodedReminderTime;
+					}
+				} else if (compareToDate(currentDate, decodedReminderDate) == 1) {
+					return decodedReminderDate + " " + decodedReminderTime;
+				}
+			}
+		}
+		return "null";
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static long calculateRemainingTime(String decodedString){
+		cal = Calendar.getInstance(TimeZone.getDefault());
+		int currentDay = cal.get(Calendar.DATE);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentYear = cal.get(Calendar.YEAR);
+		//int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		// int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		// int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+		//int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
+				//currentYear);
+		Date time = cal.getTime();
+		int currentHour = time.getHours();
+		int currentMinute = time.getMinutes();
+		int currentSeconds = time.getSeconds();
+		
+		String reminder = decodedString + ":00";
+		String currentDateAndTime = currentDay + "/" + currentMonth + "/" + currentYear + 
+				" " + currentHour + ":" + currentMinute + ":" + currentSeconds;
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		
+		Date d1 = null;
+		Date d2 = null;
+		long remainingTimeInSeconds = 0;
+		
+		try {
+			d1 = format.parse(currentDateAndTime);
+			d2 = format.parse(reminder);
+ 
+			//in milliseconds
+			long diff = d2.getTime() - d1.getTime();
+ 
+			remainingTimeInSeconds = diff / 1000;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return remainingTimeInSeconds;
+	}
+	
+	// -----------------------------------CHECK FOR OVERDUE TASK---------------
 	// NEED TESTING
 	@SuppressWarnings("deprecation")
 	public boolean isOverdue() {
@@ -984,8 +1130,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return false;
 	}
 
-	// ------------------------------------CHECK FOR
-	// CLASHES-------------------------------
+	// ------------------------------------CHECK FOR CLASHES---------------------
 	public boolean isClash(TDTDateAndTime arg0) {
 		if (arg0.isTimedTask() == true) {
 			if (!this.getStartDate().equals("null")
@@ -1115,7 +1260,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return false;
 	}
 
-	// ------------------------------------COMPARABLE----------------------------------------
+	// ------------------------------------COMPARABLE----------------------------------
 	@Override
 	public int compareTo(TDTDateAndTime arg0) {
 		String thisDate = "null";
