@@ -6,7 +6,8 @@ import todothis.command.Command;
 public interface ITDTParser {
 	
 	public enum COMMANDTYPE {
-		ADD, DELETE, HIDE, SEARCH, REDO, EDIT, DONE, UNDO, LABEL, DISPLAY, HELP, INVALID;
+		REMIND, ADD, DELETE, HIDE, SEARCH, REDO, EDIT, DONE, 
+		UNDO, LABEL, DISPLAY, HELP, INVALID;
 	}
 	
 	/**

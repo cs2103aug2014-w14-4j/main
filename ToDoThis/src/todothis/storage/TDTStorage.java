@@ -16,6 +16,7 @@ import java.util.Stack;
 import todothis.TDTGUI;
 import todothis.command.Command;
 import todothis.logic.TDTDateAndTime;
+import todothis.logic.TDTReminder;
 import todothis.logic.Task;
 
 public class TDTStorage implements ITDTStorage {
@@ -60,9 +61,10 @@ public class TDTStorage implements ITDTStorage {
 			while(br.ready()) {
 				String line = br.readLine();
 				String[] params = line.split("\t");
+				assert(params.length == 9);
 				TDTDateAndTime date = new TDTDateAndTime(params[4], params[5], 
 						params[6], params[7] );
-				Task task = new Task(0, params[0], params[1] , date,false, false);
+				Task task = new Task(0, params[0], params[1] , date, false, false, params[8]);
 				if(!labelMap.containsKey(params[0])) {
 					labelMap.put(params[0], new ArrayList<Task>());
 				}
@@ -72,6 +74,10 @@ public class TDTStorage implements ITDTStorage {
 				}
 				if(params[3].equals("true")) {
 					task.setDone(true);
+				}
+				if(!params[8].equals("null")) {
+					task.setReminder(new TDTReminder(
+							TDTDateAndTime.calculateRemainingTime(params[8]), task));
 				}
 				this.addTask(task);	
 			}
@@ -103,7 +109,8 @@ public class TDTStorage implements ITDTStorage {
 				task.getDateAndTime().getStartDate() + "\t" +
 				task.getDateAndTime().getEndDate() + "\t" +
 				task.getDateAndTime().getStartTime() + "\t" +
-				task.getDateAndTime().getEndTime());
+				task.getDateAndTime().getEndTime() + "\t" +
+				task.getRemindDateTime());
 				bw.newLine();
 			}
 			bw.close();
@@ -154,6 +161,7 @@ public class TDTStorage implements ITDTStorage {
 		autoWords.add("EDIT");
 		autoWords.add("LABEL");
 		autoWords.add("SEARCH");
+		autoWords.add("REMIND");
 	}
 	
 	public ArrayList<String> copyHideList() {
@@ -177,7 +185,7 @@ public class TDTStorage implements ITDTStorage {
 			Task task =  taskIter.next();
 			hmap.get(task.getLabelName()).add(new Task(task.getTaskID(), task.getLabelName(),
 					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
-					 task.isDone()));
+					 task.isDone(), task.getRemindDateTime()));
 		}
 		return hmap;
 	}

@@ -173,7 +173,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 				sb.append("</table></div>");
 			}
 		}
-
 	}
 
 	private String displayTaskInRow(Task task, String type) {

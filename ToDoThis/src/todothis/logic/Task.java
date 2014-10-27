@@ -7,6 +7,8 @@ public class Task implements Comparable<Task> {
 	private String details;
 	private boolean isHighPriority;
 	private boolean isDone;
+	private String remindDateTime;
+	private TDTReminder reminder;
 	
 //---------------------Task constructor---------------------------------------
 	public Task(int taskID, String labelName, String details, TDTDateAndTime dateAndTime, boolean p) {
@@ -21,13 +23,14 @@ public class Task implements Comparable<Task> {
 	
 	public Task(int taskID, String labelName, String details,
 			TDTDateAndTime dateAndTime, boolean p,
-			boolean done) {
+			boolean done, String remindeDateTime) {
 		this.setDetails(details);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName);
 		this.setDone(done);
 		this.setHighPriority(p);
 		this.setDateAndTime(dateAndTime);
+		this.setRemindDateTime(remindeDateTime);
 	}
 	
 	//-------------------------------------------------------------------------------
@@ -97,5 +100,25 @@ public class Task implements Comparable<Task> {
 
 	public void setDateAndTime(TDTDateAndTime dateAndTime) {
 		this.dateAndTime = dateAndTime;
+	}
+
+
+	public String getRemindDateTime() {
+		return remindDateTime;
+	}
+
+
+	public void setRemindDateTime(String remindDateTime) {
+		this.remindDateTime = remindDateTime;
+	}
+
+
+	public TDTReminder getReminder() {
+		return reminder;
+	}
+
+
+	public void setReminder(TDTReminder reminder) {
+		this.reminder = reminder;
 	}
 }

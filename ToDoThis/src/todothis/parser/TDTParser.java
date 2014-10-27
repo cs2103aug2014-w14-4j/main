@@ -1,6 +1,7 @@
 package todothis.parser;
 
 import java.util.ArrayList;
+
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 import todothis.command.AddCommand;
@@ -12,6 +13,7 @@ import todothis.command.EditCommand;
 import todothis.command.HideCommand;
 import todothis.command.LabelCommand;
 import todothis.command.RedoCommand;
+import todothis.command.RemindCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
 import todothis.logic.TDTDateAndTime;
@@ -77,6 +79,9 @@ public class TDTParser implements ITDTParser {
 			case DONE :
 				done();
 				return new DoneCommand(getLabelName(), getTaskID());
+			case REMIND :
+				remind();
+				return new RemindCommand(getLabelName(), getTaskID(), getCommandDetails());
 			case INVALID :
 				break;
 			default:
@@ -112,7 +117,9 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.DONE;
 		} else if (commandTypeString.equalsIgnoreCase("redo")) {
 			return COMMANDTYPE.REDO;
-		} else {
+		} else if (commandTypeString.equalsIgnoreCase("remind")) {
+			return COMMANDTYPE.REMIND;
+		}else {
 			return COMMANDTYPE.ADD;
 		}
 	}
@@ -170,6 +177,17 @@ public class TDTParser implements ITDTParser {
 				}
 			}
 		}
+	}
+	
+	private void remind() {
+		parts = getRemainingWords().split(" ");
+		setTaskID(Integer.parseInt(parts[0]));
+		String details = "";
+		for(int i = 1 ; i < parts.length; i++) {
+			details = details + parts[i] + " ";
+		}
+		setCommandDetails(details);
+		
 	}
 
 	private void edit(String userCommand) {

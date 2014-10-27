@@ -90,6 +90,11 @@ public class DeleteCommand extends Command {
 
 	@Override
 	public String undo(TDTStorage storage) {
+		//May not undo the reminders.
+		//Delete may not off the reminders.
+		//Suggest
+		//Delete all go thru each task to off reminders
+		//Undo go thru each task to add back reminder
 		storage.setLabelMap(prevState);
 		storage.setCurrLabel(prevLabel);
 		return getUndoFeedback();
