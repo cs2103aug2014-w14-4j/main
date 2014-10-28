@@ -473,51 +473,51 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	}
 
 	// -------------------------------------------DISPLAY------------------------------------------------
-	public String displayDateTime(boolean deadline) {
+	public String displayDateTime() {
 		String dateAndTimeContents = "";
-		if (deadline == true) {
+		if (isDeadlineTask) {
+			dateAndTimeContents = dateAndTimeContents + "Due: ";
 			if (!getEndDate().equals("null")) {
-				dateAndTimeContents = dateAndTimeContents + "  Due Date: "
-						+ getEndDate();
+				dateAndTimeContents = dateAndTimeContents + getEndDate() + "\t";
 			}
 			if (!getEndTime().equals("null")) {
-				dateAndTimeContents = dateAndTimeContents + "  Due Time: "
-						+ getEndTime() + "<br>";
+				dateAndTimeContents = dateAndTimeContents + getEndTime();
 			}
-		} else {
+			dateAndTimeContents = dateAndTimeContents + "<br>";
+		} else if (isTimedTask) {
+			dateAndTimeContents = dateAndTimeContents + "Start: ";
 			if (!getStartDate().equals("null")) {
-				dateAndTimeContents = dateAndTimeContents + "  Start Date: "
-						+ getStartDate();
+				dateAndTimeContents = dateAndTimeContents + getStartDate() + "\t";
 			}
 			if (!getStartTime().equals("null")) {
-				dateAndTimeContents = dateAndTimeContents + "  Start Time: "
-						+ getStartTime() + "<br>";
+				dateAndTimeContents = dateAndTimeContents + getStartTime();
 			}
-			if (!getEndDate().equals("null")) {
-				dateAndTimeContents = dateAndTimeContents + "  End Date: "
-						+ getEndDate();
-			}
-			if (!getEndTime().equals("null")) {
-				dateAndTimeContents = dateAndTimeContents + "  End Time: "
-						+ getEndTime() + "<br>";
+			dateAndTimeContents = dateAndTimeContents + "<br>";
+			if(!getEndDate().equals("null") || !getEndTime().equals("null")){
+				dateAndTimeContents = dateAndTimeContents + "End: ";
+				if (!getEndDate().equals("null")) {
+					dateAndTimeContents = dateAndTimeContents + getEndDate() + "\t";
+				}
+				if (!getEndTime().equals("null")) {
+					dateAndTimeContents = dateAndTimeContents + getEndTime();
+				}
+				dateAndTimeContents = dateAndTimeContents + "<br>";
 			}
 		}
 		return dateAndTimeContents;
 	}
 
 	public String display() {
-		boolean isDeadline = false;
 		// String displayString = "";
 		if (!getStartDate().equals("null") || !getStartTime().equals("null")) {
 			// displayString = "(TIMED TASK)";
 		} else if (!getEndDate().equals("null") || !getEndTime().equals("null")) {
 			// displayString = "(DEADLINE TASK)";
-			isDeadline = true;
 		} else {
 			// displayString = "(FLOATING TASK)";
 		}
 		// displayString = displayString + "<br>" + displayDateTime(isDeadline);
-		return displayDateTime(isDeadline);
+		return displayDateTime();
 	}
 
 	// -------------------------------Time Related
