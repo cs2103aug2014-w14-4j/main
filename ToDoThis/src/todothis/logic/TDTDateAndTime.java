@@ -591,7 +591,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			day = Integer.parseInt(dateParts[0]);
 			month = Integer.parseInt(dateParts[1]);
 			year = Integer.parseInt(dateParts[2]);
-		} catch (Exception e) {
+		} catch (NumberFormatException e) {
 			return false;
 		}
 
@@ -778,14 +778,29 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	// ---------------------------CHECK
 	// DATE------------------------------------------
 	public static boolean checkDate(String nextWord) {
-
 		nextWord = replaceEndStringPunctuation(nextWord);
-
+		String [] parts;
 		if ((nextWord.split("/").length == 3)
 				|| (nextWord.split("/").length == 2)) {
+			parts = nextWord.split("/");
+			try {
+				for(int i = 0; i<parts.length;i++){
+					Integer.parseInt(parts[i]);
+				}
+			} catch (NumberFormatException e) {
+				return false;
+			}
 			return true;
 		} else if ((nextWord.split("-").length == 3)
 				|| (nextWord.split("-").length == 2)) {
+			parts = nextWord.split("-");
+			try {
+				for(int i = 0; i<parts.length;i++){
+					Integer.parseInt(parts[i]);
+				}
+			} catch (NumberFormatException e) {
+				return false;
+			}
 			return true;
 		} else if ((nextWord.length() == 6) || (nextWord.length() == 8)) {
 			if (nextWord.matches("\\d+")) {
