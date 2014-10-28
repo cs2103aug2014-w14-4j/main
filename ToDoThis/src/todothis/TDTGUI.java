@@ -490,6 +490,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				gui.logic.write();
 				System.exit(0);             
 			}
 		});

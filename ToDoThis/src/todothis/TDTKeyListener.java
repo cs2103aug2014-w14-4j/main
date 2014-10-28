@@ -42,7 +42,7 @@ public class TDTKeyListener implements KeyListener {
 			gui.commandField.setText("");
 
 			Command command = gui.getParser().parse(gui.getUserCommand());
-
+			
 			if (command.getCommandType() != COMMANDTYPE.SEARCH) {
 				String feedback = gui.getLogic().executeCommand(command);
 				gui.updateGUI(feedback, gui.displayTask());

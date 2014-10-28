@@ -26,8 +26,10 @@ public class TDTReminder {
 		}
 		public void run() {
 			Toolkit.getDefaultToolkit().beep();
-			JOptionPane.showMessageDialog(null, "REMINDER!\nTask: " +getTask().getDetails());   
+			JOptionPane.showMessageDialog(null, "REMINDER!\nTask: " + getTask().getDetails());
 			timer.cancel(); 
+			getTask().setRemindDateTime("null");
+			getTask().setReminder(null);
 		}
 		public Task getTask() {
 			return task;

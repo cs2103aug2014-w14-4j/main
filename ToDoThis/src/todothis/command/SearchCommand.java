@@ -32,7 +32,6 @@ public class SearchCommand extends Command {
 		String feedback = searchedResult.size() + " result(s) found for \"" 
 				+ searchedWords + "\".";
 		
-		storage.insertToUndoStack(this);
 		return feedback;
 	}
 	

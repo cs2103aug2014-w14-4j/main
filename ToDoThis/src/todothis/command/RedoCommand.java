@@ -4,7 +4,7 @@ import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 public class RedoCommand extends Command{
-
+	
 	public RedoCommand() {
 		super(COMMANDTYPE.REDO);
 	}
