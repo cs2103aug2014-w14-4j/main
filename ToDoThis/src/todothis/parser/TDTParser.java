@@ -313,7 +313,7 @@ public class TDTParser implements ITDTParser {
 	 * and is then processed accordingly 
 	 */
 	private int usualAdd(int i, String checkWord) {
-		isPriority(checkWord);
+		isPriority(checkWord , i);
 		if (TDTDateAndTime.checkDate(checkWord) || TDTDateAndTime.checkTime(checkWord)) {
 			completeDateTimeDetails(i);
 		} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
@@ -405,10 +405,11 @@ public class TDTParser implements ITDTParser {
 	/**
 	 * This function checks if the command input is of priority
 	 * Presence of '!' shows priority. 
+	 * '!' will not appear in commandDetails. 
 	 */
-	private void isPriority(String word) {
+	private void isPriority(String word, int i) {
 		if (word.contains("!")) {
-			remainingWords = word.replace("!", "");
+			parts[i] = word.replace("!", "");
 			setIsHighPriority(true);
 		}
 	}
