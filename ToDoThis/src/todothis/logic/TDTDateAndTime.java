@@ -76,11 +76,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	public static void main(String args[]) {
 
 		// TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		// TDTDateAndTime test2 = new TDTDateAndTime("0212hrs");
-		// System.out.println(test2.display());
+		//TDTDateAndTime test2 = new TDTDateAndTime("12/12");
+		//System.out.println(test2.display());
 		// System.out.println(TDTDateAndTime.decodeSearchDetails("tml today monday"));
-		
-		calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("today 3.30am"));
+
+		// System.out.println(calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("1/1 3.38am")));
 
 	}
 
@@ -413,6 +413,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				boolean isMonthInt = true;
 				dateParts[0] = datePartsTemp[0];
 				dateParts[1] = datePartsTemp[1];
+
 				try {
 					Integer.parseInt(dateParts[1]);
 				} catch (NumberFormatException e) {
@@ -421,9 +422,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				if (isMonthInt) {
 					if (currentMonth > Integer.parseInt(datePartsTemp[1])) {
 						dateParts[2] = Integer.toString(currentYear + 1);
+					} else {
+						dateParts[2] = Integer.toString(currentYear);
 					}
-				} else {
-					dateParts[2] = Integer.toString(currentYear);
 				}
 			} else {
 				dateParts = datePartsTemp;
@@ -477,7 +478,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		if (deadline == true) {
 			if (!getEndDate().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "  Due Date: "
-						+ getEndDate() + "<br>";
+						+ getEndDate();
 			}
 			if (!getEndTime().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "  Due Time: "
@@ -486,7 +487,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		} else {
 			if (!getStartDate().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "  Start Date: "
-						+ getStartDate() + "<br>";
+						+ getStartDate();
 			}
 			if (!getStartTime().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "  Start Time: "
@@ -494,7 +495,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			}
 			if (!getEndDate().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "  End Date: "
-						+ getEndDate() + "<br>";
+						+ getEndDate();
 			}
 			if (!getEndTime().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "  End Time: "
@@ -506,17 +507,17 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	public String display() {
 		boolean isDeadline = false;
-		String displayString = "";
+		// String displayString = "";
 		if (!getStartDate().equals("null") || !getStartTime().equals("null")) {
-			displayString = "(TIMED TASK)";
+			// displayString = "(TIMED TASK)";
 		} else if (!getEndDate().equals("null") || !getEndTime().equals("null")) {
-			displayString = "(DEADLINE TASK)";
+			// displayString = "(DEADLINE TASK)";
 			isDeadline = true;
 		} else {
-			displayString = "(FLOATING TASK)";
+			// displayString = "(FLOATING TASK)";
 		}
-		displayString = displayString + "<br>" + displayDateTime(isDeadline);
-		return displayString;
+		// displayString = displayString + "<br>" + displayDateTime(isDeadline);
+		return displayDateTime(isDeadline);
 	}
 
 	// -------------------------------Time Related
@@ -946,7 +947,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	}
 
 	// ---------------CALCULATE REMAINING TIME FOR REMINDER--------------------
-	
+
 	@SuppressWarnings("deprecation")
 	public static String decodeReminderDetails(String reminderString) {
 		String[] reminderParts = reminderString.toLowerCase().split(" ");
@@ -1041,47 +1042,48 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		}
 		return "null";
 	}
-	
+
 	@SuppressWarnings("deprecation")
-	public static long calculateRemainingTime(String decodedString){
+	public static long calculateRemainingTime(String decodedString) {
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);
-		//int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		// int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 		// int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 		// int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-		//int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
-				//currentYear);
+		// int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
+		// currentYear);
 		Date time = cal.getTime();
 		int currentHour = time.getHours();
 		int currentMinute = time.getMinutes();
 		int currentSeconds = time.getSeconds();
-		
+
 		String reminder = decodedString + ":00";
-		String currentDateAndTime = currentDay + "/" + currentMonth + "/" + currentYear + 
-				" " + currentHour + ":" + currentMinute + ":" + currentSeconds;
+		String currentDateAndTime = currentDay + "/" + currentMonth + "/"
+				+ currentYear + " " + currentHour + ":" + currentMinute + ":"
+				+ currentSeconds;
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		
+
 		Date d1 = null;
 		Date d2 = null;
 		long remainingTimeInSeconds = 0;
-		
+
 		try {
 			d1 = format.parse(currentDateAndTime);
 			d2 = format.parse(reminder);
- 
-			//in milliseconds
+
+			// in milliseconds
 			long diff = d2.getTime() - d1.getTime();
- 
+
 			remainingTimeInSeconds = diff / 1000;
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return remainingTimeInSeconds;
 	}
-	
+
 	// -----------------------------------CHECK FOR OVERDUE TASK---------------
 	// NEED TESTING
 	@SuppressWarnings("deprecation")
@@ -1130,7 +1132,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return false;
 	}
 
-	// ------------------------------------CHECK FOR CLASHES---------------------
+	// ------------------------------------CHECK FOR
+	// CLASHES---------------------
 	public boolean isClash(TDTDateAndTime arg0) {
 		if (arg0.isTimedTask() == true) {
 			if (!this.getStartDate().equals("null")
