@@ -68,27 +68,27 @@ public class HelpCommand extends Command{
 	}
 	private String helpUndo(){
 		
-		return null;
+		return "Ctrl+Z - Shortcut for undo\n" + "Able to undo previous command";
 	}
 	private String helpRedo(){
 		
-		return null;
+		return "Ctrl+Y - Shortcut for redo\n" + "Able to reverse previous undo command";
 	}
 	private String helpSearch(){
 		
-		return null;
+		return "To search for a date/day, simply enter Search @tmr or @24/12/14\n" + "To search for a keyword, simply enter @keyword";
 	}
 	private String helpDisplay(){
 		
-		return null;
+		return "To display one or more label names, simply enter Display labelName1 labelName2";
 	}
 	private String helpHide(){
 		
-		return null;
+		return "To hide one or more label names, simply enter Hide labelName1 labelName2";
 	}
 	private String helpDone(){
 		
-		return null;
+		return "To mark everything as done, simple enter Done\n" + "To mark a task under current label as done, simply enter Done taskNum";
 	}
 	private String helpAll(){
 		
