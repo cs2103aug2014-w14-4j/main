@@ -18,19 +18,20 @@ public class Task implements Comparable<Task> {
 		this.setDone(false);
 		this.setHighPriority(p);
 		this.setDateAndTime(dateAndTime);
+		this.setRemindDateTime("null");
 	}
 
 	
 	public Task(int taskID, String labelName, String details,
 			TDTDateAndTime dateAndTime, boolean p,
-			boolean done, String remindeDateTime) {
+			boolean done, String remindDateTime) {
 		this.setDetails(details);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName);
 		this.setDone(done);
 		this.setHighPriority(p);
 		this.setDateAndTime(dateAndTime);
-		this.setRemindDateTime(remindeDateTime);
+		this.setRemindDateTime(remindDateTime);
 	}
 	
 	//-------------------------------------------------------------------------------

@@ -50,7 +50,9 @@ public class SearchCommand extends Command {
 			
 			for(int i = 0; i < params.length; i++) {
 				if(params[i].equals(startDate) || params[i].equals(endDate)) {
-					searchedResult.add(task);
+					if(!searchedResult.contains(task)) {
+						searchedResult.add(task);
+					}
 				}
 			}
 		}

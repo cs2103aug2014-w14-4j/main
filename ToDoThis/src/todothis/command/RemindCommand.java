@@ -13,6 +13,8 @@ public class RemindCommand extends Command {
 	private int taskID;
 	private String commandDetails;
 	private Task task;
+	private boolean isRemoveReminder = false;
+	private String prevReminder;
 	
 	public RemindCommand(String labelName, int taskId, String commandDetails) {
 		super(COMMANDTYPE.REMIND);
@@ -28,6 +30,7 @@ public class RemindCommand extends Command {
 		}
 		
 		if(getCommandDetails().equals("")) {
+			isRemoveReminder = true;
 			return removeReminder(storage);
 		}
 		if(storage.getLabelMap().containsKey(getLabelName().toUpperCase())) {
@@ -50,7 +53,7 @@ public class RemindCommand extends Command {
 				return "Invalid taskId.";
 			}
 		} else {
-			return "Invalid label Name. Label does not exist.";
+			return "Invalid label name. Label does not exist.";
 		}
 	}
 
@@ -59,26 +62,43 @@ public class RemindCommand extends Command {
 			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
 			if(getTaskID() > 0 && getTaskID() <= array.size()) {
 				Task temp = array.get(getTaskID() - 1);
+				if(temp.getReminder() == null) {
+					return "Invalid command. No reminder to remove.";
+				}
 				String dateTime = temp.getRemindDateTime();
+				prevReminder = dateTime;
+				setTask(temp);
+				System.out.println(prevReminder);
 				temp.getReminder().cancelReminder();
 				temp.setReminder(null);
 				temp.setRemindDateTime("null");
+				storage.insertToUndoStack(this);
 				return "Reminder at " + dateTime +  " removed.";
 			} else {
 				return "Invalid taskId.";
 			}
 		} else {
-			return "Invalid label Name. Label does not exist.";
+			return "Invalid label name. Label does not exist.";
 		}
 	}
 
 	@Override
 	public String undo(TDTStorage storage) {
-		Task temp = getTask();
-		temp.getReminder().cancelReminder();
-		temp.setReminder(null);
-		temp.setRemindDateTime("null");
-		return "Undo reminder.";
+		if(!isRemoveReminder) {
+			Task temp = getTask();
+			if(temp.getReminder() != null) {
+				temp.getReminder().cancelReminder();
+				temp.setReminder(null);
+				temp.setRemindDateTime("null");
+			}
+			return "Undo reminder.";
+		} else {
+			Task temp = getTask();
+			temp.setRemindDateTime(prevReminder);
+			temp.setReminder(new TDTReminder(
+					TDTDateAndTime.calculateRemainingTime(prevReminder), temp));
+			return "Undo remove reminder.";
+		}
 	}
 
 	

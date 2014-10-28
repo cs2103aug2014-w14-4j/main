@@ -178,7 +178,13 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	private String displayTaskInRow(Task task, String type) {
 		return "<tr" + type + "><td>" + task.getTaskID() + "</td><td>"
 				+ task.getDetails() + "</td><td class = \"datetime\">"
-				+ task.getDateAndTime().display() + "</td></tr>";
+				+ task.getDateAndTime().display()
+				+ checkIfHaveReminder(task.getRemindDateTime()) 
+				+"</td></tr>";
+	}
+	
+	private String checkIfHaveReminder(String remind) {
+		return !remind.equals("null") ? "Reminder: " + remind : "";
 	}
 
 	String displaySearch(ArrayList<Task> searched) {
@@ -211,7 +217,9 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		return "<tr" + type + "><td>" + next.getLabelName()
 				+ "</td><td>" + next.getTaskID() + "</td><td>"
 				+ next.getDetails() + "</td><td class = \"datetime\">"
-				+ next.getDateAndTime().display() + "</td></tr>";
+				+ next.getDateAndTime().display() 
+				+ checkIfHaveReminder(next.getRemindDateTime()) 
+				+"</td></tr>";
 	}
 
 	String getDateTimeStringForEdit(TDTDateAndTime dat) {
@@ -250,7 +258,11 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		taskLabel.setText("Adding task to: " + logic.getCurrLabel());
 		feedbackArea.setText(feedback);
 		taskPane.setText(text);
-
+		if((feedback.split(" "))[0].equals("Invalid")) {
+			feedbackArea.setBackground(Color.pink);
+		} else {
+			feedbackArea.setBackground(Color.green);
+		}
 	}
 	
 	//----------------Component Initialisaiton------------------------------------
@@ -261,7 +273,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	private void initFeedbackArea() {
-		feedbackArea.setPreferredSize(new Dimension(100, 60));
+		feedbackArea.setPreferredSize(new Dimension(100, 30));
 		contentPane.add(feedbackArea, BorderLayout.SOUTH);
 		feedbackArea.setEditable(false);
 		feedbackArea.setFocusable(false);
@@ -276,7 +288,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	private void initTaskPane() {
-		taskPane.setBackground(Color.LIGHT_GRAY);
+		taskPane.setBackground(Color.white);
 		HTMLEditorKit kit = new HTMLEditorKit();
 		taskPane.setEditorKit(kit);
 		StyleSheet styleSheet = kit.getStyleSheet();
