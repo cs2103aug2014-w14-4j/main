@@ -33,8 +33,8 @@ public class TDTParser implements ITDTParser {
 	private String dateAndTimeParts = "";
 	private ArrayList<String> prepositionWordsArr;
 	private ArrayList<String> dayWordsArr;
-	private int invertedCommas = 0;
-	private int counter = 0;
+	private int invertedCommas;
+	private int counter;
 	//private Logger logger = Logger.getLogger("TDTParser");
 	
 	public Command parse(String userCommand) {
@@ -317,7 +317,6 @@ public class TDTParser implements ITDTParser {
 	/**
 	 * This function does the ADD for words contained inside the " " which will
 	 * all be included commandDetails.
-	 * @param i 
 	 */
 	private void specialAdd(String checkWord, int i) {
 		if (checkWord.contains("\"")) {
@@ -405,29 +404,53 @@ public class TDTParser implements ITDTParser {
 	 * Monday Tuesday etc
 	 */
 	private void completeDayDetails(int i) {
-		if (i>0) {
-			if (getPrepositionWords().contains(parts[i-1])) {
-				isCommandDetails[i-1] = false;
-				// this / next / following
-				if (getDayWordsArr().contains(parts[i-1])) {
-					if ((i>1) && getPrepositionWords().contains(parts[i-2])) {
-						isCommandDetails[i-2] = false;
-					}
-					if ((i>2) && getPrepositionWords().contains(parts[i-3])) {
-						isCommandDetails[i-3] = false;
-					}
-				} 
+		int firstOccurance = 0;
+		for (int j=i-1; j>=0; j--) {
+			if (parts[j].equals("next") || parts[j].equals("following") ) {
+				isCommandDetails[j] = false;
+			} else {
+				firstOccurance = j+1;
+				break;
 			}
-		} 
+		}
+		if ((firstOccurance > 0) 
+				&& getPrepositionWords().contains(parts[firstOccurance-1])) {
+			isCommandDetails[firstOccurance-1] = false;
+			if ((firstOccurance>1) 
+					&& getPrepositionWords().contains(parts[firstOccurance-2])) {
+				isCommandDetails[firstOccurance-2] = false;
+			}
+			if ((firstOccurance>2) 
+					&& getPrepositionWords().contains(parts[firstOccurance-3])) {
+				isCommandDetails[firstOccurance-3] = false;
+			}
+		}
 		isCommandDetails[i] = false;
 	}
-	
+
 	/**
 	 * This function checks for the words 'next' and 'following' before the word 'day'
 	 */
 	private void completeSpecialDayDetails(int i, String checkWord) {
-		if (parts[i-1].equals("next") || parts[i-1].equals("following")) {
-			completeDayDetails(i);
+		int firstOccurance = 0;
+		for (int j=i-1; j>=0; j--) {
+			if (parts[j].equals("next") || parts[j].equals("following") ) {
+				isCommandDetails[j] = false;
+			} else {
+				firstOccurance = j+1;
+				break;
+			}
+		}
+		if (firstOccurance!=i) {
+			isCommandDetails[i] = false;
+			if ((firstOccurance > 0) 
+				&& getPrepositionWords().contains(parts[firstOccurance-1])) {
+				isCommandDetails[firstOccurance-1] = false;
+					if ((firstOccurance > 1) 
+							&& getPrepositionWords().contains(parts[firstOccurance-2])) {
+							isCommandDetails[firstOccurance-2] = false;
+					}
+			} 
 		} 
 	}
 	
