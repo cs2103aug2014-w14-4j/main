@@ -14,7 +14,7 @@ public class DoneCommand extends Command {
 	public DoneCommand(String labelName, int taskID) {
 		super(COMMANDTYPE.DONE);
 		this.setTaskID(taskID);
-		this.setLabelName(labelName);
+		this.setLabelName(labelName.toUpperCase());
 	}
 	@Override
 	public String execute(TDTStorage storage) {

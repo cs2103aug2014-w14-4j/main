@@ -74,17 +74,22 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	JViewport vp;
 	JPanel top1 = new JPanel();
 	JPanel top2 = new JPanel();
-	String css = ".datagrid table {background: \"white\"; border: 3px solid; border-radius: 20px; text-align: center; width: 100%; } "
-			+ ".datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: \"white\"; overflow: hidden; border: 4px solid #006699; border-radius: 100px;}"
-			+ ".datagrid table td  { text-align: center; padding: 3px 10px;color: #00496B; border-left: 1px solid #5882FA;font-size: 12px;font-weight: normal; }"
+			   
+	String css = ".datagrid table {background: \"white\"; text-align: center; width: 100%; } "
+			+ ".datagrid {font: normal 12px/150% Candara, Helvetica, sans-serif; overflow: hidden; border: 4px solid #006699; }"
+			+ ".datagrid table td  { text-align: left; color: #00496B; border: 1px solid white;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
 			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
-			+ ".datagrid table th{ background: #BDBDBD}"
-			+ ".datagrid table .overdue td{ background: #DF0101; color: \"white\" }"
-			+ ".datagrid table .priority td{ background: #F781D8; color: \"white\" }"
-			+ ".datagrid table tr .datetime{ font-size:10px }"
+			+ ".datagrid table .heading{ border-left: 1px solid #5882FA;border-right: 1px solid #5882FA; background: #BDBDBD}"
+			+ ".datagrid table .heading th{ border: 1px solid white;}"
+			+ ".datagrid table .overdue td{ background: #FE2E2E; color: white}"
+			+ ".datagrid table .priority td{ background: #F781D8; color: white }"
+			+ ".datagrid table tr .datetime{ font-size:12px }"
+			+ ".datagrid table #target td{ background: #EEB111 }"
+			+ ".datagrid table .taskId { width: 10%; }"
+			+ ".datagrid table .dateTime { width: 30%; }"
+			+ ".datagrid table .labelhead { width: 10%; }"
 			+ ".datagrid table .done td{ background: #04B404; text-decoration: line-through}"
-			+ ".label{ color: \"blue\"; font-size:15px}";
-
+			+ ".label{ color: #0174DF; font-size:15px font-family: Candara;}";
 	/**
 	 * Launch the application.
 	 */
@@ -96,8 +101,11 @@ public class TDTGUI extends JFrame implements DocumentListener {
 					final TDTGUI frame = new TDTGUI();
 					frame.feedbackArea.setText(frame.doInit());
 					frame.setVisible(true);
-
-					frame.taskPane.setText(frame.displayTask());
+					
+					Image image = Toolkit.getDefaultToolkit().getImage("src/taeyeon.jpg");
+					frame.setIconImage(image);
+					
+					frame.taskPane.setText(frame.displayTask(0));
 					frame.taskLabel.setText("Adding task to: "
 							+ frame.logic.getCurrLabel());
 					javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -126,7 +134,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		initFeedbackArea();
 	}
 
-	String displayTask() {
+	String displayTask(int target) {
 		StringBuilder sb = new StringBuilder();
 		String currLabel = logic.getCurrLabel();
 		Iterator<String> labelIter = logic.getLabelIterator();
@@ -134,20 +142,20 @@ public class TDTGUI extends JFrame implements DocumentListener {
 
 		// Display task from current label first
 		array = logic.getTaskListFromLabel(currLabel);
-		displayFormat(sb, currLabel, array);
+		displayFormat(sb, currLabel, array, target);
 
 		while (labelIter.hasNext()) {
 			String label = labelIter.next();
 			if (!label.equals(currLabel)) {
 				array = logic.getTaskListFromLabel(label);
-				displayFormat(sb, label, array);
+				displayFormat(sb, label, array,0);
 			}
 		}
 		return sb.toString();
 	}
 
 	private void displayFormat(StringBuilder sb, String currLabel,
-			ArrayList<Task> array) {
+			ArrayList<Task> array, int target) {
 		if (array != null) {
 			sb.append("<span class = \"label\"><b>" + currLabel + "("
 					+ array.size() + ")" + "</b></span>: <br>");
@@ -155,19 +163,20 @@ public class TDTGUI extends JFrame implements DocumentListener {
 				for (int i = 0; i < array.size(); i++) {
 					Task task = array.get(i);
 					if (i == 0) {
-						sb.append("<div class=\"datagrid\"><table>");
-						sb.append("<tr><th>TaskID</th><th>TaskDetails</th><th>Date/Time</th>");
+						sb.append("<div class= datagrid><table>");
+						sb.append("<tr class = heading> <th class = taskId>TaskID</th> <th>TaskDetails</th> "
+								+ "<th class = dateTime>Date/Time</th> </tr>");
 					}
 					if (task.isDone()) {
-						sb.append(displayTaskInRow(task, " class = \"done\""));
+						sb.append(displayTaskInRow(task, " class = done", target));
 					} else if (task.getDateAndTime().isOverdue()) {
-						sb.append(displayTaskInRow(task, " class = \"overdue\""));
+						sb.append(displayTaskInRow(task, " class = overdue", target));
 					} else if (task.isHighPriority()) {
-						sb.append(displayTaskInRow(task, " class = \"priority\""));
+						sb.append(displayTaskInRow(task, " class = priority", target));
 					} else if (i % 2 == 0) {
-						sb.append(displayTaskInRow(task, " class = \"alt\""));
+						sb.append(displayTaskInRow(task, " class = alt", target));
 					} else {
-						sb.append(displayTaskInRow(task, ""));
+						sb.append(displayTaskInRow(task, "", target));
 					}
 				}
 				sb.append("</table></div>");
@@ -175,9 +184,12 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		}
 	}
 
-	private String displayTaskInRow(Task task, String type) {
+	private String displayTaskInRow(Task task, String type, int taskId) {
+		if(taskId == task.getTaskID()) {
+			type = type + " id = target";
+		}
 		return "<tr" + type + "><td>" + task.getTaskID() + "</td><td>"
-				+ task.getDetails() + "</td><td class = \"datetime\">"
+				+ task.getDetails() + "</td><td class = datetime>"
 				+ task.getDateAndTime().display()
 				+ checkIfHaveReminder(task.getRemindDateTime()) 
 				+"</td></tr>";
@@ -194,17 +206,18 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		int i = 0;
 		res.append("<span class = \"label\"><b>SEARCH RESULTS</b></span>: <br>");
 		res.append("<div class=\"datagrid\"><table>");
-		res.append("<tr><th>Label</th><th>TaskID</th><th>TaskDetails</th><th>Date/Time</th>");
+		res.append("<tr class = heading><th class = labelhead>Label</th> <th class = taskId>TaskID</th> "
+				+ "<th>TaskDetails</th> <th class = dateTime>Date/Time</th> </tr>");
 		while (iter.hasNext()) {
 			Task next = iter.next();
 			if (next.isDone()) {
-				res.append(displaySearchTaskInRow(next, " class = \"done\""));
+				res.append(displaySearchTaskInRow(next, " class = done"));
 			} else if (next.getDateAndTime().isOverdue()) {
-				res.append(displaySearchTaskInRow(next, " class = \"overdue\""));
+				res.append(displaySearchTaskInRow(next, " class = overdue"));
 			} else if (next.isHighPriority()) {
-				res.append(displaySearchTaskInRow(next, " class = \"priority\""));
+				res.append(displaySearchTaskInRow(next, " class = priority"));
 			} else if (i % 2 == 0) {
-				res.append(displaySearchTaskInRow(next, " class = \"alt\""));
+				res.append(displaySearchTaskInRow(next, " class = alt"));
 			} else {
 				res.append(displaySearchTaskInRow(next, ""));
 			}
@@ -531,3 +544,4 @@ public class TDTGUI extends JFrame implements DocumentListener {
 
 
 }
+

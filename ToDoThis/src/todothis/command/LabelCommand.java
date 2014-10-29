@@ -23,7 +23,7 @@ public class LabelCommand extends Command {
 		String[] label = getLabelName().toUpperCase().split(" ");
 		
 		if(label.length > 1 || label.length <= 0) {
-			return "Error. Invalid Label name.";
+			return "Invalid command. Invalid Label name.";
 		}
 		
 		if(storage.getLabelMap().containsKey(label[0])) {
@@ -33,7 +33,7 @@ public class LabelCommand extends Command {
 			storage.insertToUndoStack(this);
 			return "Current label change to: " + label[0];
 		} else if(label[0].equals("") || label[0].matches("\\d+")) {
-			return "Error. Label name cannot be blank or digits only.";
+			return "Invalid command. Label name cannot be blank or digits only.";
 		} else {
 			storage.getLabelMap().put(label[0], new ArrayList<Task>());
 			storage.insertToAutoWords(label[0]);

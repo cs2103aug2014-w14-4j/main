@@ -12,7 +12,7 @@ public class DisplayCommand extends Command {
 	
 	public DisplayCommand(String labelName) {
 		super(COMMANDTYPE.DISPLAY);
-		this.setLabelName(labelName);
+		this.setLabelName(labelName.toUpperCase());
 	}
 	/*
 	@Override

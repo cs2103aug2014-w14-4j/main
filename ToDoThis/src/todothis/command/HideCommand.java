@@ -12,7 +12,7 @@ public class HideCommand extends Command {
 	
 	public HideCommand(String labelName) {
 		super(COMMANDTYPE.HIDE);
-		this.setLabelName(labelName);
+		this.setLabelName(labelName.toUpperCase());
 	}
 	/*
 	@Override

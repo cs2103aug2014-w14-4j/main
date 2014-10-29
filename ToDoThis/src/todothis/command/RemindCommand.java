@@ -18,7 +18,7 @@ public class RemindCommand extends Command {
 	
 	public RemindCommand(String labelName, int taskId, String commandDetails) {
 		super(COMMANDTYPE.REMIND);
-		this.setLabelName(labelName);
+		this.setLabelName(labelName.toUpperCase());
 		this.setTaskID(taskId);
 		this.setCommandDetails(commandDetails);
 	}
@@ -33,7 +33,7 @@ public class RemindCommand extends Command {
 			isRemoveReminder = true;
 			return removeReminder(storage);
 		}
-		if(storage.getLabelMap().containsKey(getLabelName().toUpperCase())) {
+		if(storage.getLabelMap().containsKey(getLabelName())) {
 			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
 			if(getTaskID() > 0 && getTaskID() <= array.size()) {
 				Task temp = array.get(getTaskID() - 1);
@@ -58,7 +58,7 @@ public class RemindCommand extends Command {
 	}
 
 	private String removeReminder(TDTStorage storage) {
-		if(storage.getLabelMap().containsKey(getLabelName().toUpperCase())) {
+		if(storage.getLabelMap().containsKey(getLabelName())) {
 			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
 			if(getTaskID() > 0 && getTaskID() <= array.size()) {
 				Task temp = array.get(getTaskID() - 1);
@@ -68,7 +68,6 @@ public class RemindCommand extends Command {
 				String dateTime = temp.getRemindDateTime();
 				prevReminder = dateTime;
 				setTask(temp);
-				System.out.println(prevReminder);
 				temp.getReminder().cancelReminder();
 				temp.setReminder(null);
 				temp.setRemindDateTime("null");

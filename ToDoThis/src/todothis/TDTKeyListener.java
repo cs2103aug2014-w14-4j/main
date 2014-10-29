@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
+import todothis.command.AddCommand;
 import todothis.command.Command;
 import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
@@ -25,13 +26,15 @@ public class TDTKeyListener implements KeyListener {
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
 			UndoCommand undo = new UndoCommand();
 			String feedback = gui.getLogic().executeCommand(undo);
-			gui.updateGUI(feedback, gui.displayTask());
+			gui.updateGUI(feedback, gui.displayTask(0));
+			scrollTo(0);
 		}
 
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Y) {
 			RedoCommand redo = new RedoCommand();
 			String feedback = gui.getLogic().executeCommand(redo);
-			gui.updateGUI(feedback, gui.displayTask());
+			gui.updateGUI(feedback, gui.displayTask(0));
+			scrollTo(0);
 		}
 
 		switch (keyCode) {
@@ -45,19 +48,22 @@ public class TDTKeyListener implements KeyListener {
 			
 			if (command.getCommandType() != COMMANDTYPE.SEARCH) {
 				String feedback = gui.getLogic().executeCommand(command);
-				gui.updateGUI(feedback, gui.displayTask());
+				if(command.getCommandType() == COMMANDTYPE.ADD) {
+					int id = ((AddCommand)command).getTaskID();
+					gui.updateGUI(feedback, gui.displayTask(id));
+					scrollTo(id*30);
+				}else {
+					gui.updateGUI(feedback, gui.displayTask(0));
+					scrollTo(0);
+				}
 			} else {
 				String feedback = gui.getLogic().executeCommand(command);
 				ArrayList<Task> searched = ((SearchCommand) command)
 						.getSearchedResult();
 				gui.updateGUI(feedback, gui.displaySearch(searched));
+				scrollTo(0);
 			}
 
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					gui.scrollPane.getVerticalScrollBar().setValue(0);
-				}
-			});
 			break;
 
 		case KeyEvent.VK_UP:
@@ -152,6 +158,14 @@ public class TDTKeyListener implements KeyListener {
 		default:
 			break;
 		}
+	}
+
+	private void scrollTo(final int value) {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.scrollPane.getVerticalScrollBar().setValue(value);
+			}
+		});
 	}
 
 	@Override

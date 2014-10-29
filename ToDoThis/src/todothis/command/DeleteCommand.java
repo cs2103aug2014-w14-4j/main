@@ -19,7 +19,7 @@ public class DeleteCommand extends Command {
 	public DeleteCommand(String labelName, int taskID) {
 		super(COMMANDTYPE.DELETE);
 		this.setTaskID(taskID);
-		this.setLabelName(labelName);
+		this.setLabelName(labelName.toUpperCase());
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class DeleteCommand extends Command {
 					storage.getLabelMap().get(label).clear();
 				}
 			} else {
-				return "Error. Label does not exist.";
+				return "Invalid command. Label does not exist.";
 			}
 		}
 		
@@ -65,7 +65,7 @@ public class DeleteCommand extends Command {
 				
 				return "Task deleted";
 			} else {
-				return "error. Invalid task number.";
+				return "Invalid command. Invalid task number.";
 			}
 		}
 		
@@ -78,14 +78,14 @@ public class DeleteCommand extends Command {
 					TDTLogic.renumberTaskID(array, null);
 					return "Task deleted";
 				} else {
-					return "error. Invalid task number.";
+					return "Invalid command. Invalid task number.";
 				}
 			} else {
-				return "error. Label does not exist.";
+				return "Invalid command. Label does not exist.";
 			}
 		}
 		//Shouldnt reach here
-		return "Error. Invalid delete.";
+		return "Invalid command.";
 	}
 
 	@Override
