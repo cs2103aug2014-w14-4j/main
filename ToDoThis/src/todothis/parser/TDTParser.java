@@ -33,6 +33,8 @@ public class TDTParser implements ITDTParser {
 	private String dateAndTimeParts = "";
 	private ArrayList<String> prepositionWordsArr;
 	private ArrayList<String> dayWordsArr;
+	private int invertedCommas = 0;
+	private int counter = 0;
 	//private Logger logger = Logger.getLogger("TDTParser");
 	
 	public Command parse(String userCommand) {
@@ -45,6 +47,8 @@ public class TDTParser implements ITDTParser {
 		this.setTaskID(-1);
 		this.setPrepositionWords();
 		this.setDayWordsArr();
+		this.setInvertedCommas(0);
+		this.setCounter(0);
 		dateAndTimeParts = "";
 
 		this.setCommandType(determineCommandType(getFirstWord(userCommand)));
@@ -131,20 +135,21 @@ public class TDTParser implements ITDTParser {
 		} else {
 			this.setRemainingWords(userCommand);
 		}
-
 		parts = getRemainingWords().split(" ");
 		isCommandDetails = new boolean[parts.length];
-		int invertedCommas = 0;
+		setInvertedCommas(0);
+		setCounter(0);
 		for (int i = 0; i < parts.length; i++) {
 			isCommandDetails[i] = true;
 			String checkWord = parts[i];
-			if (checkWord.contains("\"")) {
-				invertedCommas++;
+			if (checkWord.contains("\"") && (getInvertedCommas() == 0)) {
+				setInvertedCommas(1);
 			}
 			if (invertedCommas!= 0) {
+				setCounter(getCounter()+1);
 				specialAdd(checkWord , i);
-				if (invertedCommas == 2) {
-					invertedCommas = 0;
+				if (getInvertedCommas() == 2) {
+					setInvertedCommas(0);
 				}
 			} else {
 				usualAdd(i, checkWord);
@@ -180,14 +185,26 @@ public class TDTParser implements ITDTParser {
 	}
 	
 	private void remind() {
-		parts = getRemainingWords().split(" ");
-		setTaskID(Integer.parseInt(parts[0]));
 		String details = "";
-		for(int i = 1 ; i < parts.length; i++) {
-			details = details + parts[i] + " ";
+		parts = getRemainingWords().split(" ");
+		if (isValidPartsLength()) {
+			if (parts[0].matches("\\d+")) {
+				setTaskID(Integer.parseInt(parts[0]));
+				for (int i=1; i<parts.length; i++) {
+					details += parts[i] + " ";
+				}
+				setCommandDetails(details.trim());
+			} else if (parts.length > 1) {
+				if (parts[1].matches("\\d+")) {
+					setLabelName(parts[0]);
+					setTaskID(Integer.parseInt(parts[1]));
+					for (int i=2; i<parts.length; i++) {
+						details += parts[i] + " ";
+					}
+					setCommandDetails(details.trim());
+				}
+			}
 		}
-		setCommandDetails(details);
-		
 	}
 
 	private void edit(String userCommand) {
@@ -304,6 +321,28 @@ public class TDTParser implements ITDTParser {
 	 */
 	private void specialAdd(String checkWord, int i) {
 		if (checkWord.contains("\"")) {
+			String check = checkWord.replaceAll("[^\"]", "");
+			// words after the first "
+			if (getCounter() > 1 && getInvertedCommas() > 0) {
+				// second "
+				if (check.length()== 1 && getInvertedCommas()== 1) {
+					setInvertedCommas(0);
+					setCounter(0);
+				// more than 1 " in a word
+				} else if (check.length() > 1) {
+					int num = check.length()%2;
+					if (num==0) {
+						setInvertedCommas(1);
+					} else if (num==1) {
+						setInvertedCommas(0);
+						setCounter(0);
+					}
+				}
+			// first word has 2 "
+			} else if ( getCounter() == 1 && (check.length()==2)) {
+				setInvertedCommas(0);
+				setCounter(0);
+			}
 			parts[i] = checkWord.replace("\"", "");
 		} 
 	}
@@ -519,5 +558,21 @@ public class TDTParser implements ITDTParser {
 
 	private void setSkipNextWord(boolean isSkipNextWord) {
 		this.isSkipNextWord = isSkipNextWord;
+	}
+
+	public int getInvertedCommas() {
+		return invertedCommas;
+	}
+
+	public void setInvertedCommas(int invertedCommas) {
+		this.invertedCommas = invertedCommas;
+	}
+
+	public int getCounter() {
+		return counter;
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
 	}
 }
