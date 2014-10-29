@@ -475,11 +475,11 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			if (mode == Mode.COMPLETION) {
 				int pos = commandField.getSelectionEnd();
 				try {
-					commandField.getDocument().insertString(pos, " ", null);
+					commandField.getDocument().insertString(pos, "", null);
 				} catch (BadLocationException e) {
 					System.out.println("Bad location error.");
 				}
-				commandField.setCaretPosition(pos + 1);
+				commandField.setCaretPosition(pos);
 				mode = Mode.INSERT;
 			} else {
 				commandField.setCaretPosition(Math.min(commandField

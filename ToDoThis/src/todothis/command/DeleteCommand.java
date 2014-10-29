@@ -14,7 +14,7 @@ public class DeleteCommand extends Command {
 	private String labelName;
 	private HashMap<String, ArrayList<Task>> prevState;
 	private String prevLabel;
-	private String undoFeedback;
+	private String undoFeedback = "";
 	
 	public DeleteCommand(String labelName, int taskID) {
 		super(COMMANDTYPE.DELETE);
