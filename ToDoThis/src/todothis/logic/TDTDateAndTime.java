@@ -100,12 +100,15 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private void decodeDetails(String details) {
 		System.out.println(details);
+		
 		boolean endTimeDate = false;
 		boolean deadlineEndTimeDate = false;
 		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
 		String decodedDate = "";
 		String decodedTime = "";
-
+		int nextCount = 0;
+		int followingCount = 0;
+		
 		String[] parts = details.toLowerCase().split(" ");
 
 		cal = Calendar.getInstance(TimeZone.getDefault());
@@ -123,6 +126,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 			if (isPrepositionTo(parts, a)) {
 				endTimeDate = true;
+				nextCount = 0;
+				followingCount = 0;
 			}
 			if (parts[a].equals("by")) {
 				deadlineEndTimeDate = true;
@@ -131,8 +136,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			if (parts[a].equals("this")) {
 				thisOrNextOrFollowing = 1;
 			} else if (parts[a].equals("next")) {
+				nextCount++;
 				thisOrNextOrFollowing = 2;
 			} else if (parts[a].equals("following")) {
+				followingCount++;
 				thisOrNextOrFollowing = 3;
 			}
 
@@ -146,7 +153,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				storeDecodedTime(endTimeDate, deadlineEndTimeDate, decodedTime);
 			} else if (checkDay(parts[a]) != 0) {
 				int numOfDaysToAdd = determineDaysToBeAdded(
-						thisOrNextOrFollowing, parts, a, currentDayOfWeek);
+						thisOrNextOrFollowing, parts, a, currentDayOfWeek, nextCount, followingCount);
 
 				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
 						currentYear, numOfDaysCurrentMonth, numOfDaysToAdd);
@@ -269,7 +276,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	}
 
 	private static int determineDaysToBeAdded(int thisOrNextOrFollowing,
-			String[] parts, int a, int currentDayOfWeek) {
+			String[] parts, int a, int currentDayOfWeek, int nextCount, int followingCount) {
 		int numOfDaysToAdd = 0;
 		if (checkDay(parts[a]) <= 7 && checkDay(parts[a]) > 0) {
 			if (thisOrNextOrFollowing == 0) { // None of the above
@@ -287,11 +294,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
 				}
 			}
-			if (thisOrNextOrFollowing == 2) {// next
-				numOfDaysToAdd = numOfDaysToAdd + 7;
-
-			} else if (thisOrNextOrFollowing == 3) {// following
-				numOfDaysToAdd = numOfDaysToAdd + 14;
+			if (thisOrNextOrFollowing == 2 ||thisOrNextOrFollowing == 3) { //next or following
+				numOfDaysToAdd = numOfDaysToAdd + (14 * followingCount) + (7 * nextCount);
 			}
 		} else if (checkDay(parts[a]) == 8) {
 			// numofdaystoadd already 0;
@@ -951,7 +955,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
 		String decodedSearchString = "";
 		String decodedDate = "";
-
+		int nextCount = 0;
+		int followingCount = 0;
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
@@ -965,8 +970,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			if (searchParts[i].equals("this")) {
 				thisOrNextOrFollowing = 1;
 			} else if (searchParts[i].equals("next")) {
+				nextCount++;
 				thisOrNextOrFollowing = 2;
 			} else if (searchParts[i].equals("following")) {
+				followingCount++;
 				thisOrNextOrFollowing = 3;
 			}
 
@@ -976,7 +983,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				decodedSearchString = decodedSearchString + decodedDate + " ";
 			} else if (checkDay(searchParts[i]) != 0) {
 				int numOfDaysToAdd = determineDaysToBeAdded(
-						thisOrNextOrFollowing, searchParts, i, currentDayOfWeek);
+						thisOrNextOrFollowing, searchParts, i, currentDayOfWeek, nextCount, followingCount);
 				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
 						currentYear, numOfDaysCurrentMonth, numOfDaysToAdd);
 				decodedSearchString = decodedSearchString + decodedDate + " ";
@@ -1154,7 +1161,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
 		String decodedReminderDate = "null";
 		String decodedReminderTime = "null";
-
+		int nextCount = 0;
+		int followingCount = 0;
+		
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
@@ -1175,8 +1184,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			if (reminderParts[i].equals("this")) {
 				thisOrNextOrFollowing = 1;
 			} else if (reminderParts[i].equals("next")) {
+				nextCount++;
 				thisOrNextOrFollowing = 2;
 			} else if (reminderParts[i].equals("following")) {
+				followingCount++;
 				thisOrNextOrFollowing = 3;
 			}
 
@@ -1186,7 +1197,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			} else if (checkDay(reminderParts[i]) != 0) {
 				int numOfDaysToAdd = determineDaysToBeAdded(
 						thisOrNextOrFollowing, reminderParts, i,
-						currentDayOfWeek);
+						currentDayOfWeek, nextCount, followingCount);
 				decodedReminderDate = addDaysToCurrentDate(currentDay,
 						currentMonth, currentYear, numOfDaysCurrentMonth,
 						numOfDaysToAdd);
