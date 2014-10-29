@@ -78,10 +78,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		// TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
 		//TDTDateAndTime test2 = new TDTDateAndTime("12/12");
 		//System.out.println(test2.display());
-		// System.out.println(TDTDateAndTime.decodeSearchDetails("tml today monday"));
-
+		System.out.println(TDTDateAndTime.decodeSearchDetails("this year"));
+		
 		// System.out.println(calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("1/1 3.38am")));
-
 	}
 
 	public static String replaceEndStringPunctuation(String word) {
@@ -893,6 +892,21 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			return 0;
 		}
 	}
+	
+	public static int checkWeekMonthYear(String checkString){
+		if ((checkString.equalsIgnoreCase("Week"))
+				|| (checkString.equalsIgnoreCase("Wk"))) {
+			return 1;
+		} else if ((checkString.equalsIgnoreCase("Month"))
+				|| (checkString.equalsIgnoreCase("Mth"))) {
+			return 2;
+		} else if ((checkString.equalsIgnoreCase("Year"))
+				|| (checkString.equalsIgnoreCase("Yr"))) {
+			return 3;
+		} else {
+			return 0;
+		}
+	}
 
 	// -------------------------Decode Search Details------------
 	public static String decodeSearchDetails(String searchString) {
@@ -906,8 +920,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);
 		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-		// int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-		// int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+		int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
 				currentYear);
 
@@ -956,9 +969,155 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 								+ " ";
 					}
 				}
+			} else if (checkWeekMonthYear(searchParts[i]) != 0) {
+				if (checkWeekMonthYear(searchParts[i]) == 1) {
+					// this week next week following week
+					decodedSearchString = searchWeek(thisOrNextOrFollowing,
+							decodedSearchString, currentDay, currentMonth,
+							currentYear, currentDayOfWeek,
+							numOfDaysCurrentMonth);
+				} else if (checkWeekMonthYear(searchParts[i]) == 2) {
+					// this month next month following month
+					decodedSearchString = searchMonth(thisOrNextOrFollowing,
+							decodedSearchString, currentDay, currentMonth,
+							currentYear, currentDayOfMonth,
+							numOfDaysCurrentMonth);
+				} else if (checkWeekMonthYear(searchParts[i]) == 3) {
+					decodedSearchString = searchYear(thisOrNextOrFollowing,
+							decodedSearchString, currentYear);
+				}
 			}
 		}
 		return decodedSearchString.trim();
+	}
+
+	private static String searchWeek(int thisOrNextOrFollowing,
+			String decodedSearchString, int currentDay, int currentMonth,
+			int currentYear, int currentDayOfWeek, int numOfDaysCurrentMonth) {
+		int dayOfWeek = currentDayOfWeek;
+		String startDayOfWeek = addDaysToCurrentDate(currentDay,
+				currentMonth, currentYear, numOfDaysCurrentMonth,
+				Integer.parseInt("-" + dayOfWeek));
+		String[] dateParts;
+		String dateTemp;
+		dateParts = startDayOfWeek.split("/");
+		int dayTemp = Integer.parseInt(dateParts[0]);
+		int monthTemp = Integer.parseInt(dateParts[1]);
+		int yearTemp = Integer.parseInt(dateParts[2]);
+		if (thisOrNextOrFollowing == 0) {
+			return decodedSearchString;
+		} else if (thisOrNextOrFollowing == 2) {
+			startDayOfWeek = addDaysToCurrentDate(dayTemp,
+					monthTemp, yearTemp,
+					getNumOfDaysFromMonth(monthTemp, yearTemp), 7);
+
+		} else if (thisOrNextOrFollowing == 3) {
+			startDayOfWeek = addDaysToCurrentDate(dayTemp,
+					monthTemp, yearTemp,
+					getNumOfDaysFromMonth(monthTemp, yearTemp), 14);
+		}
+		decodedSearchString = decodedSearchString + startDayOfWeek
+				+ " ";
+		dateTemp = startDayOfWeek;
+		for (int z = 0; z < 6; z++) {
+			dateParts = dateTemp.split("/");
+			dayTemp = Integer.parseInt(dateParts[0]);
+			monthTemp = Integer.parseInt(dateParts[1]);
+			yearTemp = Integer.parseInt(dateParts[2]);
+
+			dateTemp = addDaysToCurrentDate(dayTemp, monthTemp,
+					yearTemp,
+					getNumOfDaysFromMonth(monthTemp, yearTemp), 1);
+			decodedSearchString = decodedSearchString + dateTemp
+					+ " ";
+		}
+		return decodedSearchString;
+	}
+
+	private static String searchMonth(int thisOrNextOrFollowing,
+			String decodedSearchString, int currentDay, int currentMonth,
+			int currentYear, int currentDayOfMonth, int numOfDaysCurrentMonth) {
+		int dayOfMonth = currentDayOfMonth - 1;
+		String startDayOfMonth = addDaysToCurrentDate(currentDay,
+				currentMonth, currentYear, numOfDaysCurrentMonth,
+				Integer.parseInt("-" + dayOfMonth));
+		String[] dateParts;
+		String dateTemp = "";
+		dateParts = startDayOfMonth.split("/");
+		int dayTemp = Integer.parseInt(dateParts[0]);
+		int monthTemp = Integer.parseInt(dateParts[1]);
+		int yearTemp = Integer.parseInt(dateParts[2]);
+
+		if (thisOrNextOrFollowing == 0) {
+			return decodedSearchString;
+		} else if (thisOrNextOrFollowing == 2) {
+			if (monthTemp == 12) {
+				monthTemp = 1;
+				yearTemp = yearTemp + 1;
+			} else {
+				monthTemp++;
+			}
+			startDayOfMonth = dayTemp + "/" + monthTemp + "/"
+					+ yearTemp;
+		} else if (thisOrNextOrFollowing == 3) {
+			if (monthTemp == 11) {
+				monthTemp = 1;
+				yearTemp = yearTemp + 1;
+			} else if (monthTemp == 12) {
+				monthTemp = 2;
+				yearTemp = yearTemp + 1;
+			} else {
+				monthTemp = monthTemp + 2;
+			}
+			startDayOfMonth = dayTemp + "/" + monthTemp + "/"
+					+ yearTemp;
+		}
+		decodedSearchString = decodedSearchString + startDayOfMonth
+				+ " ";
+		dateTemp = startDayOfMonth;
+		dateParts = dateTemp.split("/");
+		if (dateParts.length == 3) { // ensure dateTemp not = ""
+			int numDayOfMonth = getNumOfDaysFromMonth(
+					Integer.parseInt(dateParts[1]),
+					Integer.parseInt(dateParts[2]));
+			System.out.println(numDayOfMonth);
+			for (int z = 0; z < numDayOfMonth - 1; z++) {
+				dateParts = dateTemp.split("/");
+				dayTemp = Integer.parseInt(dateParts[0]);
+				monthTemp = Integer.parseInt(dateParts[1]);
+				yearTemp = Integer.parseInt(dateParts[2]);
+
+				dateTemp = addDaysToCurrentDate(dayTemp, monthTemp,
+						yearTemp,
+						getNumOfDaysFromMonth(monthTemp, yearTemp),
+						1);
+				decodedSearchString = decodedSearchString
+						+ dateTemp + " ";
+			}
+		}
+		return decodedSearchString;
+	}
+
+	private static String searchYear(int thisOrNextOrFollowing,
+			String decodedSearchString, int currentYear) {
+		int yearTemp = currentYear;
+		if (thisOrNextOrFollowing == 0) {
+			return decodedSearchString;
+		} else if (thisOrNextOrFollowing == 2) {
+			yearTemp++;
+		} else if (thisOrNextOrFollowing == 3) {
+			yearTemp = yearTemp + 2;
+		}
+		
+		for(int a = 1 ; a <= 12; a++){
+			int numDayOfMonth = getNumOfDaysFromMonth(a, yearTemp);
+			for (int b = 1; b <= numDayOfMonth; b++) {
+				String date = b + "/" + a + "/" + yearTemp;
+				decodedSearchString = decodedSearchString
+						+ date + " ";
+			}
+		}
+		return decodedSearchString;
 	}
 
 	// ---------------CALCULATE REMAINING TIME FOR REMINDER--------------------
@@ -975,10 +1134,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);
 		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-		// int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-		// int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
 		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
 				currentYear);
+		
 		Date time = cal.getTime();
 		int currentHour = time.getHours();
 		int currentMinute = time.getMinutes();
@@ -1064,11 +1222,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);
-		// int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-		// int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-		// int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-		// int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
-		// currentYear);
+		
 		Date time = cal.getTime();
 		int currentHour = time.getHours();
 		int currentMinute = time.getMinutes();
