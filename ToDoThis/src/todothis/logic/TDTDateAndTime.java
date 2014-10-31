@@ -79,9 +79,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		// TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
 		// TDTDateAndTime test2 = new TDTDateAndTime("12/12");
 		// System.out.println(test2.display());
-		//System.out.println(TDTDateAndTime.decodeSearchDetails("next week"));
+		// System.out.println(TDTDateAndTime.decodeSearchDetails("next next year"));
 		// System.out.println(TDTDateAndTime.changeTimeFormat("2:59"));
 		// System.out.println(calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("1/1 3.38am")));
+
 	}
 
 	public static String replaceEndStringPunctuation(String word) {
@@ -100,7 +101,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private void decodeDetails(String details) {
 		System.out.println(details);
-		
+
 		boolean endTimeDate = false;
 		boolean deadlineEndTimeDate = false;
 		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
@@ -108,7 +109,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		String decodedTime = "";
 		int nextCount = 0;
 		int followingCount = 0;
-		
+
 		String[] parts = details.toLowerCase().split(" ");
 
 		cal = Calendar.getInstance(TimeZone.getDefault());
@@ -118,8 +119,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 		// int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 		// int CurrentDayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
-				currentYear);
+		// int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
+		// currentYear);
 
 		for (int a = 0; a < parts.length; a++) {
 			parts[a] = replaceEndStringPunctuation(parts[a]);
@@ -153,10 +154,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				storeDecodedTime(endTimeDate, deadlineEndTimeDate, decodedTime);
 			} else if (checkDay(parts[a]) != 0) {
 				int numOfDaysToAdd = determineDaysToBeAdded(
-						thisOrNextOrFollowing, parts, a, currentDayOfWeek, nextCount, followingCount);
+						thisOrNextOrFollowing, parts, a, currentDayOfWeek,
+						nextCount, followingCount);
 
 				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
-						currentYear, numOfDaysCurrentMonth, numOfDaysToAdd);
+						currentYear, numOfDaysToAdd);
 
 				decodedDate = adjustmentToDate(endTimeDate, decodedDate, parts,
 						a);
@@ -185,8 +187,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 					int yearTemp = Integer.parseInt(toBeAddedDateParts[2]);
 
 					decodedDate = addDaysToCurrentDate(dayTemp, mthTemp,
-							yearTemp, getNumOfDaysFromMonth(mthTemp, yearTemp),
-							7);
+							yearTemp, 7);
 				}
 			}
 		}
@@ -195,6 +196,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private void storeDecodedTime(boolean endTimeDate,
 			boolean deadlineEndTimeDate, String decodedTime) {
+
 		if (deadlineEndTimeDate == true) {
 			endTime = decodedTime;
 		} else if (endTimeDate == true) {
@@ -210,6 +212,24 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private void storeDecodedDate(boolean endTimeDate,
 			boolean deadlineEndTimeDate, String decodedDate) {
+		final String OLD_FORMAT = "dd/MM/yyyy";
+		final String NEW_FORMAT = "d/M/yyyy";
+
+		String oldDateString = decodedDate;
+		String newDateString = "";
+
+		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
+		Date d = new Date();
+		try {
+			d = sdf.parse(oldDateString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		sdf.applyPattern(NEW_FORMAT);
+		newDateString = sdf.format(d);
+		decodedDate = newDateString;
+
 		if (deadlineEndTimeDate == true) {
 			endDate = decodedDate;
 		} else if (endTimeDate == true) {
@@ -242,41 +262,46 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			} else {
 				year = currentYear;
 			}
-
 		}
 		return day + "/" + month + "/" + year;
 	}
 
 	private static String addDaysToCurrentDate(int currentDay,
-			int currentMonth, int currentYear, int numOfDaysCurrentMonth,
-			int numOfDaysToAdd) {
-		int dayTemp = currentDay;
-		int monthTemp = currentMonth;
-		int yearTemp = currentYear;
-
-		if ((dayTemp + numOfDaysToAdd) > numOfDaysCurrentMonth) {
-			monthTemp++;
-			if (monthTemp > 12) {
-				monthTemp = 1; // set to Jan
-				yearTemp++;
-			}
-			dayTemp = (dayTemp + numOfDaysToAdd) - numOfDaysCurrentMonth;
-		} else if ((dayTemp + numOfDaysToAdd) <= 0) {
-			monthTemp--;
-			if (monthTemp <= 0) {
-				monthTemp = 12; // set to Dec
-				yearTemp--;
-			}
-			dayTemp = getNumOfDaysFromMonth(monthTemp, yearTemp)
-					+ (dayTemp + numOfDaysToAdd);
-		} else {
-			dayTemp = dayTemp + numOfDaysToAdd;
+			int currentMonth, int currentYear, int numOfDaysToAdd) {
+		SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
+		Date d = new Date();
+		try {
+			d = sdf.parse(currentDay + "/" + currentMonth + "/" + currentYear);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return dayTemp + "/" + monthTemp + "/" + yearTemp;
+		Calendar c = Calendar.getInstance();
+		c.setTime(d);
+		c.add(Calendar.DATE, numOfDaysToAdd);
+		String newDateString = sdf.format(c.getTime());
+		return newDateString;
 	}
 
+	/*
+	 * private static String addDaysToCurrentDate(int currentDay, int
+	 * currentMonth, int currentYear, int numOfDaysCurrentMonth, int
+	 * numOfDaysToAdd) { int dayTemp = currentDay; int monthTemp = currentMonth;
+	 * int yearTemp = currentYear;
+	 * 
+	 * if ((dayTemp + numOfDaysToAdd) > numOfDaysCurrentMonth) { monthTemp++; if
+	 * (monthTemp > 12) { monthTemp = 1; // set to Jan yearTemp++; } dayTemp =
+	 * (dayTemp + numOfDaysToAdd) - numOfDaysCurrentMonth; } else if ((dayTemp +
+	 * numOfDaysToAdd) <= 0) { monthTemp--; if (monthTemp <= 0) { monthTemp =
+	 * 12; // set to Dec yearTemp--; } dayTemp =
+	 * getNumOfDaysFromMonth(monthTemp, yearTemp) + (dayTemp + numOfDaysToAdd);
+	 * } else { dayTemp = dayTemp + numOfDaysToAdd; } return dayTemp + "/" +
+	 * monthTemp + "/" + yearTemp; }
+	 */
+
 	private static int determineDaysToBeAdded(int thisOrNextOrFollowing,
-			String[] parts, int a, int currentDayOfWeek, int nextCount, int followingCount) {
+			String[] parts, int a, int currentDayOfWeek, int nextCount,
+			int followingCount) {
 		int numOfDaysToAdd = 0;
 		if (checkDay(parts[a]) <= 7 && checkDay(parts[a]) > 0) {
 			if (thisOrNextOrFollowing == 0) { // None of the above
@@ -294,8 +319,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
 				}
 			}
-			if (thisOrNextOrFollowing == 2 ||thisOrNextOrFollowing == 3) { //next or following
-				numOfDaysToAdd = numOfDaysToAdd + (14 * followingCount) + (7 * nextCount);
+			if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) { // next
+																			// or
+																			// following
+				numOfDaysToAdd = numOfDaysToAdd + (14 * followingCount)
+						+ (7 * nextCount);
 			}
 		} else if (checkDay(parts[a]) == 8) {
 			// numofdaystoadd already 0;
@@ -473,7 +501,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	// -------------------------------------------DISPLAY------------------------------------------------
 	public static String changeDateFormat(String date) throws ParseException {
 		final String OLD_FORMAT = "dd/MM/yyyy";
-		final String NEW_FORMAT = "d MMM YYYY";
+		final String NEW_FORMAT = "d MMM yyyy";
 
 		String oldDateString = date;
 		String newDateString;
@@ -541,16 +569,14 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	public String display() {
 		/*
-		String displayString = "";
-		if (!getStartDate().equals("null") || !getStartTime().equals("null")) {
-			displayString = "(TIMED TASK)";
-		} else if (!getEndDate().equals("null") || !getEndTime().equals("null")) {
-			displayString = "(DEADLINE TASK)";
-		} else {
-			displayString = "(FLOATING TASK)";
-		}
-		displayString = displayString + "<br>" + displayDateTime(isDeadline);*/
-		
+		 * String displayString = ""; if (!getStartDate().equals("null") ||
+		 * !getStartTime().equals("null")) { displayString = "(TIMED TASK)"; }
+		 * else if (!getEndDate().equals("null") ||
+		 * !getEndTime().equals("null")) { displayString = "(DEADLINE TASK)"; }
+		 * else { displayString = "(FLOATING TASK)"; } displayString =
+		 * displayString + "<br>" + displayDateTime(isDeadline);
+		 */
+
 		try {
 			return displayDateTime();
 		} catch (ParseException e) {
@@ -963,8 +989,6 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int currentYear = cal.get(Calendar.YEAR);
 		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 		int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
-				currentYear);
 
 		for (int i = 0; i < searchParts.length; i++) {
 			if (searchParts[i].equals("this")) {
@@ -983,9 +1007,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				decodedSearchString = decodedSearchString + decodedDate + " ";
 			} else if (checkDay(searchParts[i]) != 0) {
 				int numOfDaysToAdd = determineDaysToBeAdded(
-						thisOrNextOrFollowing, searchParts, i, currentDayOfWeek, nextCount, followingCount);
+						thisOrNextOrFollowing, searchParts, i,
+						currentDayOfWeek, nextCount, followingCount);
 				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
-						currentYear, numOfDaysCurrentMonth, numOfDaysToAdd);
+						currentYear, numOfDaysToAdd);
 				decodedSearchString = decodedSearchString + decodedDate + " ";
 			} else if (checkMonth(searchParts[i]) != 0) {
 				boolean isValidDayYear = true;
@@ -1018,18 +1043,19 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 					// this week next week following week
 					decodedSearchString = searchWeek(thisOrNextOrFollowing,
 							decodedSearchString, currentDay, currentMonth,
-							currentYear, currentDayOfWeek,
-							numOfDaysCurrentMonth);
+							currentYear, currentDayOfWeek, nextCount,
+							followingCount);
 				} else if (checkWeekMonthYear(searchParts[i]) == 2) {
 					// this month next month following month
 					decodedSearchString = searchMonth(thisOrNextOrFollowing,
 							decodedSearchString, currentDay, currentMonth,
-							currentYear, currentDayOfMonth,
-							numOfDaysCurrentMonth);
+							currentYear, currentDayOfMonth, nextCount,
+							followingCount);
 				} else if (checkWeekMonthYear(searchParts[i]) == 3) {
 					// this year next year following year
 					decodedSearchString = searchYear(thisOrNextOrFollowing,
-							decodedSearchString, currentYear);
+							decodedSearchString, currentYear, nextCount,
+							followingCount);
 				}
 			}
 		}
@@ -1038,11 +1064,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private static String searchWeek(int thisOrNextOrFollowing,
 			String decodedSearchString, int currentDay, int currentMonth,
-			int currentYear, int currentDayOfWeek, int numOfDaysCurrentMonth) {
+			int currentYear, int currentDayOfWeek, int nextCount,
+			int followingCount) {
 		int dayOfWeek = currentDayOfWeek;
 		String startDayOfWeek = addDaysToCurrentDate(currentDay, currentMonth,
-				currentYear, numOfDaysCurrentMonth,
-				Integer.parseInt("-" + (dayOfWeek - 2)));
+				currentYear, Integer.parseInt("-" + (dayOfWeek - 2)));
 		String[] dateParts;
 		String dateTemp;
 		dateParts = startDayOfWeek.split("/");
@@ -1051,13 +1077,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int yearTemp = Integer.parseInt(dateParts[2]);
 		if (thisOrNextOrFollowing == 0) {
 			return decodedSearchString;
-		} else if (thisOrNextOrFollowing == 2) {
+		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
 			startDayOfWeek = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp,
-					getNumOfDaysFromMonth(monthTemp, yearTemp), 7);
-
-		} else if (thisOrNextOrFollowing == 3) {
-			startDayOfWeek = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp,
-					getNumOfDaysFromMonth(monthTemp, yearTemp), 14);
+					(7 * nextCount) + (14 * followingCount));
 		}
 		decodedSearchString = decodedSearchString + startDayOfWeek + " ";
 		dateTemp = startDayOfWeek;
@@ -1067,8 +1089,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			monthTemp = Integer.parseInt(dateParts[1]);
 			yearTemp = Integer.parseInt(dateParts[2]);
 
-			dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp,
-					getNumOfDaysFromMonth(monthTemp, yearTemp), 1);
+			dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
 			decodedSearchString = decodedSearchString + dateTemp + " ";
 		}
 		return decodedSearchString;
@@ -1076,11 +1097,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private static String searchMonth(int thisOrNextOrFollowing,
 			String decodedSearchString, int currentDay, int currentMonth,
-			int currentYear, int currentDayOfMonth, int numOfDaysCurrentMonth) {
+			int currentYear, int currentDayOfMonth, int nextCount,
+			int followingCount) {
 		int dayOfMonth = currentDayOfMonth - 1;
 		String startDayOfMonth = addDaysToCurrentDate(currentDay, currentMonth,
-				currentYear, numOfDaysCurrentMonth,
-				Integer.parseInt("-" + dayOfMonth));
+				currentYear, Integer.parseInt("-" + dayOfMonth));
 		String[] dateParts;
 		String dateTemp = "";
 		dateParts = startDayOfMonth.split("/");
@@ -1090,26 +1111,19 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 		if (thisOrNextOrFollowing == 0) {
 			return decodedSearchString;
-		} else if (thisOrNextOrFollowing == 2) {
-			if (monthTemp == 12) {
-				monthTemp = 1;
-				yearTemp = yearTemp + 1;
-			} else {
-				monthTemp++;
-			}
-			startDayOfMonth = dayTemp + "/" + monthTemp + "/" + yearTemp;
-		} else if (thisOrNextOrFollowing == 3) {
-			if (monthTemp == 11) {
-				monthTemp = 1;
-				yearTemp = yearTemp + 1;
-			} else if (monthTemp == 12) {
-				monthTemp = 2;
-				yearTemp = yearTemp + 1;
-			} else {
-				monthTemp = monthTemp + 2;
+		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
+			int numOfMthToAdd = nextCount + followingCount * 2;
+			for (int i = 0; i < numOfMthToAdd; i++) {
+				if (monthTemp == 12) {
+					monthTemp = 1;
+					yearTemp = yearTemp + 1;
+				} else {
+					monthTemp++;
+				}
 			}
 			startDayOfMonth = dayTemp + "/" + monthTemp + "/" + yearTemp;
 		}
+
 		decodedSearchString = decodedSearchString + startDayOfMonth + " ";
 		dateTemp = startDayOfMonth;
 		dateParts = dateTemp.split("/");
@@ -1117,15 +1131,13 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			int numDayOfMonth = getNumOfDaysFromMonth(
 					Integer.parseInt(dateParts[1]),
 					Integer.parseInt(dateParts[2]));
-			System.out.println(numDayOfMonth);
 			for (int z = 0; z < numDayOfMonth - 1; z++) {
 				dateParts = dateTemp.split("/");
 				dayTemp = Integer.parseInt(dateParts[0]);
 				monthTemp = Integer.parseInt(dateParts[1]);
 				yearTemp = Integer.parseInt(dateParts[2]);
 
-				dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp,
-						getNumOfDaysFromMonth(monthTemp, yearTemp), 1);
+				dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
 				decodedSearchString = decodedSearchString + dateTemp + " ";
 			}
 		}
@@ -1133,14 +1145,13 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	}
 
 	private static String searchYear(int thisOrNextOrFollowing,
-			String decodedSearchString, int currentYear) {
+			String decodedSearchString, int currentYear, int nextCount,
+			int followingCount) {
 		int yearTemp = currentYear;
 		if (thisOrNextOrFollowing == 0) {
 			return decodedSearchString;
-		} else if (thisOrNextOrFollowing == 2) {
-			yearTemp++;
-		} else if (thisOrNextOrFollowing == 3) {
-			yearTemp = yearTemp + 2;
+		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
+			yearTemp = yearTemp + (nextCount + followingCount * 2);
 		}
 
 		for (int a = 1; a <= 12; a++) {
@@ -1163,14 +1174,12 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		String decodedReminderTime = "null";
 		int nextCount = 0;
 		int followingCount = 0;
-		
+
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);
 		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-		int numOfDaysCurrentMonth = getNumOfDaysFromMonth(currentMonth,
-				currentYear);
 
 		Date time = cal.getTime();
 		int currentHour = time.getHours();
@@ -1199,8 +1208,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 						thisOrNextOrFollowing, reminderParts, i,
 						currentDayOfWeek, nextCount, followingCount);
 				decodedReminderDate = addDaysToCurrentDate(currentDay,
-						currentMonth, currentYear, numOfDaysCurrentMonth,
-						numOfDaysToAdd);
+						currentMonth, currentYear, numOfDaysToAdd);
 			} else if (checkMonth(reminderParts[i]) != 0) {
 				boolean isValidDayYear = true;
 				if (i != 0 && i != reminderParts.length - 1) {
