@@ -59,6 +59,10 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
+	public boolean hasReminder() {
+		return reminder != null;
+	}
+	
 	//------------------Getters & Setters--------------------------------
 	
 	public int getTaskID() {

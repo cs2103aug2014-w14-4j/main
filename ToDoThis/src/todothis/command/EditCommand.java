@@ -16,6 +16,7 @@ public class EditCommand extends Command {
 	private String prevDetails;
 	private TDTDateAndTime prevDNT;
 	private boolean prevPriority;
+	private Task editedTask;
 
 	
 	public EditCommand(String labelName, int taskID,
@@ -43,6 +44,7 @@ public class EditCommand extends Command {
 			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
+				setEditedTask(task);
 				prevDetails = task.getDetails();
 				prevDNT = task.getDateAndTime();
 				prevPriority = task.isHighPriority();
@@ -64,6 +66,7 @@ public class EditCommand extends Command {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
+					setEditedTask(task);
 					prevDetails = task.getDetails();
 					prevDNT = task.getDateAndTime();
 					prevPriority = task.isHighPriority();
@@ -134,6 +137,14 @@ public class EditCommand extends Command {
 
 	public void setHighPriority(boolean isHighPriority) {
 		this.isHighPriority = isHighPriority;
+	}
+
+	public Task getEditedTask() {
+		return editedTask;
+	}
+
+	public void setEditedTask(Task editedTask) {
+		this.editedTask = editedTask;
 	}
 
 

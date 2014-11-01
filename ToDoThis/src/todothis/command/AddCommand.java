@@ -14,6 +14,7 @@ public class AddCommand extends Command {
 	private String commandDetails;
 	private TDTDateAndTime dateAndTime;
 	private boolean isHighPriority;
+	private Task addedTask;
 
 	public AddCommand(String commandDetails, TDTDateAndTime dateAndTime, boolean isHighPriority ) {
 		super(COMMANDTYPE.ADD);
@@ -28,6 +29,7 @@ public class AddCommand extends Command {
 		setTaskID(storage.getLabelSize(getLabelName()) + 1);
 		Task task = new Task(getTaskID(), labelName, getCommandDetails(),
 				getDateAndTime(), isHighPriority());
+		setAddedTask(task);
 		TDTDateAndTime dnt = getDateAndTime();
 		
 		if(!isValidDateTimeRange(dnt)) {
@@ -113,6 +115,14 @@ public class AddCommand extends Command {
 
 	public void setHighPriority(boolean isHighPriority) {
 		this.isHighPriority = isHighPriority;
+	}
+
+	public Task getAddedTask() {
+		return addedTask;
+	}
+
+	public void setAddedTask(Task addedTask) {
+		this.addedTask = addedTask;
 	}
 
 	

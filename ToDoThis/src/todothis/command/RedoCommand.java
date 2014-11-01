@@ -15,7 +15,7 @@ public class RedoCommand extends Command{
 			Command comd = storage.getRedoStack().pop();
 			return comd.execute(storage);
 		} else {
-			return "No command to redo.";
+			return "Invalid command. No command to redo.";
 		}
 	}
 

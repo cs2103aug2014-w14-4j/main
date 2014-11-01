@@ -36,7 +36,7 @@ public class UndoCommand extends Command {
 			
 			return comd.undo(storage);
 		} else {
-			return "No command to undo.";
+			return "Invalid command. No command to undo.";
 		}
 	}
 

@@ -185,12 +185,22 @@ public class TDTStorage implements ITDTStorage {
 			Task task =  taskIter.next();
 			hmap.get(task.getLabelName()).add(new Task(task.getTaskID(), task.getLabelName(),
 					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
-					 task.isDone(), task.getRemindDateTime()));
+					 task.isDone(), "null"));
 		}
 		return hmap;
 	}
 	
-	
+	public ArrayList<Task> copyTaskList(ArrayList<Task> array) {
+		ArrayList<Task> res = new ArrayList<Task>();
+		Iterator<Task> taskIter = array.iterator();
+		while(taskIter.hasNext()) {
+			Task task =  taskIter.next();
+			res.add(new Task(task.getTaskID(), task.getLabelName(),
+					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
+					 task.isDone(), "null"));
+		}
+		return res;
+	}
 	
 	
 	//-----------------------------GETTERS & SETTERS----------------------------------------------

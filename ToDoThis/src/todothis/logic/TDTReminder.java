@@ -12,7 +12,13 @@ public class TDTReminder {
 
 	public TDTReminder(long sec, Task task) {
 		timer = new Timer();
-		timer.schedule(new TDTReminderTask(task), sec * 1000);
+		try{
+			timer.schedule(new TDTReminderTask(task), sec * 1000);
+		} catch (IllegalArgumentException e) {
+			//Undoing a already past reminder
+			task.setRemindDateTime("null");
+			task.setReminder(null);
+		}
 	}
 	
 	public void cancelReminder() {

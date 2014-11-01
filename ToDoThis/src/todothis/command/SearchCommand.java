@@ -55,7 +55,6 @@ public class SearchCommand extends Command {
 				}
 			}
 		}
-		
 	}
 
 	private void searchKeyWords(Iterator<Task> iter) {
@@ -68,7 +67,7 @@ public class SearchCommand extends Command {
 			//String[] words = task.getDetails().split(" ");
 			for(int j = 0; j < params.length; j++) {
 				for(int k = 0; k < words.length; k++) {
-					if(words[k].equalsIgnoreCase(params[j])) {
+					if(words[k].startsWith(params[j])) {
 						found = true;
 						break;
 					} else {
@@ -89,6 +88,15 @@ public class SearchCommand extends Command {
 	private void searchEveryTask(Iterator<Task> iter) {
 		while(iter.hasNext()) {
 			searchedResult.add(iter.next());
+		}
+	}
+	
+	private void searchDoneTask(Iterator<Task> iter) {
+		while(iter.hasNext()) {
+			Task task = iter.next();
+			if(task.isDone()) {
+				searchedResult.add(task);
+			}
 		}
 	}
 

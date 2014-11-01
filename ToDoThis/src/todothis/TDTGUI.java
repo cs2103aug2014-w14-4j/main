@@ -84,7 +84,9 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			+ ".datagrid table .overdue td{ background: #FE2E2E; color: white}"
 			+ ".datagrid table .priority td{ background: #F781D8; color: white }"
 			+ ".datagrid table tr .datetime{ font-size:12px }"
-			+ ".datagrid table #target td{ background: #EEB111 }"
+			+ ".datagrid table .target td{ border: 3px solid #EEB111 }"
+			+ ".datagrid table .prioritytarget td{ border: 3px solid #EEB111; background: #F781D8; color: white }"
+			+ ".datagrid table .alttarget { border: 3px solid #EEB111;background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .taskId { width: 10%; }"
 			+ ".datagrid table .dateTime { width: 30%; }"
 			+ ".datagrid table .labelhead { width: 10%; }"
@@ -100,14 +102,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 				try {
 					final TDTGUI frame = new TDTGUI();
 					frame.feedbackArea.setText(frame.doInit());
-					frame.setVisible(true);
 					
-					Image image = Toolkit.getDefaultToolkit().getImage("src/taeyeon.jpg");
-					frame.setIconImage(image);
-					
-					frame.taskPane.setText(frame.displayTask(0));
-					frame.taskLabel.setText("Adding task to: "
-							+ frame.logic.getCurrLabel());
 					javax.swing.SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
 							frame.scrollPane.getVerticalScrollBar().setValue(0);
@@ -134,7 +129,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		initFeedbackArea();
 	}
 
-	String displayTask(int target) {
+	String displayTask(Task target) {
 		StringBuilder sb = new StringBuilder();
 		String currLabel = logic.getCurrLabel();
 		Iterator<String> labelIter = logic.getLabelIterator();
@@ -148,17 +143,18 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			String label = labelIter.next();
 			if (!label.equals(currLabel)) {
 				array = logic.getTaskListFromLabel(label);
-				displayFormat(sb, label, array,0);
+				displayFormat(sb, label, array, target);
 			}
 		}
 		return sb.toString();
 	}
 
 	private void displayFormat(StringBuilder sb, String currLabel,
-			ArrayList<Task> array, int target) {
+			ArrayList<Task> array, Task target) {
 		if (array != null) {
-			sb.append("<span class = \"label\"><b>" + currLabel + "("
+			sb.append("<span class = label><b>" + currLabel + "("
 					+ array.size() + ")" + "</b></span>: <br>");
+					
 			if (!logic.isHideLabel(currLabel)) {
 				for (int i = 0; i < array.size(); i++) {
 					Task task = array.get(i);
@@ -176,7 +172,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 					} else if (i % 2 == 0) {
 						sb.append(displayTaskInRow(task, " class = alt", target));
 					} else {
-						sb.append(displayTaskInRow(task, "", target));
+						sb.append(displayTaskInRow(task, " class =", target));
 					}
 				}
 				sb.append("</table></div>");
@@ -184,15 +180,26 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		}
 	}
 
-	private String displayTaskInRow(Task task, String type, int taskId) {
-		if(taskId == task.getTaskID()) {
-			type = type + " id = target";
+	private String displayTaskInRow(Task task, String type, Task target) {
+		if(task == target ) {
+			type = type + "target";
 		}
 		return "<tr" + type + "><td>" + task.getTaskID() + "</td><td>"
 				+ task.getDetails() + "</td><td class = datetime>"
 				+ task.getDateAndTime().display()
 				+ checkIfHaveReminder(task.getRemindDateTime()) 
 				+"</td></tr>";
+	}
+	
+	private int getTotalDoneTask( ArrayList<Task> array) {
+		int ans = 0;
+		for(int i = 0; i < array.size(); i++) {
+			Task task = array.get(i);
+			if(task.isDone()) {
+				ans++;
+			}
+		}
+		return ans;
 	}
 	
 	private String checkIfHaveReminder(String remind) {
@@ -349,6 +356,14 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		} catch (Exception e) {
 			return "Unable to create todothis.txt";
 		}
+		setVisible(true);
+		Image image = Toolkit.getDefaultToolkit().getImage("src/taeyeon.jpg");
+		setIconImage(image);
+		setTitle("TodoThis");
+		
+		taskPane.setText(displayTask(null));
+		taskLabel.setText("Adding task to: "
+				+ logic.getCurrLabel());
 		return "Todo-This ready!";
 	}
 	
@@ -493,6 +508,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		final TDTGUI gui = this;
 		if(!SystemTray.isSupported()){
 			System.out.println("System tray is not supported !!! ");
+			gui.logic.write();
 			System.exit(0);
 		}
 		SystemTray systemTray = SystemTray.getSystemTray();

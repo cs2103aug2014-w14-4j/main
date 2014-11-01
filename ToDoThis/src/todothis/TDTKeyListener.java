@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import todothis.command.AddCommand;
 import todothis.command.Command;
+import todothis.command.EditCommand;
 import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
@@ -14,6 +15,7 @@ import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 
 public class TDTKeyListener implements KeyListener {
+	private static final int _SCROLLFACTOR = 30;
 	private TDTGUI gui;
 
 	public TDTKeyListener(TDTGUI gui) {
@@ -23,18 +25,19 @@ public class TDTKeyListener implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent arg0) {
 		int keyCode = arg0.getKeyCode();
+		int prevScrollVal = gui.scrollPane.getVerticalScrollBar().getValue();
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
 			UndoCommand undo = new UndoCommand();
 			String feedback = gui.getLogic().executeCommand(undo);
-			gui.updateGUI(feedback, gui.displayTask(0));
-			scrollTo(0);
+			gui.updateGUI(feedback, gui.displayTask(null));
+			scrollTo(prevScrollVal);
 		}
 
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Y) {
 			RedoCommand redo = new RedoCommand();
 			String feedback = gui.getLogic().executeCommand(redo);
-			gui.updateGUI(feedback, gui.displayTask(0));
-			scrollTo(0);
+			gui.updateGUI(feedback, gui.displayTask(null));
+			scrollTo(prevScrollVal);
 		}
 
 		switch (keyCode) {
@@ -43,18 +46,27 @@ public class TDTKeyListener implements KeyListener {
 			gui.getCommandHistory().add(gui.getUserCommand());
 			gui.setHistoryPointer(gui.getCommandHistory().size());
 			gui.commandField.setText("");
-
 			Command command = gui.getParser().parse(gui.getUserCommand());
 			
 			if (command.getCommandType() != COMMANDTYPE.SEARCH) {
 				String feedback = gui.getLogic().executeCommand(command);
-				if(command.getCommandType() == COMMANDTYPE.ADD) {
-					int id = ((AddCommand)command).getTaskID();
-					gui.updateGUI(feedback, gui.displayTask(id));
-					scrollTo(id*30);
-				}else {
-					gui.updateGUI(feedback, gui.displayTask(0));
-					scrollTo(0);
+				if(command.getCommandType() == COMMANDTYPE.ADD || 
+						command.getCommandType() == COMMANDTYPE.EDIT) {
+					Task task = null;
+					if(command.getCommandType() == COMMANDTYPE.ADD) {
+						task = ((AddCommand)command).getAddedTask();
+					} else {
+						task = ((EditCommand)command).getEditedTask();
+					}
+					gui.updateGUI(feedback, gui.displayTask(task));
+					if(task != null && command.getCommandType() == COMMANDTYPE.ADD) {
+						scrollTo(task.getTaskID() * _SCROLLFACTOR);
+					} else {
+						scrollTo(prevScrollVal);
+					}
+				} else {
+					gui.updateGUI(feedback, gui.displayTask(null));
+					scrollTo(prevScrollVal);
 				}
 			} else {
 				String feedback = gui.getLogic().executeCommand(command);
