@@ -68,54 +68,132 @@ public class HelpCommand extends Command{
 	}
 	
 	private String helpAdd(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>ADD - input task</b>");
+		sb.append("<br>");
+		sb.append("To add a task under current label: add taskDetails");
+		sb.append("<br>");
+		sb.append("Note that the word 'add' can be omitted and the only required field is taskDetails");
+		sb.append("<br>");
+		sb.append("List of preposition words available: ON, AT, BY, TO, FROM, TILL, UNTIL, ABOUT, THE, NEXT, FOLLOWING, THIS, '-'");
+		sb.append("<br>");
+		sb.append("Examples:");
+		sb.append("<br>");
+		sb.append("complete assignment by monday at 2pm");
+		sb.append("<br>");
+		sb.append("study in school from 6am - 8am on the following tuesday");
+		sb.append("<br>");
+		sb.append("Date and Time formats");
 		
-		return null;
+		
+		return sb.toString();
 	}
 	private String helpDelete(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>DELETE - remove task completely</b>");
+		sb.append("<br>");
+		sb.append("To delete task from the current label: delete taskID");
+		sb.append("<br>");
+		sb.append("To delete task from a different label: delete labelName taskID");
+		sb.append("<br>");
+		sb.append("To delete an entire label and its contents: delete labelName");
+		sb.append("<br>");
+		sb.append("To delete all labels and tasks: delete");
+		sb.append("<br>");
 		
-		return null;
+		return sb.toString();
 	}
 	private String helpEdit(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>EDIT - change task details</b>");
+		sb.append("<br>");
+		sb.append("Task details of the corresponding task ID will be auto completed for convenience");
+		sb.append("<br>");
+		sb.append("To edit task under current label: edit taskID detailsToBeChanged");
+		sb.append("<br>");
+		sb.append("To edit a task under a different label: edit labelName taskID detailsToBeChanged");
+		sb.append("<br>");	
 		
-		return null;
+		return sb.toString();
 	}
 	private String helpLabel(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>LABEL - categorize tasks</b>");
+		sb.append("<br>");
+		sb.append("A valid label has to comprise of only one word");
+		sb.append("<br>");
+		sb.append("To create a new label: label labelName");
+		sb.append("<br>");
+		sb.append("To change current directory to a different label: label labelName");
+		sb.append("<br>");	
+		sb.append("Note that this is similar to creating a new label");
 		
-		return null;
+		return sb.toString();
 	}
 	private String helpUndo(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>UNDO - reverse the effect of previous command</b>");
+		sb.append("<br>");
+		sb.append("Keyboard shortcut available: Ctrl + Z");
+		sb.append("<br>");
 		
-		return "Ctrl+Z - Shortcut for undo\n" + "Able to undo previous command";
+		return sb.toString();
 	}
 	private String helpRedo(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>REDO - reverse the effect of undo</b>");
+		sb.append("<br>");
+		sb.append("Keyboard shortcut available: Ctrl + Y");
+		sb.append("<br>");
 		
-		return "Ctrl+Y - Shortcut for redo\n" + "Able to reverse previous undo command";
+		return sb.toString();
 	}
 	private String helpSearch(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>SEARCH - locate tasks with given keyword or date</b>");
+		sb.append("<br>");
+		sb.append("To search for a keyword: search keyword");
+		sb.append("<br>");
+		sb.append("To search for a day/date: search @tmr OR Search @24/12/14");
+		sb.append("<br>");
 		
-		return "To search for a date/day, simply enter Search @tmr or @24/12/14\n" + "To search for a keyword, simply enter @keyword";
+		return sb.toString();
 	}
 	private String helpShow(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>SHOW - display labels desired</b>");
+		sb.append("<br>");
+		sb.append("To show one or more labels from view: show labelName1 labelName2 ...");
+		sb.append("<br>");
+		sb.append("To show all labels available: show");
+		sb.append("<br>");
 		
-		return "To display one or more label names, simply enter Display labelName1 labelName2";
+		return sb.toString();
 	}
 	private String helpHide(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>HIDE - hide labels from view</b>");
+		sb.append("<br>");
+		sb.append("To hide one or more labels from view: hide labelName1 labelName2 ...");
+		sb.append("<br>");
+		sb.append("To hide all labels from view: hide");
+		sb.append("<br>");
 		
-		return "To hide one or more label names, simply enter Hide labelName1 labelName2";
+		return sb.toString();
 	}
 	private String helpDone(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("To mark task as completed");
+		sb.append("<b>DONE - mark task as completed</b>");
 		sb.append("<br>");
 		sb.append("Marking a task which has already been marked done will switch it back to undone");
 		sb.append("<br>");
-		sb.append("To mark a task from the current label as done: Done taskID");
+		sb.append("To mark a task from the current label as done: done taskID");
 		sb.append("<br>");
-		sb.append("To mark a task from a different label as done: Done labelName taskID");
+		sb.append("To mark a task from a different label as done: done labelName taskID");
 		sb.append("<br>");
-		sb.append("To mark all tasks under a label as complete: Done labelName");
+		sb.append("To mark all tasks under a label as complete: done labelName");
 		sb.append("<br>");
-		sb.append("To mark everything as done: Done");
+		sb.append("To mark everything as done: done");
 		sb.append("<br>");
 		 
 		 return sb.toString();	
