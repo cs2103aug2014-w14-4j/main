@@ -48,7 +48,10 @@ public class TDTKeyListener implements KeyListener {
 			gui.commandField.setText("");
 			Command command = gui.getParser().parse(gui.getUserCommand());
 			
-			if (command.getCommandType() != COMMANDTYPE.SEARCH) {
+			if(command.getCommandType() == COMMANDTYPE.HELP) { 
+				String feedback = gui.getLogic().executeCommand(command);
+				gui.updateGUI("Displaying Help text.", feedback);
+			} else if (command.getCommandType() != COMMANDTYPE.SEARCH) {
 				String feedback = gui.getLogic().executeCommand(command);
 				if(command.getCommandType() == COMMANDTYPE.ADD || 
 						command.getCommandType() == COMMANDTYPE.EDIT) {

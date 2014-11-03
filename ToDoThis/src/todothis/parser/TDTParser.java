@@ -91,7 +91,7 @@ public class TDTParser implements ITDTParser {
 				return new ExitCommand();
 			case HELP :
 				help();
-				return new HelpCommand(getCommandDetails());
+				return new HelpCommand(this.getRemainingWords());
 			case INVALID :
 				break;
 			default:

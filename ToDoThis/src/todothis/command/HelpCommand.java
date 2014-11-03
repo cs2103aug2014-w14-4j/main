@@ -8,7 +8,7 @@ public class HelpCommand extends Command{
 	
 	public HelpCommand(String command) {
 		super(COMMANDTYPE.HELP);
-		commandTypeForHelp = determineHelpCommandType(command);
+		commandTypeForHelp = determineHelpCommandType(command.trim());
 	}
 
 	@Override
@@ -34,25 +34,20 @@ public class HelpCommand extends Command{
 			return helpHide();
 		case DONE:
 			return helpDone();
-		case HELP:
-			return helpAll();
-		case INVALID:
-			break;
 		default:
 			break;
 		}
-		return "INVALID HELP COMMAND!";
+		return helpAll();
 	}
 	
 	@Override
 	public String undo(TDTStorage storage) {
-		
 		return "";
 	}
 	
 	private String helpAdd(){
 		
-		return null;
+		return "<span color = blue><b>HELP SECTION</b></span>";
 	}
 	private String helpDelete(){
 		
@@ -91,8 +86,7 @@ public class HelpCommand extends Command{
 		return "To mark everything as done, simple enter Done\n" + "To mark a task under current label as done, simply enter Done taskNum";
 	}
 	private String helpAll(){
-		
-		return null;
+		return "<span color = red><b>HELP SECTION</b></span>";
 	}
 	
 	public COMMANDTYPE getCommandForHelp(){

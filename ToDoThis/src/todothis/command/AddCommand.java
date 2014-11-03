@@ -73,7 +73,6 @@ public class AddCommand extends Command {
 	private void checkForClash(Task target, Iterator<Task> iter) {
 		while(iter.hasNext()) {
 			Task task = iter.next();
-
 			if(target.getDateAndTime().isClash(task.getDateAndTime())) {
 				clashedTask.add(task);
 			}
