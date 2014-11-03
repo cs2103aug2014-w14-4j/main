@@ -1,6 +1,8 @@
 package todothis.command;
 
 import todothis.parser.ITDTParser.COMMANDTYPE;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import todothis.storage.TDTStorage;
 
 public class HelpCommand extends Command{
@@ -8,8 +10,31 @@ public class HelpCommand extends Command{
 	
 	public HelpCommand(String command) {
 		super(COMMANDTYPE.HELP);
+		HtmlContent hc = new HtmlContent();
+		hc.start();	
 		commandTypeForHelp = determineHelpCommandType(command);
 	}
+	
+	public static class HtmlContent extends JFrame {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		void start() {
+			String html;
+			html="<html><head><title>Simple Page</title></head>"; 
+			html+="<body bgcolor='#777779'><hr/><font size=50>Help Command</font><hr/>"; 
+			html+="</body></html>";
+			JEditorPane ed1=new JEditorPane("text/html",html);
+			add(ed1);
+			setVisible(true);
+			setSize(600,600);
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+		}
+	}
+	
 
 	@Override
 	public String execute(TDTStorage storage) {
@@ -87,8 +112,21 @@ public class HelpCommand extends Command{
 		return "To hide one or more label names, simply enter Hide labelName1 labelName2";
 	}
 	private String helpDone(){
-		
-		return "To mark everything as done, simple enter Done\n" + "To mark a task under current label as done, simply enter Done taskNum";
+		StringBuilder sb = new StringBuilder();
+		sb.append("To mark task as completed");
+		sb.append("<br>");
+		sb.append("Marking a task which has already been marked done will switch it back to undone");
+		sb.append("<br>");
+		sb.append("To mark a task from the current label as done: Done taskID");
+		sb.append("<br>");
+		sb.append("To mark a task from a different label as done: Done labelName taskID");
+		sb.append("<br>");
+		sb.append("To mark all tasks under a label as complete: Done labelName");
+		sb.append("<br>");
+		sb.append("To mark everything as done: Done");
+		sb.append("<br>");
+		 
+		 return sb.toString();	
 	}
 	private String helpAll(){
 		
