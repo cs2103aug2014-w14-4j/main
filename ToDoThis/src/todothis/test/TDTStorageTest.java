@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.Task;
 import todothis.storage.TDTStorage;
 

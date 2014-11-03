@@ -10,7 +10,7 @@ import todothis.command.EditCommand;
 import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 
@@ -48,7 +48,10 @@ public class TDTKeyListener implements KeyListener {
 			gui.commandField.setText("");
 			Command command = gui.getParser().parse(gui.getUserCommand());
 			
-			if (command.getCommandType() != COMMANDTYPE.SEARCH) {
+			if(command.getCommandType() == COMMANDTYPE.HELP) { 
+				String feedback = gui.getLogic().executeCommand(command);
+				gui.updateGUI("Displaying Help text.", feedback);
+			} else if (command.getCommandType() != COMMANDTYPE.SEARCH) {
 				String feedback = gui.getLogic().executeCommand(command);
 				if(command.getCommandType() == COMMANDTYPE.ADD || 
 						command.getCommandType() == COMMANDTYPE.EDIT) {
@@ -162,7 +165,7 @@ public class TDTKeyListener implements KeyListener {
 			}
 			break;
 		case KeyEvent.VK_F1:
-			gui.setBounds(300, 0, 500, 110);
+			gui.setBounds(300, 0, 500, 125);
 			break;
 		case KeyEvent.VK_F2:
 			gui.setBounds(300, 100, 800, 600);

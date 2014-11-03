@@ -7,7 +7,7 @@ public interface ITDTParser {
 	
 	public enum COMMANDTYPE {
 		REMIND, ADD, DELETE, HIDE, SEARCH, REDO, EDIT, DONE, 
-		UNDO, LABEL, DISPLAY, HELP, INVALID;
+		UNDO, LABEL, SHOW, HELP, INVALID, EXIT;
 	}
 	
 	/**

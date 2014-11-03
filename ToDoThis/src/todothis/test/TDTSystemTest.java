@@ -7,7 +7,7 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import todothis.command.Command;
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.Task;
 import todothis.parser.TDTParser;
 import todothis.storage.TDTStorage;

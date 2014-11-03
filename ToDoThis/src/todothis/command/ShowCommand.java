@@ -6,12 +6,12 @@ import java.util.Iterator;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
-public class DisplayCommand extends Command {
+public class ShowCommand extends Command {
 	private String labelName;
 	private ArrayList<String> prevHideList;
 	
-	public DisplayCommand(String labelName) {
-		super(COMMANDTYPE.DISPLAY);
+	public ShowCommand(String labelName) {
+		super(COMMANDTYPE.SHOW);
 		this.setLabelName(labelName.toUpperCase());
 	}
 	/*

@@ -1,4 +1,4 @@
-package todothis.logic;
+package todothis.dateandtime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -79,7 +79,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		// TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
 		// TDTDateAndTime test2 = new TDTDateAndTime("12/12");
 		// System.out.println(test2.display());
-		//System.out.println(TDTDateAndTime.decodeSearchDetails("07/12/14"));
+		// System.out.println(TDTDateAndTime.decodeSearchDetails(""));
 		// System.out.println(TDTDateAndTime.changeTimeFormat("2:59"));
 		// System.out.println(calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("1/1 3.38am")));
 
@@ -504,7 +504,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	}
 
 	// -------------------------------------------DISPLAY------------------------------------------------
-	public static String changeDateFormatDisplay(String date) throws ParseException {
+	public static String changeDateFormatDisplay(String date)
+			throws ParseException {
 		final String OLD_FORMAT = "dd/MM/yyyy";
 		final String NEW_FORMAT = "d MMM yyyy";
 
@@ -518,7 +519,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return newDateString;
 	}
 
-	public static String changeTimeFormatDisplay(String time) throws ParseException {
+	public static String changeTimeFormatDisplay(String time)
+			throws ParseException {
 		final String OLD_FORMAT = "HH:mm";
 		final String NEW_FORMAT = "h:mm a";
 
@@ -598,8 +600,15 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			return true;
 		}
 		String[] timeParts = time.split(":");
-		int hours = Integer.parseInt(timeParts[0]);
-		int minutes = Integer.parseInt(timeParts[1]);
+		int hours;
+		int minutes;
+		try {
+			hours = Integer.parseInt(timeParts[0]);
+			minutes = Integer.parseInt(timeParts[1]);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+
 		if (hours < 24 && hours >= 0 && minutes < 60 && minutes >= 0) {
 			return true;
 		}
@@ -991,7 +1000,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		String startSearchDate = "";
 		String endSearchDate = "";
 		boolean isSearchDateRange = false;
-		
+
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
@@ -1000,10 +1009,12 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 
 		for (int i = 0; i < searchParts.length; i++) {
-			if(isPrepositionTo(searchParts, i) && !startSearchDate.equals("")){
+			searchParts[i] = replaceEndStringPunctuation(searchParts[i]);
+
+			if (isPrepositionTo(searchParts, i) && !startSearchDate.equals("")) {
 				isSearchDateRange = true;
 			}
-			
+
 			if (searchParts[i].equals("this")) {
 				thisOrNextOrFollowing = 1;
 			} else if (searchParts[i].equals("next")) {
@@ -1017,10 +1028,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			if (checkDate(searchParts[i])) {
 				decodedDate = decodeDate(searchParts, i, currentYear,
 						currentMonth);
-				if(isValidDateRange(decodedDate)){
+				if (isValidDateRange(decodedDate)) {
 					decodedDate = changeDateFormat(decodedDate);
 				}
-				if(isSearchDateRange){
+				if (isSearchDateRange) {
 					endSearchDate = decodedDate;
 				} else {
 					startSearchDate = decodedDate;
@@ -1032,10 +1043,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 						currentDayOfWeek, nextCount, followingCount);
 				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
 						currentYear, numOfDaysToAdd);
-				if(isValidDateRange(decodedDate)){
+				if (isValidDateRange(decodedDate)) {
 					decodedDate = changeDateFormat(decodedDate);
 				}
-				if(isSearchDateRange){
+				if (isSearchDateRange) {
 					endSearchDate = decodedDate;
 				} else {
 					startSearchDate = decodedDate;
@@ -1063,10 +1074,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 						year = Integer.parseInt(after);
 
 						decodedDate = day + "/" + month + "/" + year;
-						if(isValidDateRange(decodedDate)){
+						if (isValidDateRange(decodedDate)) {
 							decodedDate = changeDateFormat(decodedDate);
 						}
-						if(isSearchDateRange){
+						if (isSearchDateRange) {
 							endSearchDate = decodedDate;
 						} else {
 							startSearchDate = decodedDate;
@@ -1095,15 +1106,15 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 							followingCount);
 				}
 			}
-			
-			if(isSearchDateRange && !endSearchDate.equals("")){
-				if(isValidDateRange(startSearchDate) && isValidDateRange(endSearchDate)){
-					if(compareToDate(startSearchDate, endSearchDate) == 1){
+
+			if (isSearchDateRange && !endSearchDate.equals("")) {
+				if (isValidDateRange(startSearchDate)
+						&& isValidDateRange(endSearchDate)) {
+					if (compareToDate(startSearchDate, endSearchDate) == 1) {
 						decodedSearchString = searchDateRange(
 								decodedSearchString, startSearchDate,
 								endSearchDate);
 					}
-				
 				}
 				isSearchDateRange = false;
 				startSearchDate = "";
@@ -1117,14 +1128,13 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			String startSearchDate, String endSearchDate) {
 		String dateTemp = "";
 		dateTemp = startSearchDate;
-		while(!dateTemp.equals(endSearchDate)){
-			String [] dateParts = dateTemp.split("/");
+		while (!dateTemp.equals(endSearchDate)) {
+			String[] dateParts = dateTemp.split("/");
 			int dayTemp = Integer.parseInt(dateParts[0]);
 			int monthTemp = Integer.parseInt(dateParts[1]);
 			int yearTemp = Integer.parseInt(dateParts[2]);
 			dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
-			decodedSearchString = decodedSearchString + dateTemp
-					+ " ";
+			decodedSearchString = decodedSearchString + dateTemp + " ";
 		}
 		return decodedSearchString;
 	}
@@ -1257,6 +1267,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				+ currentYear;
 
 		for (int i = 0; i < reminderParts.length; i++) {
+			reminderParts[i] = replaceEndStringPunctuation(reminderParts[i]);
+
 			if (reminderParts[i].equals("this")) {
 				thisOrNextOrFollowing = 1;
 			} else if (reminderParts[i].equals("next")) {
@@ -1413,8 +1425,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return false;
 	}
 
-	// ------------------------------------CHECK FOR
-	// CLASHES---------------------
+	// -----------------------------CHECK FOR CLASHES---------------------
 	public boolean isClash(TDTDateAndTime arg0) {
 		if (arg0.isTimedTask() == true) {
 			if (!this.getStartDate().equals("null")
