@@ -10,7 +10,7 @@ import todothis.command.EditCommand;
 import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 

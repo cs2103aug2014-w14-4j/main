@@ -15,7 +15,7 @@ import java.util.Stack;
 
 import todothis.TDTGUI;
 import todothis.command.Command;
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.TDTReminder;
 import todothis.logic.Task;
 

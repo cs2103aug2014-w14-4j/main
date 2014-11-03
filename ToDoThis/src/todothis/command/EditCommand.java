@@ -2,7 +2,7 @@ package todothis.command;
 
 import java.util.ArrayList;
 
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;

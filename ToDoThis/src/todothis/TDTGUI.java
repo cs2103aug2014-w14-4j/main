@@ -39,7 +39,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
 import todothis.parser.TDTParser;

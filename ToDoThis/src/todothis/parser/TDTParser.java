@@ -16,7 +16,7 @@ import todothis.command.RedoCommand;
 import todothis.command.RemindCommand;
 import todothis.command.SearchCommand;
 import todothis.command.UndoCommand;
-import todothis.logic.TDTDateAndTime;
+import todothis.dateandtime.TDTDateAndTime;
 
 public class TDTParser implements ITDTParser {
 
