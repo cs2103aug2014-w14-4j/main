@@ -64,7 +64,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	private String userCommand;
 	private ArrayList<String> commandHistory = new ArrayList<String>();
 	private int historyPointer = 0;
-	JLabel commandLabel = new JLabel("I want to: ");
+	JLabel commandLabel = new JLabel(" I want to: ");
 	JTextPane taskPane = new JTextPane();
 	JTextPane feedbackArea = new JTextPane();
 	JTextField commandField = new JTextField();
@@ -86,6 +86,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			+ ".datagrid table tr .datetime{ font-size:12px }"
 			+ ".datagrid table .target td{ border: 3px solid #EEB111 }"
 			+ ".datagrid table .prioritytarget td{ border: 3px solid #EEB111; background: #FE2E2E; color: white }"
+			+ ".datagrid table .overduetarget td{ border: 3px solid #EEB111; background: #F781D8; color: white }"
 			+ ".datagrid table .alttarget { border: 3px solid #EEB111;background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .taskId { width: 10%; }"
 			+ ".datagrid table .dateTime { width: 30%; }"
@@ -275,11 +276,23 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	public void updateGUI(String feedback, String text) {
-		taskLabel.setText("Adding task to: " + logic.getCurrLabel());
+		taskLabel.setText(" Current Label: " + logic.getCurrLabel());
 		feedbackArea.setText(feedback);
 		taskPane.setText(text);
-		if((feedback.split(" "))[0].equals("Invalid")) {
-			feedbackArea.setBackground(Color.pink);
+		changeColorOfFeedbackArea(feedback);
+	}
+
+	private void changeColorOfFeedbackArea(String feedback) {
+		String[] feedbackParams = feedback.split(" ");
+		if(feedbackParams.length > 0) {
+			String firstWord = feedbackParams[0];
+			if(firstWord.equals("Invalid")) {
+				feedbackArea.setBackground(Color.pink);
+			} else if(firstWord.equals("Clashes")){
+				feedbackArea.setBackground(Color.yellow);
+			} else {
+				feedbackArea.setBackground(Color.green);
+			}
 		} else {
 			feedbackArea.setBackground(Color.green);
 		}
@@ -293,7 +306,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	private void initFeedbackArea() {
-		feedbackArea.setPreferredSize(new Dimension(100, 30));
+		feedbackArea.setPreferredSize(new Dimension(100, 40));
 		contentPane.add(feedbackArea, BorderLayout.SOUTH);
 		feedbackArea.setEditable(false);
 		feedbackArea.setFocusable(false);
@@ -363,7 +376,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		setTitle("TodoThis");
 		
 		taskPane.setText(displayTask(null));
-		taskLabel.setText("Adding task to: "
+		taskLabel.setText(" Current Label: "
 				+ logic.getCurrLabel());
 		return "Todo-This ready!";
 	}

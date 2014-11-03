@@ -157,11 +157,13 @@ public class TDTStorage implements ITDTStorage {
 		autoWords.add("REDO");
 		autoWords.add("UNDO");
 		autoWords.add("HIDE");
-		autoWords.add("DISPLAY");
+		autoWords.add("SHOW");
 		autoWords.add("EDIT");
 		autoWords.add("LABEL");
 		autoWords.add("SEARCH");
 		autoWords.add("REMIND");
+		autoWords.add("EXIT");
+		autoWords.add("HELP");
 	}
 	
 	public ArrayList<String> copyHideList() {

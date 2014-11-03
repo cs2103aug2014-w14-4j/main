@@ -2,21 +2,21 @@ package todothis.parser;
 
 import java.util.ArrayList;
 
-
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 import todothis.command.AddCommand;
 import todothis.command.Command;
 import todothis.command.DeleteCommand;
-import todothis.command.HelpCommand;
-import todothis.command.ShowCommand;
 import todothis.command.DoneCommand;
 import todothis.command.EditCommand;
+import todothis.command.ExitCommand;
+import todothis.command.HelpCommand;
 import todothis.command.HideCommand;
 import todothis.command.LabelCommand;
 import todothis.command.RedoCommand;
 import todothis.command.RemindCommand;
 import todothis.command.SearchCommand;
+import todothis.command.ShowCommand;
 import todothis.command.UndoCommand;
 import todothis.dateandtime.TDTDateAndTime;
 
@@ -88,7 +88,7 @@ public class TDTParser implements ITDTParser {
 				return new RemindCommand(getLabelName(), getTaskID(), getCommandDetails());
 			case EXIT :
 				exit();
-				break;
+				return new ExitCommand();
 			case HELP :
 				help();
 				return new HelpCommand(getCommandDetails());

@@ -1,5 +1,8 @@
 package todothis.command;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
@@ -15,6 +18,9 @@ public class AddCommand extends Command {
 	private TDTDateAndTime dateAndTime;
 	private boolean isHighPriority;
 	private Task addedTask;
+	private String feedback = "";
+	private ArrayList<Task> clashedTask = new ArrayList<Task>();
+	private boolean gotClashes = false;
 
 	public AddCommand(String commandDetails, TDTDateAndTime dateAndTime, boolean isHighPriority ) {
 		super(COMMANDTYPE.ADD);
@@ -53,13 +59,34 @@ public class AddCommand extends Command {
 				return "Invalid end time! End Time should be after start time!";
 			}
 		}
+		
+		
+		checkForClash(task, storage.getTaskIterator());
 		storage.addTask(task);
 		setTaskID(TDTLogic.sort(storage.getLabelMap().get(getLabelName()), task));
 		storage.insertToUndoStack(this);
+		
 		//Proper return statement!
-		return "Add success";
+		return gotClashes?this.getFeedback():"Task added.";
 	}
 	
+	private void checkForClash(Task target, Iterator<Task> iter) {
+		while(iter.hasNext()) {
+			Task task = iter.next();
+
+			if(target.getDateAndTime().isClash(task.getDateAndTime())) {
+				clashedTask.add(task);
+			}
+		}
+		if(!clashedTask.isEmpty()) {
+			gotClashes = true;
+			String feedback = "Clashes detected. Task added.\n" + clashedTask.size() 
+					+ " task(s) found to have same time range on " 
+					+ target.getDateAndTime().getStartDate();
+			this.setFeedback(feedback);
+		}
+	}
+
 	@Override
 	public String undo(TDTStorage storage) {
 		DeleteCommand comd = new DeleteCommand(getLabelName(), getTaskID());
@@ -123,6 +150,14 @@ public class AddCommand extends Command {
 
 	public void setAddedTask(Task addedTask) {
 		this.addedTask = addedTask;
+	}
+
+	public String getFeedback() {
+		return feedback;
+	}
+
+	public void setFeedback(String feedback) {
+		this.feedback = feedback;
 	}
 
 	

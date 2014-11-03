@@ -39,17 +39,19 @@ public class SearchCommand extends Command {
 			searchDoneTask(iter);
 		} else if(searchedWords.trim().equalsIgnoreCase("overdue") ){
 			searchOverdueTask(iter);
-		} else if(searchedWords.indexOf('@') != -1){
-			this.setSearchDate(TDTDateAndTime.decodeSearchDetails(
-					searchedWords.substring(searchedWords.indexOf('@') + 1)));
-			this.setSearchedWords(searchedWords.substring(0, searchedWords.indexOf('@')));
-			
-			searchKeyWords(iter);
-			searchByDate(searchedResult.iterator());
 		} else {
-			searchKeyWords(iter);
+			this.setSearchedWords(getSearchedWords().replaceAll("\"", ""));
+			if(searchedWords.indexOf('@') != -1) {
+				this.setSearchDate(TDTDateAndTime.decodeSearchDetails(
+						searchedWords.substring(searchedWords.indexOf('@') + 1)));
+				this.setSearchedWords(searchedWords.substring(0, searchedWords.indexOf('@')));
+				
+				searchKeyWords(iter);
+				searchByDate(searchedResult.iterator());
+			} else {
+				searchKeyWords(iter);
+			}
 		}
-		
 		storage.insertToUndoStack(this);
 		return String.format(SEARCH_FEEDBACK, searchedResult.size());	
 	}
@@ -109,7 +111,7 @@ public class SearchCommand extends Command {
 			//search result. Reset found to false and repeat for the next task.
 			for(int j = 0; j < keyWords.length; j++) {
 				for(int k = 0; k < details.length; k++) {
-					if(details[k].startsWith(keyWords[j])) {
+					if(details[k].toLowerCase().startsWith(keyWords[j].toLowerCase())) {
 						found = true;
 						break;
 					} else {
