@@ -1,8 +1,6 @@
 package todothis.command;
 
 import todothis.parser.ITDTParser.COMMANDTYPE;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import todothis.storage.TDTStorage;
 
 public class HelpCommand extends Command{
@@ -10,15 +8,13 @@ public class HelpCommand extends Command{
 	
 	public HelpCommand(String command) {
 		super(COMMANDTYPE.HELP);
-		HtmlContent hc = new HtmlContent();
-		hc.start();	
 		commandTypeForHelp = determineHelpCommandType(command);
 	}
 	
+	/*
+	 * NO need create new frame
 	public static class HtmlContent extends JFrame {
-		/**
-		 * 
-		 */
+	
 		private static final long serialVersionUID = 1L;
 		
 		void start() {
@@ -34,7 +30,7 @@ public class HelpCommand extends Command{
 
 		}
 	}
-	
+	*/
 
 	@Override
 	public String execute(TDTStorage storage) {
@@ -53,20 +49,16 @@ public class HelpCommand extends Command{
 			return helpRedo();
 		case SEARCH:
 			return helpSearch();
-		case DISPLAY:
-			return helpDisplay();
+		case SHOW:
+			return helpShow();
 		case HIDE:
 			return helpHide();
 		case DONE:
 			return helpDone();
-		case HELP:
-			return helpAll();
-		case INVALID:
-			break;
 		default:
 			break;
 		}
-		return "INVALID HELP COMMAND!";
+		return helpAll();
 	}
 	
 	@Override
@@ -103,7 +95,7 @@ public class HelpCommand extends Command{
 		
 		return "To search for a date/day, simply enter Search @tmr or @24/12/14\n" + "To search for a keyword, simply enter @keyword";
 	}
-	private String helpDisplay(){
+	private String helpShow(){
 		
 		return "To display one or more label names, simply enter Display labelName1 labelName2";
 	}
@@ -130,7 +122,7 @@ public class HelpCommand extends Command{
 	}
 	private String helpAll(){
 		
-		return null;
+		return "<span color = red><b>HELP</b></span>";
 	}
 	
 	public COMMANDTYPE getCommandForHelp(){
@@ -142,8 +134,8 @@ public class HelpCommand extends Command{
 			return COMMANDTYPE.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("hide")) {
 			return COMMANDTYPE.HIDE;
-		} else if (commandTypeString.equalsIgnoreCase("display")) {
-			return COMMANDTYPE.DISPLAY;
+		} else if (commandTypeString.equalsIgnoreCase("show")) {
+			return COMMANDTYPE.SHOW;
 		} else if (commandTypeString.equalsIgnoreCase("delete")) {
 			return COMMANDTYPE.DELETE;
 		} else if (commandTypeString.equalsIgnoreCase("label")) {
