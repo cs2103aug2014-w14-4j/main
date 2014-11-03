@@ -2,11 +2,13 @@ package todothis.parser;
 
 import java.util.ArrayList;
 
+
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 import todothis.command.AddCommand;
 import todothis.command.Command;
 import todothis.command.DeleteCommand;
+import todothis.command.HelpCommand;
 import todothis.command.ShowCommand;
 import todothis.command.DoneCommand;
 import todothis.command.EditCommand;
@@ -26,13 +28,13 @@ public class TDTParser implements ITDTParser {
 	private String commandDetails;
 	private int taskID;
 	private TDTDateAndTime dateAndTime;
+	private String dateAndTimeParts;
 	private boolean isSkipNextWord;
 	private boolean[] isCommandDetails;
 	private String remainingWords;
 	private String[] parts;
-	private String dateAndTimeParts = "";
 	private ArrayList<String> prepositionWordsArr;
-	private int invertedCommas;
+	private int quotationMarks;
 	private int counter;
 	//private Logger logger = Logger.getLogger("TDTParser");
 	
@@ -45,7 +47,7 @@ public class TDTParser implements ITDTParser {
 		this.setCommandDetails("");
 		this.setTaskID(-1);
 		this.setPrepositionWords();
-		this.setInvertedCommas(0);
+		this.setQuotationMarks(0);
 		this.setCounter(0);
 		dateAndTimeParts = "";
 
@@ -89,18 +91,18 @@ public class TDTParser implements ITDTParser {
 				break;
 			case HELP :
 				help();
-				break;
+				return new HelpCommand(getCommandDetails());
 			case INVALID :
 				break;
 			default:
 				break;
 		}
-	//logger.log(Level.INFO, "end of parsing");
+		//logger.log(Level.INFO, "end of parsing");
 		return null;
 	}
 
 	/**
-	 * Default command is assumed to be ADD
+	 * Default command is ADD
 	 */
 	private COMMANDTYPE determineCommandType(String commandTypeString) {
 		if (commandTypeString == null) {
@@ -131,7 +133,7 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.EXIT;
 		} else if (commandTypeString.equalsIgnoreCase("help")) {
 			return COMMANDTYPE.HELP;
-		}else {
+		} else {
 			return COMMANDTYPE.ADD;
 		}
 	}
@@ -145,19 +147,19 @@ public class TDTParser implements ITDTParser {
 		}
 		parts = getRemainingWords().split(" ");
 		isCommandDetails = new boolean[parts.length];
-		setInvertedCommas(0);
+		setQuotationMarks(0);
 		setCounter(0);
-		for (int i = 0; i < parts.length; i++) {
+		for (int i=0; i<parts.length; i++) {
 			isCommandDetails[i] = true;
 			String checkWord = parts[i];
-			if (checkWord.contains("\"") && (getInvertedCommas() == 0)) {
-				setInvertedCommas(1);
+			if (checkWord.contains("\"") && (getQuotationMarks() == 0)) {
+				setQuotationMarks(1);
 			}
-			if (invertedCommas!= 0) {
+			if (getQuotationMarks()!= 0) {
 				setCounter(getCounter()+1);
 				specialAdd(checkWord , i);
-				if (getInvertedCommas() == 2) {
-					setInvertedCommas(0);
+				if (getQuotationMarks() == 2) {
+					setQuotationMarks(0);
 				}
 			} else {
 				usualAdd(i, checkWord);
@@ -173,12 +175,14 @@ public class TDTParser implements ITDTParser {
 	private void done() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
+			// Only taskID OR labelName 
 			if (parts.length == 1) {
 				if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
 				} else {
 					setLabelName(parts[0]);
 				}
+			// Both taskID AND labelName
 			} else if (parts.length == 2) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
@@ -190,6 +194,7 @@ public class TDTParser implements ITDTParser {
 					setTaskID(-1);
 					setLabelName(" ");
 				}
+			// Invalid
 			} else {
 				setTaskID(-1);
 				setLabelName(" ");
@@ -201,21 +206,33 @@ public class TDTParser implements ITDTParser {
 		String details = "";
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			if (parts[0].matches("\\d+")) {
-				setTaskID(Integer.parseInt(parts[0]));
-				for (int i=1; i<parts.length; i++) {
-					details += parts[i] + " ";
+			// Only taskID or labelName or invalid inputs
+			if (parts.length == 1) {
+				if (parts[0].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[0]));
+				} else {
+					setCommandDetails(parts[0]);
 				}
-				setCommandDetails(details.trim());
 			} else if (parts.length > 1) {
-				if (parts[1].matches("\\d+")) {
+				// taskID followed by date and time
+				if (parts[0].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[0]));
+					if (parts.length > 1) {
+						for (int i=1; i<parts.length; i++) {
+							details += parts[i] + " ";
+						}
+					}
+				// labelName, taskID followed by date and time
+				} else if (parts[1].matches("\\d+")) {
 					setLabelName(parts[0]);
 					setTaskID(Integer.parseInt(parts[1]));
-					for (int i=2; i<parts.length; i++) {
-						details += parts[i] + " ";
+					if (parts.length > 2) {
+						for (int i=2; i<parts.length; i++) {
+							details += parts[i] + " ";
+						}
 					}
-					setCommandDetails(details.trim());
 				}
+				setCommandDetails(details.trim());
 			}
 		}
 	}
@@ -224,12 +241,14 @@ public class TDTParser implements ITDTParser {
 		boolean isValidEdit = false;
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
+			// taskID then details. 
 			if (parts[0].matches("\\d+")) {
 				setTaskID(Integer.parseInt(parts[0]));
 				if (parts.length > 1) {
 					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
 					isValidEdit = true;
 				}
+			// labelName, taskID, then details.
 			} else if (parts.length > 1) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
@@ -248,6 +267,7 @@ public class TDTParser implements ITDTParser {
 	private void delete() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
+			// Only taskID or labelName
 			if (parts.length == 1) {
 				if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
@@ -255,6 +275,7 @@ public class TDTParser implements ITDTParser {
 					setLabelName(parts[0]);
 				}
 			}
+			// Both taskID and labelName
 			else if (parts.length == 2) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
@@ -266,6 +287,7 @@ public class TDTParser implements ITDTParser {
 					setTaskID(-1);
 					setLabelName(" ");
 				}
+			// Invalid. 
 			} else {
 				setTaskID(-1);
 				setLabelName(" ");
@@ -290,12 +312,10 @@ public class TDTParser implements ITDTParser {
 	}
 
 	private void help() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	private void exit() {
-		// TODO Auto-generated method stub
 		
 	}
 //------------------------------ Other Methods -----------------------------------------------
@@ -307,7 +327,7 @@ public class TDTParser implements ITDTParser {
 	}
 
 	/**
-	 * This function gets the first word / Command word of the userCommand
+	 * This function gets the first word (CommandWord) of the userCommand
 	 */
 	private static String getFirstWord(String userCommand) {
 		if(userCommand.indexOf(" ") == -1) {
@@ -343,31 +363,31 @@ public class TDTParser implements ITDTParser {
 	}
 
 	/**
-	 * This function does the ADD for words contained inside the " " which will
-	 * all be included commandDetails.
+	 * This function does the ADD for words contained inside the " ".
+	 * All the words will be included in commandDetails.
 	 */
 	private void specialAdd(String checkWord, int i) {
 		if (checkWord.contains("\"")) {
 			String check = checkWord.replaceAll("[^\"]", "");
 			// words after the first "
-			if (getCounter() > 1 && getInvertedCommas() > 0) {
+			if (getCounter() > 1 && getQuotationMarks() > 0) {
 				// second "
-				if (check.length()== 1 && getInvertedCommas()== 1) {
-					setInvertedCommas(0);
+				if (check.length()== 1 && getQuotationMarks()== 1) {
+					setQuotationMarks(0);
 					setCounter(0);
 				// more than 1 " in a word
 				} else if (check.length() > 1) {
 					int num = check.length()%2;
 					if (num==0) {
-						setInvertedCommas(1);
+						setQuotationMarks(1);
 					} else if (num==1) {
-						setInvertedCommas(0);
+						setQuotationMarks(0);
 						setCounter(0);
 					}
 				}
 			// first word has 2 "
 			} else if ( getCounter() == 1 && (check.length()==2)) {
-				setInvertedCommas(0);
+				setQuotationMarks(0);
 				setCounter(0);
 			}
 			parts[i] = checkWord.replace("\"", "");
@@ -397,9 +417,10 @@ public class TDTParser implements ITDTParser {
 	
 	/**
 	 * This function completes the commandDetails for an input that contains a date format
-	 * such as 4 August 2014 and 4 Aug. Date Month Year / Date Month
+	 * with the month spelled out. Eg. 4 August 2014 and 4 Aug. 
 	 */
 	private void completeMonthDetails(int i) {
+		// checks it the word before the month is a number (date)
 		if ((i>0) && parts[i-1].matches("\\d+")) {
 			if ((i>1) && getPrepositionWords().contains(parts[i-2])) {
 				isCommandDetails[i-2] = false;
@@ -407,6 +428,7 @@ public class TDTParser implements ITDTParser {
 			isCommandDetails[i] = false;
 			isCommandDetails[i-1] = false;
 			parts[i] = "~" + parts[i];
+			// checks if the word after the month is a number (year)
 			if ((i+1 < parts.length) && (parts[i+1].matches("\\d+"))) {
 				isCommandDetails[i+1] = false;
 				parts[i+1] = "~" + parts[i+1];
@@ -428,7 +450,7 @@ public class TDTParser implements ITDTParser {
 	}
 	
 	/**
-	 * This function completes the commandDetails for a words of days such as
+	 * This function completes the commandDetails for words that are days such as
 	 * Monday Tuesday etc
 	 */
 	private void completeDayDetails(int i) {
@@ -494,8 +516,7 @@ public class TDTParser implements ITDTParser {
 	
 	/**
 	 * This function checks if the command input is of priority
-	 * Presence of '!' shows priority. 
-	 * '!' will not appear in commandDetails. 
+	 * Presence of '!' shows priority and '!' will not appear in commandDetails. 
 	 */
 	private void isPriority(String word, int i) {
 		if (word.contains("!")) {
@@ -510,7 +531,7 @@ public class TDTParser implements ITDTParser {
 	}
 
 	/**
-	 * This function sets the list of 'Preposition' words used in
+	 * This function sets the list of "Preposition" words used in
 	 * day, date, time checking.
 	 */
 	public void setPrepositionWords() {
@@ -595,19 +616,19 @@ public class TDTParser implements ITDTParser {
 		this.isSkipNextWord = isSkipNextWord;
 	}
 
-	public int getInvertedCommas() {
-		return invertedCommas;
+	private int getQuotationMarks() {
+		return quotationMarks;
 	}
 
-	public void setInvertedCommas(int invertedCommas) {
-		this.invertedCommas = invertedCommas;
+	private void setQuotationMarks(int quotationMarks) {
+		this.quotationMarks = quotationMarks;
 	}
 
-	public int getCounter() {
+	private int getCounter() {
 		return counter;
 	}
 
-	public void setCounter(int counter) {
+	private void setCounter(int counter) {
 		this.counter = counter;
 	}
 	
