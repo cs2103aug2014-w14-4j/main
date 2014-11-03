@@ -1,5 +1,2 @@
 1
 TODOTHIS
-TODOTHIS	 buy eggs	false	false	3/11/2014	4/12/2014	null	null	null
-TODOTHIS	 buy eksadksakdk	false	false	null	null	10:00	null	null
-TODOTHIS	 buy eggs	false	false	null	null	22:00	null	null

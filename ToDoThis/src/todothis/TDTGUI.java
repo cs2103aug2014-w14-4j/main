@@ -81,11 +81,11 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .heading{ border-left: 1px solid #5882FA;border-right: 1px solid #5882FA; background: #BDBDBD}"
 			+ ".datagrid table .heading th{ border: 1px solid white;}"
-			+ ".datagrid table .overdue td{ background: #FE2E2E; color: white}"
-			+ ".datagrid table .priority td{ background: #F781D8; color: white }"
+			+ ".datagrid table .overdue td{ background: #F781D8; color: white}"
+			+ ".datagrid table .priority td{ background: #FE2E2E; color: white }"
 			+ ".datagrid table tr .datetime{ font-size:12px }"
 			+ ".datagrid table .target td{ border: 3px solid #EEB111 }"
-			+ ".datagrid table .prioritytarget td{ border: 3px solid #EEB111; background: #F781D8; color: white }"
+			+ ".datagrid table .prioritytarget td{ border: 3px solid #EEB111; background: #FE2E2E; color: white }"
 			+ ".datagrid table .alttarget { border: 3px solid #EEB111;background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .taskId { width: 10%; }"
 			+ ".datagrid table .dateTime { width: 30%; }"
@@ -318,6 +318,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	private void initCommandField() {
+		commandField.setPreferredSize(new Dimension(100, 27));
 		commandField.getDocument().addDocumentListener(this);
 		InputMap im = commandField.getInputMap();
 		ActionMap am = commandField.getActionMap();

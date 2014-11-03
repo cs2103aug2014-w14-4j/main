@@ -162,7 +162,7 @@ public class TDTKeyListener implements KeyListener {
 			}
 			break;
 		case KeyEvent.VK_F1:
-			gui.setBounds(300, 0, 500, 110);
+			gui.setBounds(300, 0, 500, 120);
 			break;
 		case KeyEvent.VK_F2:
 			gui.setBounds(300, 100, 800, 600);
