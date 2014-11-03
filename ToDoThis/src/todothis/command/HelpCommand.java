@@ -28,7 +28,7 @@ public class HelpCommand extends Command{
 			return helpRedo();
 		case SEARCH:
 			return helpSearch();
-		case DISPLAY:
+		case SHOW:
 			return helpDisplay();
 		case HIDE:
 			return helpHide();
@@ -104,8 +104,8 @@ public class HelpCommand extends Command{
 			return COMMANDTYPE.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("hide")) {
 			return COMMANDTYPE.HIDE;
-		} else if (commandTypeString.equalsIgnoreCase("display")) {
-			return COMMANDTYPE.DISPLAY;
+		} else if (commandTypeString.equalsIgnoreCase("show")) {
+			return COMMANDTYPE.SHOW;
 		} else if (commandTypeString.equalsIgnoreCase("delete")) {
 			return COMMANDTYPE.DELETE;
 		} else if (commandTypeString.equalsIgnoreCase("label")) {

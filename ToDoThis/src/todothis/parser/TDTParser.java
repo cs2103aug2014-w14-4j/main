@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import todothis.command.AddCommand;
 import todothis.command.Command;
 import todothis.command.DeleteCommand;
-import todothis.command.DisplayCommand;
+import todothis.command.ShowCommand;
 import todothis.command.DoneCommand;
 import todothis.command.EditCommand;
 import todothis.command.HideCommand;
@@ -32,7 +32,6 @@ public class TDTParser implements ITDTParser {
 	private String[] parts;
 	private String dateAndTimeParts = "";
 	private ArrayList<String> prepositionWordsArr;
-	private ArrayList<String> dayWordsArr;
 	private int invertedCommas;
 	private int counter;
 	//private Logger logger = Logger.getLogger("TDTParser");
@@ -46,12 +45,11 @@ public class TDTParser implements ITDTParser {
 		this.setCommandDetails("");
 		this.setTaskID(-1);
 		this.setPrepositionWords();
-		this.setDayWordsArr();
 		this.setInvertedCommas(0);
 		this.setCounter(0);
 		dateAndTimeParts = "";
 
-		this.setCommandType(determineCommandType(getFirstWord(userCommand)));
+		this.setCommandType(determineCommandType(getFirstWord(userCommand.trim())));
 		this.setRemainingWords(removeFirstWord(userCommand));
 		switch(getCommandType()) {
 			case ADD :
@@ -74,9 +72,9 @@ public class TDTParser implements ITDTParser {
 			case SEARCH :
 				search();
 				return new SearchCommand(getCommandDetails());
-			case DISPLAY :
-				display();
-				return new DisplayCommand(getCommandDetails());
+			case SHOW :
+				show();
+				return new ShowCommand(getCommandDetails());
 			case HIDE :
 				hide();
 				return new HideCommand(getCommandDetails());
@@ -86,6 +84,12 @@ public class TDTParser implements ITDTParser {
 			case REMIND :
 				remind();
 				return new RemindCommand(getLabelName(), getTaskID(), getCommandDetails());
+			case EXIT :
+				exit();
+				break;
+			case HELP :
+				help();
+				break;
 			case INVALID :
 				break;
 			default:
@@ -94,7 +98,7 @@ public class TDTParser implements ITDTParser {
 	//logger.log(Level.INFO, "end of parsing");
 		return null;
 	}
-	
+
 	/**
 	 * Default command is assumed to be ADD
 	 */
@@ -103,17 +107,17 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.INVALID;
 		} else if (commandTypeString.equalsIgnoreCase("hide")) {
 			return COMMANDTYPE.HIDE;
-		} else if (commandTypeString.equalsIgnoreCase("display")) {
-			return COMMANDTYPE.DISPLAY;
-		} else if (commandTypeString.equalsIgnoreCase("delete")) {
+		} else if (commandTypeString.equalsIgnoreCase("show")) {
+			return COMMANDTYPE.SHOW;
+		} else if (commandTypeString.equalsIgnoreCase("delete") || commandTypeString.equalsIgnoreCase("de")) {
 			return COMMANDTYPE.DELETE;
-		} else if (commandTypeString.equalsIgnoreCase("label")) {
+		} else if (commandTypeString.equalsIgnoreCase("label") || commandTypeString.equalsIgnoreCase("la")) {
 			return COMMANDTYPE.LABEL;
 		} else if (commandTypeString.equalsIgnoreCase("edit")) {
 			return COMMANDTYPE.EDIT;
 		} else if (commandTypeString.equalsIgnoreCase("add")) {
 			return COMMANDTYPE.ADD;
-		} else if (commandTypeString.equalsIgnoreCase("search")) {
+		} else if (commandTypeString.equalsIgnoreCase("search") || commandTypeString.equalsIgnoreCase("se")) {
 			return COMMANDTYPE.SEARCH;
 		} else if (commandTypeString.equalsIgnoreCase("undo")) {
 			return COMMANDTYPE.UNDO;
@@ -121,8 +125,12 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.DONE;
 		} else if (commandTypeString.equalsIgnoreCase("redo")) {
 			return COMMANDTYPE.REDO;
-		} else if (commandTypeString.equalsIgnoreCase("remind")) {
+		} else if (commandTypeString.equalsIgnoreCase("remind") || commandTypeString.equalsIgnoreCase("rem")) {
 			return COMMANDTYPE.REMIND;
+		} else if (commandTypeString.equalsIgnoreCase("exit")) {
+			return COMMANDTYPE.EXIT;
+		} else if (commandTypeString.equalsIgnoreCase("help")) {
+			return COMMANDTYPE.HELP;
 		}else {
 			return COMMANDTYPE.ADD;
 		}
@@ -171,15 +179,20 @@ public class TDTParser implements ITDTParser {
 				} else {
 					setLabelName(parts[0]);
 				}
-			}
-			if (parts.length == 2) {
+			} else if (parts.length == 2) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
 					setLabelName(parts[0]);
-				} else {
+				} else if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
 					setLabelName(parts[1]);
+				} else {
+					setTaskID(-1);
+					setLabelName(" ");
 				}
+			} else {
+				setTaskID(-1);
+				setLabelName(" ");
 			}
 		}
 	}
@@ -242,19 +255,25 @@ public class TDTParser implements ITDTParser {
 					setLabelName(parts[0]);
 				}
 			}
-			if (parts.length == 2) {
+			else if (parts.length == 2) {
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
 					setLabelName(parts[0]);
-				} else {
+				} else if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
 					setLabelName(parts[1]);
+				} else {
+					setTaskID(-1);
+					setLabelName(" ");
 				}
+			} else {
+				setTaskID(-1);
+				setLabelName(" ");
 			}
 		}
 	}
 	
-	private void display() {
+	private void show() {
 		setCommandDetails(getRemainingWords());
 	}
 	
@@ -270,6 +289,15 @@ public class TDTParser implements ITDTParser {
 		setLabelName(getRemainingWords());
 	}
 
+	private void help() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void exit() {
+		// TODO Auto-generated method stub
+		
+	}
 //------------------------------ Other Methods -----------------------------------------------
 	/**
 	 * This function removes the first word of the userCommand. 
@@ -503,22 +531,6 @@ public class TDTParser implements ITDTParser {
 		this.prepositionWordsArr = prepositionWords;
 	}
 	
-	private ArrayList<String> getDayWordsArr() {
-		return dayWordsArr;
-	}
-
-	/**
-	 * This function sets the list of words used in the checking of days.
-	 */
-	private void setDayWordsArr() {
-		ArrayList<String> dayWordsArr = new ArrayList<String>();
-		dayWordsArr.add("this");
-		dayWordsArr.add("the");
-		dayWordsArr.add("next");
-		dayWordsArr.add("following");
-		this.dayWordsArr = dayWordsArr;
-	}
-	
 	private String getRemainingWords() {
 		return remainingWords;
 	}
@@ -598,4 +610,5 @@ public class TDTParser implements ITDTParser {
 	public void setCounter(int counter) {
 		this.counter = counter;
 	}
+	
 }
