@@ -336,10 +336,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			numOfDaysToAdd++;
 		} else if (checkDay(parts[a]) == 10) {
 			if (thisOrNextOrFollowing == 2) {// next
-				numOfDaysToAdd = numOfDaysToAdd + 1;
+				numOfDaysToAdd = numOfDaysToAdd + (1 * nextCount);
 
 			} else if (thisOrNextOrFollowing == 3) {// following
-				numOfDaysToAdd = numOfDaysToAdd + 2;
+				numOfDaysToAdd = numOfDaysToAdd + (2 * followingCount);
 			}
 		}
 		return numOfDaysToAdd;
@@ -1436,23 +1436,29 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 							&& arg0.getStartTime().equals(this.getStartTime())) {
 						return true;
 					} else {
-						/*
 						if(!arg0.getEndDate().equals("")){
 							if(compareToDate(this.getStartDate(), arg0.getStartDate()) == -1 &&
 									compareToDate(this.getStartDate(), arg0.getEndDate()) == 1){
 								return true;
-							}
-							if(compareToDate(this.getStartDate(), arg0.getStartDate()) == 0){
-								if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1){
+							} else if(compareToDate(this.getStartDate(), arg0.getStartDate()) == 0 &&
+									compareToDate(this.getStartDate(), arg0.getEndDate()) == 0){
+								if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1 && 
+										compareToTime(this.getStartTime(), arg0.getEndTime()) == 1){
 									return true;
 								}
-							}
-							if(compareToDate(this.getStartDate(), arg0.getEndDate()) == 0){
-								if(compareToTime(this.getStartTime(), arg0.getEndTime()) == 1){
-									return true;
+							}else{
+								if(compareToDate(this.getStartDate(), arg0.getStartDate()) == 0){
+									if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1){
+										return true;
+									}
+								}
+								if(compareToDate(this.getStartDate(), arg0.getEndDate()) == 0){
+									if(compareToTime(this.getStartTime(), arg0.getEndTime()) == 1){
+										return true;
+									}
 								}
 							}
-						}*/
+						}
 					}
 				} 
 				if ((!this.getEndDate().equals("null") && !this
