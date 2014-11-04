@@ -171,6 +171,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				storeDecodedDate(endTimeDate, deadlineEndTimeDate, decodedDate);
 			}
 		}
+		// case when today from 1pm to 10pm
+		if (!startDate.equals("null") && endDate.equals("null")
+				&& !startTime.equals("null") && !endTime.equals("null")) {
+			endDate = startDate;
+		}
 	}
 
 	private String adjustmentToDate(boolean endTimeDate, String decodedDate,
@@ -594,10 +599,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		 * displayString + "<br>" + displayDateTime(isDeadline);
 		 */
 
-		
 		return displayDateTime();
-		
-		
+
 	}
 
 	// -------------------------------Time Related
@@ -1443,34 +1446,43 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 							&& arg0.getStartTime().equals(this.getStartTime())) {
 						return true;
 					} else {
-						if(!arg0.getEndDate().equals("null")){
-							if(compareToDate(this.getStartDate(), arg0.getStartDate()) == -1 &&
-									compareToDate(this.getStartDate(), arg0.getEndDate()) == 1){
+						if (!arg0.getEndDate().equals("null")) {
+							if (compareToDate(this.getStartDate(),
+									arg0.getStartDate()) == -1
+									&& compareToDate(this.getStartDate(),
+											arg0.getEndDate()) == 1) {
 								return true;
-							} else if(compareToDate(this.getStartDate(), arg0.getStartDate()) == 0 &&
-									compareToDate(this.getStartDate(), arg0.getEndDate()) == 0){
-								if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1 && 
-										compareToTime(this.getStartTime(), arg0.getEndTime()) == 1){
+							} else if (compareToDate(this.getStartDate(),
+									arg0.getStartDate()) == 0
+									&& compareToDate(this.getStartDate(),
+											arg0.getEndDate()) == 0) {
+								if (compareToTime(this.getStartTime(),
+										arg0.getStartTime()) == -1
+										&& compareToTime(this.getStartTime(),
+												arg0.getEndTime()) == 1) {
 									return true;
 								}
-							}else{
-								if(compareToDate(this.getStartDate(), arg0.getStartDate()) == 0){
-									if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1){
+							} else {
+								if (compareToDate(this.getStartDate(),
+										arg0.getStartDate()) == 0) {
+									if (compareToTime(this.getStartTime(),
+											arg0.getStartTime()) == -1) {
 										return true;
 									}
 								}
-								if(compareToDate(this.getStartDate(), arg0.getEndDate()) == 0){
-									if(compareToTime(this.getStartTime(), arg0.getEndTime()) == 1){
+								if (compareToDate(this.getStartDate(),
+										arg0.getEndDate()) == 0) {
+									if (compareToTime(this.getStartTime(),
+											arg0.getEndTime()) == 1) {
 										return true;
 									}
 								}
 							}
 						}
 					}
-				} 
-				if ((!this.getEndDate().equals("null") && !this
-						.getEndTime().equals("null"))
-						&& !arg0.getStartDate().equals("null")) {
+				}
+				if ((!this.getEndDate().equals("null") && !this.getEndTime()
+						.equals("null")) && !arg0.getStartDate().equals("null")) {
 					// condition where this->has SD ED ST ET and arg0->has SD
 					// may have ED may have ST ET
 					if (compareToDate(this.getStartDate(), arg0.getStartDate()) == 1
@@ -1523,9 +1535,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 							// argtime = 1000/0900
 							return true;
 						}
-						if(!arg0.getEndTime().equals("null")){
-							if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1 &&
-									compareToTime(this.getEndTime(), arg0.getEndTime()) == 1){
+						if (!arg0.getEndTime().equals("null")) {
+							if (compareToTime(this.getStartTime(),
+									arg0.getStartTime()) == -1
+									&& compareToTime(this.getEndTime(),
+											arg0.getEndTime()) == 1) {
 								return true;
 							}
 						}
@@ -1584,9 +1598,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 											arg0.getEndTime()) == 0)) {
 								return true;
 							}
-							if(!arg0.getStartTime().equals("null")){
-								if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1 &&
-										compareToTime(this.getEndTime(), arg0.getEndTime()) == 1){
+							if (!arg0.getStartTime().equals("null")) {
+								if (compareToTime(this.getStartTime(),
+										arg0.getStartTime()) == -1
+										&& compareToTime(this.getEndTime(),
+												arg0.getEndTime()) == 1) {
 									return true;
 								}
 							}
@@ -1597,33 +1613,46 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 										arg0.getEndDate()) == 1) {
 							return true;
 						}
-						//when startdate = arg0startdate & enddate<arg0enddate
-						if(compareToDate(this.getStartDate(), arg0.getStartDate()) == 0 && 
-								compareToDate(this.getEndDate(), arg0.getEndDate()) == 1) {
-							if(!arg0.getStartTime().equals("null")){
-								if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1){
+						// when startdate = arg0startdate & enddate<arg0enddate
+						if (compareToDate(this.getStartDate(),
+								arg0.getStartDate()) == 0
+								&& compareToDate(this.getEndDate(),
+										arg0.getEndDate()) == 1) {
+							if (!arg0.getStartTime().equals("null")) {
+								if (compareToTime(this.getStartTime(),
+										arg0.getStartTime()) == -1) {
 									return true;
 								}
 							}
 						}
-						
-						//when startdate > arg0startdate & enddate = arg0enddate
-						if(compareToDate(this.getStartDate(), arg0.getStartDate()) == -1 && 
-								compareToDate(this.getEndDate(), arg0.getEndDate()) == 0) {
-							if(!arg0.getEndTime().equals("null")){
-								if(compareToTime(this.getEndTime(), arg0.getEndTime()) == 1){
+
+						// when startdate > arg0startdate & enddate =
+						// arg0enddate
+						if (compareToDate(this.getStartDate(),
+								arg0.getStartDate()) == -1
+								&& compareToDate(this.getEndDate(),
+										arg0.getEndDate()) == 0) {
+							if (!arg0.getEndTime().equals("null")) {
+								if (compareToTime(this.getEndTime(),
+										arg0.getEndTime()) == 1) {
 									return true;
 								}
 							}
 						}
-								
-						//when startdate = arg0startdate & enddate = arg0enddate
-						//arg0 start ----- end arg0
-						if(compareToDate(this.getStartDate(), arg0.getStartDate()) == 0 &&
-								compareToDate(this.getEndDate(), arg0.getEndDate()) == 0){
-							if(!arg0.getStartTime().equals("null") && !arg0.getEndTime().equals("null")){
-								if(compareToTime(this.getStartTime(), arg0.getStartTime()) == -1 &&
-										compareToTime(this.getEndTime(), arg0.getEndTime()) == 1){
+
+						// when startdate = arg0startdate & enddate =
+						// arg0enddate
+						// arg0 start ----- end arg0
+						if (compareToDate(this.getStartDate(),
+								arg0.getStartDate()) == 0
+								&& compareToDate(this.getEndDate(),
+										arg0.getEndDate()) == 0) {
+							if (!arg0.getStartTime().equals("null")
+									&& !arg0.getEndTime().equals("null")) {
+								if (compareToTime(this.getStartTime(),
+										arg0.getStartTime()) == -1
+										&& compareToTime(this.getEndTime(),
+												arg0.getEndTime()) == 1) {
 									return true;
 								}
 							}
