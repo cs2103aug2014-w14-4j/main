@@ -92,7 +92,11 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			+ ".datagrid table .dateTime { width: 30%; }"
 			+ ".datagrid table .labelhead { width: 10%; }"
 			+ ".datagrid table .done td{ background: #04B404; text-decoration: line-through}"
-			+ ".label{ color: #0174DF; font-size:15px font-family: Candara;}";
+			+ ".label{ color: #0174DF; font-size:15px font-family: Candara;}"
+			+ ".helptable td { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
+			+ ".helptable tr { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
+			+ ".helptable th { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }";
+			
 	/**
 	 * Launch the application.
 	 */
