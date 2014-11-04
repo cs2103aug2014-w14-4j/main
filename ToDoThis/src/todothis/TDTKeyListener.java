@@ -1,14 +1,19 @@
 package todothis;
 
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import todothis.command.AddCommand;
 import todothis.command.Command;
 import todothis.command.EditCommand;
+import todothis.command.HideCommand;
 import todothis.command.RedoCommand;
 import todothis.command.SearchCommand;
+import todothis.command.ShowCommand;
 import todothis.command.UndoCommand;
 import todothis.dateandtime.TDTDateAndTime;
 import todothis.logic.Task;
@@ -31,6 +36,25 @@ public class TDTKeyListener implements KeyListener {
 			String feedback = gui.getLogic().executeCommand(undo);
 			gui.updateGUI(feedback, gui.displayTask(null));
 			scrollTo(prevScrollVal);
+		}
+		
+		if (arg0.isControlDown() && keyCode == KeyEvent.VK_R) {
+			Toolkit.getDefaultToolkit().beep();
+			JOptionPane.showMessageDialog(null, "REMINDER!\nTask: Jermyn's SHOWTIME!!! =).");
+		}
+		
+		if (arg0.isAltDown()  && keyCode == KeyEvent.VK_S) {
+			ShowCommand show = new ShowCommand("");
+			String feedback = gui.getLogic().executeCommand(show);
+			gui.updateGUI(feedback, gui.displayTask(null));
+			scrollTo(0);
+		}
+		
+		if (arg0.isAltDown() && keyCode == KeyEvent.VK_H) {
+			HideCommand hide = new HideCommand("");
+			String feedback = gui.getLogic().executeCommand(hide);
+			gui.updateGUI(feedback, gui.displayTask(null));
+			scrollTo(0);
 		}
 
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Y) {

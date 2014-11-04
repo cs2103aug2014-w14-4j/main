@@ -12,6 +12,11 @@ import todothis.storage.TDTStorage;
 
 
 public class AddCommand extends Command {
+	private static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
+	private static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
+	private static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
+	private static final String MESSAGE_ADD_FEEDBACK = "Task added to %s.";
+	
 	private int taskID;
 	private String labelName;
 	private String commandDetails;
@@ -39,27 +44,16 @@ public class AddCommand extends Command {
 		TDTDateAndTime dnt = getDateAndTime();
 		
 		if(!isValidDateTimeRange(dnt)) {
-			return "Invalid date/time format.";
+			return MESSAGE_INVALID_DATE_TIME_FORMAT;
 		}
 		
-		//WTF???
-		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")) {
-			if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
-				return "Invalid end date! End date should be after start date!";
-			} else if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
-				if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
-					if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
-						return "Invalid end time! End Time should be after start time!";
-					}
-				}
-			}
-		} else if((dnt.getStartDate().equals("null") || dnt.getEndDate().equals("null")) && 
-				!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
-			if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
-				return "Invalid end time! End Time should be after start time!";
-			}
+		if(!isValidStartEndDate(dnt)) {
+			return MESSAGE_INVALID_END_DATE;
 		}
 		
+		if(!isValidStartEndTime(dnt)) {
+			return MESSAGE_INVALID_END_TIME;
+		}
 		
 		checkForClash(task, storage.getTaskIterator());
 		storage.addTask(task);
@@ -67,9 +61,30 @@ public class AddCommand extends Command {
 		storage.insertToUndoStack(this);
 		
 		//Proper return statement!
-		return gotClashes?this.getFeedback():"Task added.";
+		return gotClashes?this.getFeedback():String.format(MESSAGE_ADD_FEEDBACK,
+															storage.getCurrLabel());
 	}
 	
+	private boolean isValidStartEndTime(TDTDateAndTime dnt) {
+		if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
+			if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
+				if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean isValidStartEndDate(TDTDateAndTime dnt) {
+		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")) {
+			if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private void checkForClash(Task target, Iterator<Task> iter) {
 		while(iter.hasNext()) {
 			Task task = iter.next();
@@ -79,7 +94,8 @@ public class AddCommand extends Command {
 		}
 		if(!clashedTask.isEmpty()) {
 			gotClashes = true;
-			String feedback = "Clashes detected. Task added.\n" + clashedTask.size() 
+			String feedback = "Clashes detected. " + String.format(MESSAGE_ADD_FEEDBACK,
+					target.getLabelName()) + "\n" + clashedTask.size() 
 					+ " task(s) found to have same time range on " 
 					+ target.getDateAndTime().getStartDate();
 			this.setFeedback(feedback);

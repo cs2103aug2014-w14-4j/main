@@ -56,7 +56,7 @@ public class EditCommand extends Command {
 				storage.insertToUndoStack(this);
 				return "Task edited";
 			} else {
-				return "error. Invalid task number.";
+				return "Invalid Command. Label does not exist or invalid task number.";
 			}
 		}
 
@@ -78,14 +78,14 @@ public class EditCommand extends Command {
 					storage.insertToUndoStack(this);
 					return "Task edited";
 				} else {
-					return "error. Invalid task number.";
+					return "Invalid Command. Label does not exist or invalid task number.";
 				}
 			} else {
-				return "Error. Label does not exist.";
+				return "Invalid Command. Label does not exist or invalid task number.";
 			}
 		}
 		
-		return "Error. Invalid edit command.";
+		return "Invalid Command";
 	}
 	
 

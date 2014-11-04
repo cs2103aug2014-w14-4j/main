@@ -164,6 +164,7 @@ public class TDTStorage implements ITDTStorage {
 		autoWords.add("REMIND");
 		autoWords.add("EXIT");
 		autoWords.add("HELP");
+		autoWords.add("TODOTHIS");
 	}
 	
 	public ArrayList<String> copyHideList() {

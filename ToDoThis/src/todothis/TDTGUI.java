@@ -208,7 +208,14 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 	
 	private String checkIfHaveReminder(String remind) {
-		return !remind.equals("null") ? "Reminder: " + remind : "";
+		String res = "";
+		if(!remind.equals("null")) {
+			String[] temp = remind.split(" ");
+			res = res + TDTDateAndTime.changeDateFormatDisplay(temp[0]) + " ";
+			res = res + TDTDateAndTime.changeTimeFormatDisplay(temp[1]);
+			res = "Reminder: " + res;
+		}
+		return res;
 	}
 
 	String displaySearch(ArrayList<Task> searched) {
@@ -382,7 +389,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		taskPane.setText(displayTask(null));
 		taskLabel.setText(" Current Label: "
 				+ logic.getCurrLabel());
-		return "Todo-This ready!";
+		return "Todo-This ready!\nType \"help\" for more information.";
 	}
 	
 	//--------------------------Getters & Setters------------------------------------

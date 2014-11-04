@@ -45,7 +45,7 @@ public class DoneCommand extends Command {
 				storage.insertToUndoStack(this);
 				return "Tasks under " + label + "are done.";
 			} else {
-				return "Error. Label does not exist.";
+				return "Invalid Command. Label does not exist or invalid task number.";
 			}
 		}
 		
@@ -59,7 +59,7 @@ public class DoneCommand extends Command {
 				storage.insertToUndoStack(this);
 				return "Task done";
 			} else {
-				return "error. Invalid task number.";
+				return "Invalid Command. Label does not exist or invalid task number.";
 			}
 		}
 		
@@ -74,14 +74,14 @@ public class DoneCommand extends Command {
 					storage.insertToUndoStack(this);
 					return "Task done";
 				} else {
-					return "error. Invalid task number.";
+					return "Invalid Command. Label does not exist or invalid task number.";
 				}
 			} else {
-				return "Error. Label does not exist.";
+				return "Invalid Command. Label does not exist or invalid task number.";
 			}
 		}
 		//Shouldnt reach here
-		return "Error. Invalid done.";
+		return "Invalid command.";
 	}
 	
 	@Override

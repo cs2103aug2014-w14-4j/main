@@ -47,13 +47,13 @@ public class RemindCommand extends Command {
 					
 					return "Reminder set at " + remindDateTime;
 				} else {
-					return "Invalid date/time for reminder.";
+					return "Invalid command. Invalid date/time for reminder.";
 				}
 			} else {
-				return "Invalid taskId.";
+				return "Invalid command. Invalid taskId.";
 			}
 		} else {
-			return "Invalid label name. Label does not exist.";
+			return "Invalid command.Invalid label name.";
 		}
 	}
 
@@ -74,10 +74,10 @@ public class RemindCommand extends Command {
 				storage.insertToUndoStack(this);
 				return "Reminder at " + dateTime +  " removed.";
 			} else {
-				return "Invalid taskId.";
+				return "Invalid command. Invalid taskId.";
 			}
 		} else {
-			return "Invalid label name. Label does not exist.";
+			return "Invalid command.Invalid label name.";
 		}
 	}
 
