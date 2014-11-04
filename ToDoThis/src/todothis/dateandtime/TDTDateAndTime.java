@@ -504,8 +504,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	}
 
 	// -------------------------------------------DISPLAY------------------------------------------------
-	public static String changeDateFormatDisplay(String date)
-			throws ParseException {
+	public static String changeDateFormatDisplay(String date) {
 		final String OLD_FORMAT = "dd/MM/yyyy";
 		final String NEW_FORMAT = "d MMM yyyy";
 
@@ -513,14 +512,19 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		String newDateString;
 
 		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-		Date d = sdf.parse(oldDateString);
+		Date d = new Date();
+		try {
+			d = sdf.parse(oldDateString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		sdf.applyPattern(NEW_FORMAT);
 		newDateString = sdf.format(d);
 		return newDateString;
 	}
 
-	public static String changeTimeFormatDisplay(String time)
-			throws ParseException {
+	public static String changeTimeFormatDisplay(String time) {
 		final String OLD_FORMAT = "HH:mm";
 		final String NEW_FORMAT = "h:mm a";
 
@@ -528,13 +532,19 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		String newTimeString;
 
 		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-		Date d = sdf.parse(oldTimeString);
+		Date d = new Date();
+		try {
+			d = sdf.parse(oldTimeString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		sdf.applyPattern(NEW_FORMAT);
 		newTimeString = sdf.format(d);
 		return newTimeString;
 	}
 
-	public String displayDateTime() throws ParseException {
+	public String displayDateTime() {
 		String dateAndTimeContents = "";
 		if (isDeadlineTask) {
 			dateAndTimeContents = dateAndTimeContents + "Due: ";
@@ -584,13 +594,10 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		 * displayString + "<br>" + displayDateTime(isDeadline);
 		 */
 
-		try {
-			return displayDateTime();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "";
+		
+		return displayDateTime();
+		
+		
 	}
 
 	// -------------------------------Time Related
@@ -1436,7 +1443,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 							&& arg0.getStartTime().equals(this.getStartTime())) {
 						return true;
 					} else {
-						if(!arg0.getEndDate().equals("")){
+						if(!arg0.getEndDate().equals("null")){
 							if(compareToDate(this.getStartDate(), arg0.getStartDate()) == -1 &&
 									compareToDate(this.getStartDate(), arg0.getEndDate()) == 1){
 								return true;
