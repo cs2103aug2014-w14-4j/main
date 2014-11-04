@@ -69,9 +69,9 @@ public class HelpCommand extends Command{
 	
 	private String helpAdd(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>ADD - input task</b>");
+		sb.append("<span color = purple><b>ADD - input task</b></span>");
 		sb.append("<br>");
-		sb.append("To add a task under current label: add taskDetails");
+		sb.append("<b>To add a task under current label</b>: add <span color = blue>taskDetails</span>");
 		sb.append("<br>");
 		sb.append("Note that the word 'add' can be omitted and the only required field is taskDetails");
 		sb.append("<br>");
@@ -83,124 +83,169 @@ public class HelpCommand extends Command{
 		sb.append("<br>");
 		sb.append("study in school from 6am - 8am on the following tuesday");
 		sb.append("<br>");
-		sb.append("Date and Time formats");
+		sb.append("<table class = helptable>");
+		sb.append("<caption>Date and Time formats</caption>");
+		sb.append("<tr>");
+	    sb.append("<th><b>Time</b></th>");
+	    sb.append("<th><b>Date</b></th>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>12 Hours Format</td>");
+	    sb.append("<td>27 October 2014 / 27 October 14</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>3pm</td>");
+	    sb.append("<td>27 Oct 2014 / 27 Oct 14</td>");
+	    sb.append("</tr>");
+	    sb.append("</table>");
+	    sb.append("<br>");
+	    sb.append("<br>");
+
+	    
 		
 		
 		return sb.toString();
 	}
 	private String helpDelete(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>DELETE - remove task completely</b>");
+		sb.append("<span color = purple><b>DELETE - remove task completely</b></span>");
 		sb.append("<br>");
-		sb.append("To delete task from the current label: delete taskID");
+		sb.append("<b>To delete task from the current label</b>: delete <span color = blue>taskID</span>");
 		sb.append("<br>");
-		sb.append("To delete task from a different label: delete labelName taskID");
+		sb.append("<b>To delete task from a different label</b>: delete <span color = blue>labelName</span> <span color = green>taskID</span>");
 		sb.append("<br>");
-		sb.append("To delete an entire label and its contents: delete labelName");
+		sb.append("<b>To delete an entire label and its contents</b>: delete <span color = blue>labelName</span>");
 		sb.append("<br>");
-		sb.append("To delete all labels and tasks: delete");
+		sb.append("<b>To delete all labels and tasks</b>: delete");
+		sb.append("<br>");
 		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpEdit(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>EDIT - change task details</b>");
+		sb.append("<span color = purple><b>EDIT - change task details</b></span>");
 		sb.append("<br>");
 		sb.append("Task details of the corresponding task ID will be auto completed for convenience");
 		sb.append("<br>");
-		sb.append("To edit task under current label: edit taskID detailsToBeChanged");
+		sb.append("<b>To edit task under current label</b>: edit taskID detailsToBeChanged");
 		sb.append("<br>");
-		sb.append("To edit a task under a different label: edit labelName taskID detailsToBeChanged");
+		sb.append("<b>To edit a task under a different label</b>: edit <span color = blue>labelName</span> <span color = green>taskID</span> <span color = orange>detailsToBeChanged</span>");
 		sb.append("<br>");	
+		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpLabel(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>LABEL - categorize tasks</b>");
+		sb.append("<span color = purple><b>LABEL - categorize tasks</b></span>");
 		sb.append("<br>");
 		sb.append("A valid label has to comprise of only one word");
 		sb.append("<br>");
-		sb.append("To create a new label: label labelName");
+		sb.append("<b>To create a new label</b>: label <span color = blue>labelName</span>");
 		sb.append("<br>");
-		sb.append("To change current directory to a different label: label labelName");
+		sb.append("<b>To change current directory to a different label</b>: label <span color = blue>labelName</span>");
 		sb.append("<br>");	
 		sb.append("Note that this is similar to creating a new label");
+		sb.append("<br>");
+		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpUndo(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>UNDO - reverse the effect of previous command</b>");
+		sb.append("<span color = purple><b>UNDO - reverse the effect of previous command</b></span>");
 		sb.append("<br>");
-		sb.append("Keyboard shortcut available: Ctrl + Z");
+		sb.append("<b>Keyboard shortcut available</b>: Ctrl + Z");
+		sb.append("<br>");
 		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpRedo(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>REDO - reverse the effect of undo</b>");
+		sb.append("<span color = purple><b>REDO - reverse the effect of undo</b></span>");
 		sb.append("<br>");
-		sb.append("Keyboard shortcut available: Ctrl + Y");
+		sb.append("<b>Keyboard shortcut available</b>: Ctrl + Y");
+		sb.append("<br>");
 		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpSearch(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>SEARCH - locate tasks with given keyword or date</b>");
+		sb.append("<span color = purple><b>SEARCH - locate tasks with given keyword or date</b></span>");
 		sb.append("<br>");
-		sb.append("To search for a keyword: search keyword");
+		sb.append("<b>To search for a keyword</b>: search <span color = blue>keyword</span>");
 		sb.append("<br>");
-		sb.append("To search for a day/date: search @tmr OR Search @24/12/14");
+		sb.append("<b>To search for a day/date</b>: search <span color = blue>@tmr</span> OR Search <span color = blur>@24/12/14</span>");
+		sb.append("<br>");
 		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpShow(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>SHOW - display labels desired</b>");
+		sb.append("<span color = purple><b>SHOW - display labels desired</b></span>");
 		sb.append("<br>");
-		sb.append("To show one or more labels from view: show labelName1 labelName2 ...");
+		sb.append("<b>To show one or more labels from view</b>: show <span color = blue>labelName1</span> <span color = green>labelName2</span> ...");
 		sb.append("<br>");
-		sb.append("To show all labels available: show");
+		sb.append("<b>To show all labels available</b>: show");
+		sb.append("<br>");
 		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpHide(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>HIDE - hide labels from view</b>");
+		sb.append("<span color = purple><b>HIDE - hide labels from view</b></span>");
 		sb.append("<br>");
-		sb.append("To hide one or more labels from view: hide labelName1 labelName2 ...");
+		sb.append("<b>To hide one or more labels from view</b>: hide <span color = blue>labelName1</span> <span color = green>labelName2</span> ...");
 		sb.append("<br>");
-		sb.append("To hide all labels from view: hide");
+		sb.append("<b>To hide all labels from view</b>: hide");
+		sb.append("<br>");
 		sb.append("<br>");
 		
 		return sb.toString();
 	}
 	private String helpDone(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<b>DONE - mark task as completed</b>");
+		sb.append("<span color = purple><b>DONE - mark task as completed</b></span>");
 		sb.append("<br>");
 		sb.append("Marking a task which has already been marked done will switch it back to undone");
 		sb.append("<br>");
-		sb.append("To mark a task from the current label as done: done taskID");
+		sb.append("<b>To mark a task from the current label as done</b>: done <span color = blue>taskID</span>");
 		sb.append("<br>");
-		sb.append("To mark a task from a different label as done: done labelName taskID");
+		sb.append("<b>To mark a task from a different label as done</b>: done <span color = blue>labelName</span> <span color = green>taskID</span>");
 		sb.append("<br>");
-		sb.append("To mark all tasks under a label as complete: done labelName");
+		sb.append("<b>To mark all tasks under a label as complete</b>: done <span color = blue>labelName</span>");
 		sb.append("<br>");
-		sb.append("To mark everything as done: done");
+		sb.append("<b>To mark everything as done</b>: done");
+		sb.append("<br>");
 		sb.append("<br>");
 		 
 		 return sb.toString();	
 	}
 	private String helpAll(){
-		
-		return "<span color = red><b>HELP</b></span>";
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = red><b>HELP - List of available commands</b></span>");
+		sb.append("<br>");
+		sb.append("<b>For specific command help: help <span color = blue>commandName</span></b>");
+		// list of shortcuts!!!
+		sb.append("<br>");
+		sb.append("<br>");
+		sb.append(helpAdd());
+		sb.append(helpLabel());
+		sb.append(helpDelete());
+		sb.append(helpEdit());
+		sb.append(helpSearch());
+		sb.append(helpDone());
+		sb.append(helpHide());
+		sb.append(helpShow());
+		sb.append(helpUndo());
+		sb.append(helpRedo());
+				
+		return sb.toString();
 	}
 	
 	public COMMANDTYPE getCommandForHelp(){
