@@ -130,7 +130,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				nextCount = 0;
 				followingCount = 0;
 			}
-			if (parts[a].equals("by")) {
+			if (parts[a].equals("by") || parts[a].equals("due")
+					|| parts[a].equals("before")) {
 				deadlineEndTimeDate = true;
 			}
 
