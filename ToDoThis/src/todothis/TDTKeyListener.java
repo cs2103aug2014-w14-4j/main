@@ -6,9 +6,9 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JOptionPane;
 
+import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
-import todothis.logic.Task;
-import todothis.parser.TDTDateAndTime;
 
 public class TDTKeyListener implements KeyListener {
 	private static final int _SCROLLFACTOR = 30;

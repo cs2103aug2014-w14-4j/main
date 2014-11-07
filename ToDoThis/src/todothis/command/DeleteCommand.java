@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import todothis.TDTGUI;
+import todothis.commons.Task;
 import todothis.logic.TDTLogic;
-import todothis.logic.Task;
-import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 public class DeleteCommand extends Command {

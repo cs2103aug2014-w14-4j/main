@@ -41,9 +41,9 @@ import javax.swing.text.html.StyleSheet;
 
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
+import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
-import todothis.logic.Task;
-import todothis.parser.TDTDateAndTime;
 
 public class TDTGUI extends JFrame implements DocumentListener {
 	/**

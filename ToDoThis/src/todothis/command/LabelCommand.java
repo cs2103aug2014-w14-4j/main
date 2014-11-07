@@ -2,8 +2,8 @@ package todothis.command;
 
 import java.util.ArrayList;
 
-import todothis.logic.Task;
-import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.commons.Task;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 public class LabelCommand extends Command {

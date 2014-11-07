@@ -2,11 +2,11 @@ package todothis.command;
 
 import java.util.ArrayList;
 
+import todothis.commons.TDTReminder;
 import todothis.commons.TDTTimeMethods;
-import todothis.logic.TDTReminder;
-import todothis.logic.Task;
-import todothis.parser.TDTDateAndTime;
-import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 public class RemindCommand extends Command {

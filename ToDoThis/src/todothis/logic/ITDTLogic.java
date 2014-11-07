@@ -2,6 +2,8 @@ package todothis.logic;
 
 import java.util.Iterator;
 
+import todothis.commons.Task;
+
 
 
 //Interface for Logic

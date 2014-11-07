@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
-import todothis.parser.TDTDateAndTime;
+import todothis.logic.TDTDateAndTime;
 
 public class TDTDateAndTimeTest {
 	@Test

@@ -5,10 +5,10 @@ import java.util.Iterator;
 
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
+import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
-import todothis.logic.Task;
-import todothis.parser.TDTDateAndTime;
-import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 

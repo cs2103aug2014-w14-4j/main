@@ -3,7 +3,7 @@ package todothis.command;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 public class ShowCommand extends Command {

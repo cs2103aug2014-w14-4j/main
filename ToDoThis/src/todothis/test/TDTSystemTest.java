@@ -7,9 +7,9 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import todothis.command.Command;
-import todothis.logic.Task;
-import todothis.parser.TDTDateAndTime;
-import todothis.parser.TDTParser;
+import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
+import todothis.logic.TDTParser;
 import todothis.storage.TDTStorage;
 
 public class TDTSystemTest {

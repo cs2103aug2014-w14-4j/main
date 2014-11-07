@@ -1,6 +1,6 @@
 package todothis.command;
 
-import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 public class HelpCommand extends Command{

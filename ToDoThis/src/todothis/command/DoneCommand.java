@@ -3,8 +3,8 @@ package todothis.command;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import todothis.logic.Task;
-import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.commons.Task;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 public class DoneCommand extends Command {

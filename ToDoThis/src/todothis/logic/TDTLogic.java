@@ -9,8 +9,8 @@ import todothis.command.AddCommand;
 import todothis.command.Command;
 import todothis.command.EditCommand;
 import todothis.command.SearchCommand;
-import todothis.parser.ITDTParser.COMMANDTYPE;
-import todothis.parser.TDTParser;
+import todothis.commons.Task;
+import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
 
 

@@ -2,7 +2,7 @@ package todothis.storage;
 
 import java.util.Iterator;
 
-import todothis.logic.Task;
+import todothis.commons.Task;
 
 public interface ITDTStorage{
 	/**
