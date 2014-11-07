@@ -1,6 +1,5 @@
 package todothis.commons;
 
-import todothis.logic.TDTDateAndTime;
 
 public class Task implements Comparable<Task> {
 	private int taskID;

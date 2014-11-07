@@ -3,9 +3,10 @@ package todothis.command;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
-import todothis.logic.TDTDateAndTime;
 import todothis.logic.ITDTParser.COMMANDTYPE;
+import todothis.logic.TDTDateAndTimeParser;
 import todothis.storage.TDTStorage;
 
 public class SearchCommand extends Command {
@@ -42,7 +43,7 @@ public class SearchCommand extends Command {
 		} else {
 			this.setSearchedWords(getSearchedWords().replaceAll("\"", ""));
 			if(searchedWords.indexOf('@') != -1) {
-				this.setSearchDate(TDTDateAndTime.decodeSearchDetails(
+				this.setSearchDate(TDTDateAndTimeParser.decodeSearchDetails(
 						searchedWords.substring(searchedWords.indexOf('@') + 1)));
 				this.setSearchedWords(searchedWords.substring(0, searchedWords.indexOf('@')));
 				
