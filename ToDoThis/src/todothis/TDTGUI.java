@@ -39,10 +39,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
-import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
 
 public class TDTGUI extends JFrame implements DocumentListener {

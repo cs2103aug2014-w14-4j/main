@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import todothis.commons.TDTReminder;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.logic.TDTDateAndTimeParser;
 import todothis.storage.TDTStorage;
 
 public class RemindCommand extends Command {
@@ -38,7 +38,7 @@ public class RemindCommand extends Command {
 			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
 			if(getTaskID() > 0 && getTaskID() <= array.size()) {
 				Task temp = array.get(getTaskID() - 1);
-				String remindDateTime = TDTDateAndTimeParser.decodeReminderDetails(getCommandDetails());
+				String remindDateTime = TDTDateAndTime.decodeReminderDetails(getCommandDetails());
 				if(!remindDateTime.equals("null")) {
 					temp.setRemindDateTime(remindDateTime);
 					temp.setReminder(new TDTReminder(TDTTimeMethods.calculateRemainingTime(remindDateTime), temp));

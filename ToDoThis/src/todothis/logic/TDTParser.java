@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 
 
-
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 import todothis.command.AddCommand;
@@ -27,7 +26,6 @@ import todothis.command.RemindCommand;
 import todothis.command.SearchCommand;
 import todothis.command.ShowCommand;
 import todothis.command.UndoCommand;
-import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
 
@@ -370,8 +368,7 @@ public class TDTParser implements ITDTParser {
 			}
 		}
 		setCommandDetails(commandDetails);
-		TDTDateAndTimeParser dateAndTimeParser = new TDTDateAndTimeParser();
-		setDateAndTime(dateAndTimeParser.decodeDateAndTimeDetails(dateAndTimeParts));
+		setDateAndTime(new TDTDateAndTime(dateAndTimeParts));
 	}
 
 	/**

@@ -15,10 +15,10 @@ import java.util.Stack;
 
 import todothis.TDTGUI;
 import todothis.command.Command;
-import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTReminder;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 
 public class TDTStorage implements ITDTStorage {
 	private String fileName;

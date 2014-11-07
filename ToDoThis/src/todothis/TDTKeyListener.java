@@ -6,8 +6,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JOptionPane;
 
-import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
 
 public class TDTKeyListener implements KeyListener {

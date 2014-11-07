@@ -3,10 +3,10 @@ package todothis.command;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.logic.TDTLogic;
 import todothis.logic.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;

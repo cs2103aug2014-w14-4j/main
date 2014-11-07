@@ -9,8 +9,8 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
+import todothis.logic.TDTDateAndTime;
 import todothis.storage.TDTStorage;
 
 public class TDTStorageTest {
