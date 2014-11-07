@@ -159,8 +159,10 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		while (hideIter.hasNext()) {
 			String label = hideIter.next();
 			array = logic.getTaskListFromLabel(label);
-			sb.append("<span class = label><b>" + label + "("
-					+ array.size() + ")" + "</b></span>: <br>");
+			if(array != null) {
+				sb.append("<span class = label><b>" + label + "("
+						+ array.size() + ")" + "</b></span>: <br>");
+			}
 		}
 		return sb.toString();
 	}
