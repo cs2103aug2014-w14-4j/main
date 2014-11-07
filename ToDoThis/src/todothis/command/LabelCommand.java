@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import todothis.commons.Task;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class LabelCommand extends Command {
 	private String labelName;
@@ -18,42 +18,42 @@ public class LabelCommand extends Command {
 	}
 
 	@Override
-	public String execute(TDTStorage storage) {
-		prevLabel = storage.getCurrLabel();
+	public String execute(TDTDataStore data) {
+		prevLabel = data.getCurrLabel();
 		String[] label = getLabelName().toUpperCase().split(" ");
 		
 		if(label.length > 1 || label.length <= 0) {
 			return "Invalid command. Invalid Label name.";
 		}
 		
-		if(storage.getLabelMap().containsKey(label[0])) {
-			storage.setCurrLabel(label[0]);
-			storage.getHideList().remove(label[0]);
+		if(data.getTaskMap().containsKey(label[0])) {
+			data.setCurrLabel(label[0]);
+			data.getHideList().remove(label[0]);
 			setUndoFeedback("Current label change to: " + prevLabel);
-			storage.insertToUndoStack(this);
+			data.insertToUndoStack(this);
 			return "Current label change to: " + label[0];
 		} else if(label[0].equals("") || label[0].matches("\\d+")) {
 			return "Invalid command. Label name cannot be blank or digits only.";
 		} else {
-			storage.getLabelMap().put(label[0], new ArrayList<Task>());
-			storage.insertToAutoWords(label[0]);
-			storage.setCurrLabel(label[0]);
+			data.getTaskMap().put(label[0], new ArrayList<Task>());
+			data.insertToAutoWords(label[0]);
+			data.setCurrLabel(label[0]);
 			newLabelCreated = true;
 			
 			setUndoFeedback("Label " + label[0] + " deleted");
-			storage.insertToUndoStack(this);
+			data.insertToUndoStack(this);
 			return "Label " + label[0] + " created";
 		}
 	}
 	
 	@Override
-	public String undo(TDTStorage storage) {
-		storage.setCurrLabel(prevLabel);
+	public String undo(TDTDataStore data) {
+		data.setCurrLabel(prevLabel);
 		if(newLabelCreated) {
 			DeleteCommand comd = new DeleteCommand(labelName, -1);
-			comd.execute(storage);
-			assert (storage.getUndoStack().size() > 0) : "undostack is empty";
-			storage.getUndoStack().pop();
+			comd.execute(data);
+			assert (data.getUndoStack().size() > 0) : "undostack is empty";
+			data.getUndoStack().pop();
 		}
 		return getUndoFeedback();
 	}

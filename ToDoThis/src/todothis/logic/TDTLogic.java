@@ -2,7 +2,6 @@ package todothis.logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 
 import todothis.command.AddCommand;
@@ -11,7 +10,8 @@ import todothis.command.EditCommand;
 import todothis.command.SearchCommand;
 import todothis.commons.Task;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
+import todothis.storage.TDTFileHandler;
 
 
 
@@ -20,8 +20,9 @@ public class TDTLogic implements ITDTLogic {
 	public static final int SEARCH_VIEW = 1;
 	public static final int HELP_VIEW = 2;
 	
-	private TDTStorage storage;
 	private TDTParser parser;
+	private TDTDataStore dataStore;
+	private TDTFileHandler fileHandler;
 	private int viewMode = 0;
 	private int scrollVal = -1;
 	private ArrayList<Task> highlightTask;
@@ -29,19 +30,20 @@ public class TDTLogic implements ITDTLogic {
 	private ArrayList<Task> searchedTask;
 	
 	public TDTLogic(String fileName) {
-		this.storage = new TDTStorage(fileName);
+		this.fileHandler = new TDTFileHandler(fileName);
 		this.parser = new TDTParser();
+		this.setData(new TDTDataStore());
 		
 	}
 	
 	@Override
 	public String executeCommand(String userCommand) {
 		Command command = parser.parse(userCommand);
-		String feedback = command.execute(storage);
+		String feedback = command.execute(dataStore);
 		
 		if(command.getCommandType() != COMMANDTYPE.UNDO &&
 				command.getCommandType() != COMMANDTYPE.REDO) {
-			storage.getRedoStack().clear();
+			dataStore.getRedoStack().clear();
 		}
 		
 		if(command.getCommandType() == COMMANDTYPE.SEARCH) {
@@ -73,80 +75,60 @@ public class TDTLogic implements ITDTLogic {
 		}
 		
 
-		storage.write();
+		this.writeToFile();
 		return feedback;
 		
 	}
 	
-	public static int renumberTaskID(ArrayList<Task> array, Task t) {
-		int newNum = 0;
-		for(int i = 0; i < array.size(); i++) {
-			Task task = array.get(i);
-			task.setTaskID(i + 1);
-			if(task == t) {
-				newNum = i + 1;
-			}
-		}
-		return newNum;
-	}
-	
 	public Iterator<String> getHideIter() {
-		return storage.getHideList().iterator();
-	}
-	
-	public static int sort(ArrayList<Task> array, Task task) {
-		Collections.sort(array);
-		return renumberTaskID(array, task);
+		return dataStore.getHideList().iterator();
 	}
 	
 	public boolean isInLabelMap(String label) {
-		return storage.getLabelMap().containsKey(label.toUpperCase());
+		return dataStore.getTaskMap().containsKey(label.toUpperCase());
 	}
 	
 	public boolean isHideLabel(String label) {
-		return storage.getHideList().contains(label);
+		return dataStore.getHideList().contains(label);
 	}
 
 	@Override
 	public Iterator<Task> getTaskIterator() {
-		return storage.getTaskIterator();
+		return dataStore.getTaskIterator();
 	}
 
 	@Override
 	public Iterator<String> getLabelIterator() {
-		return storage.getLabelMap().keySet().iterator();
+		return dataStore.getLabelIterator();
 	}
 	
 	public ArrayList<Task> getTaskListFromLabel(String label) {
-		return storage.getLabelMap().get(label.toUpperCase());
+		return dataStore.getTaskMap().get(label.toUpperCase());
 	}
 	
 	public int getLabelSize(String label) {
-		return storage.getLabelSize(label.toUpperCase());
+		return dataStore.getLabelSize(label.toUpperCase());
 	}
 	
 	public Task getTask(String label, int id) {
 		return this.getTaskListFromLabel(label.toUpperCase()).get(id - 1);
 	}
-	
-	public TDTStorage getStorage() {
-		return storage;
-	}
+
 	
 	public String getCurrLabel() {
-		return storage.getCurrLabel();
+		return dataStore.getCurrLabel();
 	}
 	
 	public void readAndInitialize() throws IOException {
-		storage.readInitialise();
+		fileHandler.readInitialise(dataStore);
 	}
 	
-	public void write() {
-		storage.write();
+	public void writeToFile() {
+		fileHandler.write(dataStore);
 	}
 	
 	public ArrayList<String> getAutoWords() {
-		return storage.getAutoWords();
+		return dataStore.getAutoWords();
 	}
 
 	public int getViewMode() {
@@ -187,6 +169,22 @@ public class TDTLogic implements ITDTLogic {
 
 	public void setAddedTask(Task addedTask) {
 		this.addedTask = addedTask;
+	}
+
+	public TDTDataStore getData() {
+		return dataStore;
+	}
+
+	public void setData(TDTDataStore data) {
+		this.dataStore = data;
+	}
+
+	public TDTFileHandler getFileHandler() {
+		return fileHandler;
+	}
+
+	public void setFileHandler(TDTFileHandler fileHandler) {
+		this.fileHandler = fileHandler;
 	}
 
 

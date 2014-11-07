@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import todothis.TDTGUI;
+import todothis.commons.TDTCommons;
 import todothis.commons.Task;
-import todothis.logic.TDTLogic;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class DeleteCommand extends Command {
 	private static final int DELETE_ALL = 0;
@@ -34,33 +34,33 @@ public class DeleteCommand extends Command {
 	}
 	
 	@Override
-	public String execute(TDTStorage storage) {
-		prevLabelPointer = storage.getCurrLabel();
+	public String execute(TDTDataStore data) {
+		prevLabelPointer = data.getCurrLabel();
 		String label = getLabelName();
 		int taskId = getTaskID();
 		
 		
 		//delete
 		if(label.equals("") && taskId == -1) {
-			deleteEverything(storage);
-			storage.insertToUndoStack(this);
+			deleteEverything(data);
+			data.insertToUndoStack(this);
 			setUndoFeedback("Undo clear TodoThis.");
-			return storage.getFileName() + " is cleared!";
+			return "TodoThis is cleared!";
 		}
 		
 		//delete label
 		if(!label.equals("") && taskId == -1) {
-			if(storage.getLabelMap().containsKey(label)) {
+			if(data.getTaskMap().containsKey(label)) {
 				//If label is empty, delete label
-				if(storage.getLabelSize(label) == 0) {
-					deleteLabel(storage, label);
-					storage.insertToUndoStack(this);
+				if(data.getLabelSize(label) == 0) {
+					deleteLabel(data, label);
+					data.insertToUndoStack(this);
 					setUndoFeedback("Undo delete " + label);
 					return "Label deleted.";
 				} else {
 					//label not empty, clear task in label
-					deleteLabelTask(storage, label);
-					storage.insertToUndoStack(this);
+					deleteLabelTask(data, label);
+					data.insertToUndoStack(this);
 					setUndoFeedback("Undo delete " + label);
 					return "Task under " + label + " deleted.";
 				}
@@ -71,10 +71,10 @@ public class DeleteCommand extends Command {
 		
 		//delete task from current label
 		if(label.equals("") && taskId != -1) {
-			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
+			ArrayList<Task> array = data.getTaskMap().get(data.getCurrLabel());
 			if(taskId <= array.size() && getTaskID() > 0) {
-				deleteTask(storage.getCurrLabel(),taskId, storage);
-				storage.insertToUndoStack(this);
+				deleteTask(data.getCurrLabel(),taskId, data);
+				data.insertToUndoStack(this);
 				setUndoFeedback("Undo delete task.");
 				return "Task deleted";
 			} else {
@@ -84,11 +84,11 @@ public class DeleteCommand extends Command {
 		
 		//delete task from specific label
 		if(!label.equals("") && taskId != -1) {
-			if(storage.getLabelMap().containsKey(label)) {
-				ArrayList<Task> array = storage.getLabelMap().get(label);
+			if(data.getTaskMap().containsKey(label)) {
+				ArrayList<Task> array = data.getTaskMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
-					deleteTask(label,taskId, storage);
-					storage.insertToUndoStack(this);
+					deleteTask(label,taskId, data);
+					data.insertToUndoStack(this);
 					setUndoFeedback("Undo delete task.");
 					return "Task deleted";
 				} else {
@@ -102,11 +102,11 @@ public class DeleteCommand extends Command {
 		return "Invalid command.";
 	}
 
-	private void deleteTask(String label, int taskId, TDTStorage storage) {
+	private void deleteTask(String label, int taskId, TDTDataStore data) {
 		setDeleteState(DELETE_TASK);
 		undoLabel = label;
-		ArrayList<Task> taskList = storage.getLabelMap().get(label);
-		undoTaskList = storage.copyTaskList(taskList);
+		ArrayList<Task> taskList = data.getTaskMap().get(label);
+		undoTaskList = copyTaskList(taskList);
 		Task task = taskList.get(taskId - 1);
 		if(task.hasReminder()) {
 			task.getReminder().cancelReminder();
@@ -114,42 +114,42 @@ public class DeleteCommand extends Command {
 						task.getRemindDateTime()));
 		}
 		taskList.remove(taskId - 1);
-		TDTLogic.renumberTaskID(taskList, null);
+		TDTCommons.renumberTaskID(taskList, null);
 	}
 
 	
-	private void deleteEverything(TDTStorage storage) {
-		prevState = storage.copyLabelMap();
+	private void deleteEverything(TDTDataStore data) {
+		prevState = copyLabelMap(data);
 		setDeleteState(DELETE_ALL);
-		Iterator<String> iter = storage.getLabelIterator();
+		Iterator<String> iter = data.getLabelIterator();
 		while(iter.hasNext()) {
 			String next = iter.next();
-			ArrayList<Task> taskList = storage.getLabelMap().get(next);
+			ArrayList<Task> taskList = data.getTaskMap().get(next);
 			stopReminderInTaskList(taskList);
 		}
 		
-		storage.setLabelMap(new HashMap<String, ArrayList<Task>>());
-		storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
-		storage.setCurrLabel(TDTGUI.DEFAULT_LABEL);
+		data.setTaskMap(new HashMap<String, ArrayList<Task>>());
+		data.getTaskMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
+		data.setCurrLabel(TDTGUI.DEFAULT_LABEL);
 	}
 	
 
-	private void deleteLabel(TDTStorage storage, String label) {
+	private void deleteLabel(TDTDataStore data, String label) {
 		undoLabel = label;
 		setDeleteState(DELETE_LABEL);
-		storage.getLabelMap().remove(label);
-		storage.getAutoWords().remove(label);
-		storage.setCurrLabel(TDTGUI.DEFAULT_LABEL);
+		data.getTaskMap().remove(label);
+		data.getAutoWords().remove(label);
+		data.setCurrLabel(TDTGUI.DEFAULT_LABEL);
 		if(label.equals(TDTGUI.DEFAULT_LABEL)) {
-			storage.getLabelMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
-			storage.insertToAutoWords(TDTGUI.DEFAULT_LABEL);
+			data.getTaskMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
+			data.insertToAutoWords(TDTGUI.DEFAULT_LABEL);
 		}
 	}
 	
-	private void deleteLabelTask(TDTStorage storage, String label) {
+	private void deleteLabelTask(TDTDataStore data, String label) {
 		undoLabel = label;
-		ArrayList<Task> taskList = storage.getLabelMap().get(label);
-		undoTaskList = storage.copyTaskList(taskList);
+		ArrayList<Task> taskList = data.getTaskMap().get(label);
+		undoTaskList = copyTaskList(taskList);
 		setDeleteState(DELETE_LABELTASK);
 		stopReminderInTaskList(taskList);
 		taskList.clear();
@@ -169,84 +169,115 @@ public class DeleteCommand extends Command {
 	
 	
 	@Override
-	public String undo(TDTStorage storage) {
-		storage.setCurrLabel(prevLabelPointer);
+	public String undo(TDTDataStore data) {
+		data.setCurrLabel(prevLabelPointer);
 		if(getDeleteState() == DELETE_ALL) {
-			undoDeleteAll(storage);
+			undoDeleteAll(data);
 		}
 		
 		if(getDeleteState() == DELETE_LABEL) {
-			undoDeleteLabel(storage);
+			undoDeleteLabel(data);
 		}
 		
 		if(getDeleteState() == DELETE_LABELTASK) {
-			undoDeleteLabelTask(storage);
+			undoDeleteLabelTask(data);
 		}
 		
 		if(getDeleteState() == DELETE_TASK) {
-			undoDeleteTask(storage);
+			undoDeleteTask(data);
 		}
 
 		return getUndoFeedback();
 	}
 	
-	private void undoDeleteTask(TDTStorage storage) {
-		storage.getLabelMap().put(undoLabel, undoTaskList);
-		restartReminder(storage);
+	private void undoDeleteTask(TDTDataStore data) {
+		data.getTaskMap().put(undoLabel, undoTaskList);
+		restartReminder(data);
 	}
 
-	private void undoDeleteLabelTask(TDTStorage storage) {
-		storage.getLabelMap().put(undoLabel, undoTaskList);
-		restartReminder(storage);
+	private void undoDeleteLabelTask(TDTDataStore data) {
+		data.getTaskMap().put(undoLabel, undoTaskList);
+		restartReminder(data);
 	}
 
-	private void undoDeleteLabel(TDTStorage storage) {
-		storage.getLabelMap().put(undoLabel, new ArrayList<Task>());
-		storage.setCurrLabel(prevLabelPointer);
+	private void undoDeleteLabel(TDTDataStore data) {
+		data.getTaskMap().put(undoLabel, new ArrayList<Task>());
+		data.setCurrLabel(prevLabelPointer);
 	}
 
-	private void undoDeleteAll(TDTStorage storage) {
-		storage.setLabelMap(prevState);
-		restartReminder(storage);
+	private void undoDeleteAll(TDTDataStore data) {
+		data.setTaskMap(prevState);
+		restartReminder(data);
 	}
 	
-	private void restartReminder(TDTStorage storage) {
+	private void restartReminder(TDTDataStore data) {
 		for(int i = 0; i < undoReminderList.size(); i++) {
-			undoReminderList.get(i).execute(storage);
-			assert(storage.getUndoStack().size() > 0);
-			storage.getUndoStack().pop();
+			undoReminderList.get(i).execute(data);
+			assert(data.getUndoStack().size() > 0);
+			data.getUndoStack().pop();
 		}
 		undoReminderList.clear();
 	}
+	
+	private HashMap<String, ArrayList<Task>> copyLabelMap(TDTDataStore data) {
+		HashMap<String, ArrayList<Task>> hmap = new HashMap<String, ArrayList<Task>>();
+		Iterator<String> labelIter = data.getLabelIterator();
+		Iterator<Task> taskIter = data.getTaskIterator();
+		
+		while(labelIter.hasNext()) {
+			String next = labelIter.next();
+			hmap.put(next, new ArrayList<Task>());
+		}
+		while(taskIter.hasNext()) {
+			Task task =  taskIter.next();
+			hmap.get(task.getLabelName()).add(new Task(task.getTaskID(), task.getLabelName(),
+					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
+					 task.isDone(), "null"));
+		}
+		return hmap;
+	}
+	
+	private ArrayList<Task> copyTaskList(ArrayList<Task> array) {
+		ArrayList<Task> res = new ArrayList<Task>();
+		Iterator<Task> taskIter = array.iterator();
+		while(taskIter.hasNext()) {
+			Task task =  taskIter.next();
+			res.add(new Task(task.getTaskID(), task.getLabelName(),
+					 task.getDetails(), task.getDateAndTime(), task.isHighPriority(), 
+					 task.isDone(), "null"));
+		}
+		return res;
+	}
+	
 	/*
 	@Override
-	public String execute(TDTStorage storage) {
-		prevState = storage.copyLabelMap();
-		prevLabelPointer = storage.getCurrLabel();
+	public String execute(TDTDataStore data) {
+		prevState = data.copyLabelMap();
+		prevLabelPointer = data.getCurrLabel();
 		String label = getLabelName().toUpperCase();
 		int taskId = getTaskID();
 		
-		storage.insertToUndoStack(this);
+		data.insertToUndoStack(this);
 		//delete
 		if(label.equals("") && taskId == -1) {
-			deleteEverything(storage);
+			deleteEverything(data);
 			
 			setUndoFeedback("Undo delete");
-			return storage.getFileName() + " is cleared!";
+			return data.getFileName() + " is cleared!";
 		}
 		
 		//delete label
 		if(!label.equals("") && taskId == -1) {
-			if(storage.getLabelMap().containsKey(label)) {
+			if(data.getLabelMap().containsKey(label)) {
 				//If label is empty, delete label
-				if(storage.getLabelSize(label) == 0) {
-					deleteLabel(storage, label);
+				if(data.getLabelSize(label) == 0) {
+					deleteLabel(data, label);
 					
 					setUndoFeedback("Undo delete " + label);
 					return "Label deleted.";
 				} else {
 					//label not empty, clear task in label
-					storage.getLabelMap().get(label).clear();
+					data.getLabelMap().get(label).clear();
 				}
 			} else {
 				return "Invalid command. Label does not exist.";
@@ -255,7 +286,7 @@ public class DeleteCommand extends Command {
 		
 		//delete task from current label
 		if(label.equals("") && taskId != -1) {
-			ArrayList<Task> array = storage.getLabelMap().get(storage.getCurrLabel());
+			ArrayList<Task> array = data.getLabelMap().get(data.getCurrLabel());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				array.remove(taskId - 1);
 				TDTLogic.renumberTaskID(array, null);
@@ -268,8 +299,8 @@ public class DeleteCommand extends Command {
 		
 		//delete task from specific label
 		if(!label.equals("") && taskId != -1) {
-			if(storage.getLabelMap().containsKey(label)) {
-				ArrayList<Task> array = storage.getLabelMap().get(label);
+			if(data.getLabelMap().containsKey(label)) {
+				ArrayList<Task> array = data.getLabelMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					array.remove(taskId - 1);
 					TDTLogic.renumberTaskID(array, null);
@@ -286,14 +317,14 @@ public class DeleteCommand extends Command {
 	}
 
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		//May not undo the reminders.
 		//Delete may not off the reminders.
 		//Suggest
 		//Delete all go thru each task to off reminders
 		//Undo go thru each task to add back reminder
-		storage.setLabelMap(prevState);
-		storage.setCurrLabel(prevLabelPointer);
+		data.setLabelMap(prevState);
+		data.setCurrLabel(prevLabelPointer);
 		return getUndoFeedback();
 	}*/
 	

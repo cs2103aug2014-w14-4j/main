@@ -3,13 +3,13 @@ package todothis.command;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import todothis.commons.TDTCommons;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
-import todothis.logic.TDTDateAndTime;
-import todothis.logic.TDTLogic;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.logic.TDTDateAndTime;
+import todothis.storage.TDTDataStore;
 
 
 
@@ -38,9 +38,9 @@ public class AddCommand extends Command {
 	}
 
 	@Override
-	public String execute(TDTStorage storage) {
-		setLabelName(storage.getCurrLabel());
-		setTaskID(storage.getLabelSize(getLabelName()) + 1);
+	public String execute(TDTDataStore data) {
+		setLabelName(data.getCurrLabel());
+		setTaskID(data.getLabelSize(getLabelName()) + 1);
 		Task task = new Task(getTaskID(), labelName, getCommandDetails(),
 				getDateAndTime(), isHighPriority());
 		setAddedTask(task);
@@ -58,14 +58,14 @@ public class AddCommand extends Command {
 			return MESSAGE_INVALID_END_TIME;
 		}
 		
-		checkForClash(task, storage.getTaskIterator());
-		storage.addTask(task);
-		setTaskID(TDTLogic.sort(storage.getLabelMap().get(getLabelName()), task));
-		storage.insertToUndoStack(this);
+		checkForClash(task, data.getTaskIterator());
+		data.addTask(task);
+		setTaskID(TDTCommons.sort(data.getTaskMap().get(getLabelName()), task));
+		data.insertToUndoStack(this);
 		
 		//Proper return statement!
 		return gotClashes?this.getFeedback():String.format(MESSAGE_ADD_FEEDBACK,
-															storage.getCurrLabel());
+															data.getCurrLabel());
 	}
 	
 	private boolean isValidStartEndTime(TDTDateAndTime dnt) {
@@ -110,12 +110,12 @@ public class AddCommand extends Command {
 	}
 
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		targetTask.clear();
 		DeleteCommand comd = new DeleteCommand(getLabelName(), getTaskID());
-		comd.execute(storage);
-		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
-		storage.getUndoStack().pop();
+		comd.execute(data);
+		assert (data.getUndoStack().size() > 0) : "undostack is empty";
+		data.getUndoStack().pop();
 		return "Undo add!";
 	}
 	

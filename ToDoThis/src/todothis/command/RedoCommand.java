@@ -1,7 +1,7 @@
 package todothis.command;
 
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class RedoCommand extends Command{
 	
@@ -10,17 +10,17 @@ public class RedoCommand extends Command{
 	}
 
 	@Override
-	public String execute(TDTStorage storage) {
-		if(!storage.getRedoStack().isEmpty()) {
-			Command comd = storage.getRedoStack().pop();
-			return comd.execute(storage);
+	public String execute(TDTDataStore data) {
+		if(!data.getRedoStack().isEmpty()) {
+			Command comd = data.getRedoStack().pop();
+			return comd.execute(data);
 		} else {
 			return "Invalid command. No command to redo.";
 		}
 	}
 
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		return null;
 	}
 

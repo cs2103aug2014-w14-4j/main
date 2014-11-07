@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import todothis.commons.Task;
-import todothis.logic.TDTDateAndTime;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.logic.TDTDateAndTime;
+import todothis.storage.TDTDataStore;
 
 public class SearchCommand extends Command {
 	private static final String SEARCH_FEEDBACK = "%d results found.";
@@ -31,8 +31,8 @@ public class SearchCommand extends Command {
 	 * the searched tasks in a ArrayList.
 	 */
 	@Override
-	public String execute(TDTStorage storage) {
-		Iterator<Task> iter = storage.getTaskIterator();
+	public String execute(TDTDataStore data) {
+		Iterator<Task> iter = data.getTaskIterator();
 		if(searchedWords.equals("")) {
 			searchEveryTask(iter);
 		} else if(searchedWords.trim().equalsIgnoreCase("done") ){
@@ -52,7 +52,7 @@ public class SearchCommand extends Command {
 				searchKeyWords(iter);
 			}
 		}
-		storage.insertToUndoStack(this);
+		data.insertToUndoStack(this);
 		return String.format(SEARCH_FEEDBACK, searchedResult.size());	
 	}
 	
@@ -61,11 +61,11 @@ public class SearchCommand extends Command {
 	 * Unable to redo search.
 	 */
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		//Since we do not allow to redo search, we need to pop the 
 		//comd added to redo stack by undo
-		assert(!storage.getRedoStack().isEmpty());
-		storage.getRedoStack().pop();
+		assert(!data.getRedoStack().isEmpty());
+		data.getRedoStack().pop();
 		return "";
 	}
 	

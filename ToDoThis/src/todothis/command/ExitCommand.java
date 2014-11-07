@@ -1,7 +1,7 @@
 package todothis.command;
 
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class ExitCommand extends Command {
 	
@@ -16,14 +16,13 @@ public class ExitCommand extends Command {
 	 * Executing ExitCommand will save the file and exits.
 	 */
 	@Override
-	public String execute(TDTStorage storage) {
-		storage.write();
+	public String execute(TDTDataStore data) {
 		System.exit(0);
 		return "";
 	}
 
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		return "";
 	}
 	

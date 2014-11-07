@@ -1,7 +1,7 @@
 package todothis.command;
 
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class UndoCommand extends Command {
 
@@ -10,38 +10,38 @@ public class UndoCommand extends Command {
 	}
 	/*
 	@Override
-	public String execute(TDTStorage storage) {
-		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
-		storage.getRedoStack().push(storage.getUndoStack().pop());
-		storage.getRedoLabelPointerStack().push(storage.getLabelPointerStack().pop());
-		if(!storage.getUndoStack().isEmpty()) {
-			storage.setLabelMap(storage.getUndoStack().pop());
-			storage.setCurrLabel(storage.getLabelPointerStack().pop());
+	public String execute(TDTDataStore data) {
+		assert (data.getUndoStack().size() > 0) : "undostack is empty";
+		data.getRedoStack().push(data.getUndoStack().pop());
+		data.getRedoLabelPointerStack().push(data.getLabelPointerStack().pop());
+		if(!data.getUndoStack().isEmpty()) {
+			data.setLabelMap(data.getUndoStack().pop());
+			data.setCurrLabel(data.getLabelPointerStack().pop());
 			
 			return "Undo success!";
 		} else {
-			storage.getRedoStack().pop();
-			storage.getRedoLabelPointerStack().pop();
+			data.getRedoStack().pop();
+			data.getRedoLabelPointerStack().pop();
 			return "No command to undo.";
 		}
 	}*/
 	
 	@Override
-	public String execute(TDTStorage storage) {
+	public String execute(TDTDataStore data) {
 		
-		if(!storage.getUndoStack().isEmpty()) {
+		if(!data.getUndoStack().isEmpty()) {
 			
-			Command comd = storage.getUndoStack().pop();
-			storage.getRedoStack().push(comd);
+			Command comd = data.getUndoStack().pop();
+			data.getRedoStack().push(comd);
 			
-			return comd.undo(storage);
+			return comd.undo(data);
 		} else {
 			return "Invalid command. No command to undo.";
 		}
 	}
 
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		
 		return null;
 	}

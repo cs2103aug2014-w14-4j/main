@@ -531,7 +531,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		final TDTGUI gui = this;
 		if(!SystemTray.isSupported()){
 			System.out.println("System tray is not supported !!! ");
-			gui.logic.write();
+			gui.logic.writeToFile();
 			System.exit(0);
 		}
 		SystemTray systemTray = SystemTray.getSystemTray();
@@ -542,7 +542,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				gui.logic.write();
+				gui.logic.writeToFile();
 				System.exit(0);             
 			}
 		});

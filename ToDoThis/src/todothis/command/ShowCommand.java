@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class ShowCommand extends Command {
 	private String labelName;
@@ -16,18 +16,18 @@ public class ShowCommand extends Command {
 	}
 	/*
 	@Override
-	public String execute(TDTStorage storage) {
+	public String execute(TDTDataStore data) {
 		String[] labelNames = getLabelName().split(" ");
 		Iterator<Task> iter;
 
 		if(labelNames[0].equals("")){
-			iter = storage.getTaskIterator();
+			iter = data.getTaskIterator();
 			while(iter.hasNext()){
 				Task temp = iter.next();
 				temp.setHide(false);
 			}
 		}else {
-			iter = storage.getTaskIterator();
+			iter = data.getTaskIterator();
 			while(iter.hasNext()){
 				Task temp = iter.next();
 				if(containInArray(temp.getLabelName(), labelNames)){
@@ -41,32 +41,32 @@ public class ShowCommand extends Command {
 		return "";
 	}*/
 	
-	public String execute(TDTStorage storage) {
-		prevHideList = storage.getHideList();
-		//prevHideList = storage.copyHideList();
+	public String execute(TDTDataStore data) {
+		prevHideList = data.getHideList();
+		//prevHideList = data.copyHideList();
 		String[] labelNames = getLabelName().split(" ");
-		Iterator<String> iter = storage.getLabelIterator();
+		Iterator<String> iter = data.getLabelIterator();
 
 		if(labelNames[0].equals("")){
-			storage.getHideList().clear();
+			data.getHideList().clear();
 		}else {
 			while(iter.hasNext()){
 				String temp = iter.next();
 				if(containInArray(temp, labelNames)){
-					storage.getHideList().remove(temp);
+					data.getHideList().remove(temp);
 				}else{
-					storage.insertToHideList(temp);
+					data.insertToHideList(temp);
 				}
 			}
 		}
 		
-		storage.insertToUndoStack(this);
+		data.insertToUndoStack(this);
 		return "Display selected labels";
 	}
 	
 	@Override
-	public String undo(TDTStorage storage) {
-		storage.setHideList(prevHideList);
+	public String undo(TDTDataStore data) {
+		data.setHideList(prevHideList);
 		return "Undo display";
 	}
 

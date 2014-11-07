@@ -25,10 +25,8 @@ public class TDTStorage implements ITDTStorage {
 	private HashMap<String, ArrayList<Task>> labelMap;
 	private String currLabel = TDTGUI.DEFAULT_LABEL;
 	private Stack<Command> undoStack;
-	private Stack<String> labelPointerStack;
 	private BufferedWriter bw;
 	private Stack<Command> redoStack;
-	private Stack<String> redoLabelPointerStack;
 	private ArrayList<String> hideList;
 	private ArrayList<String> autoWords;
 	
@@ -36,9 +34,7 @@ public class TDTStorage implements ITDTStorage {
 		this.setFileName(fileName);
 		setLabelMap(new HashMap<String, ArrayList<Task>>());
 		setUndoStack(new Stack<Command>());
-		setLabelPointerStack(new Stack<String>());
 		setRedoStack(new Stack<Command>());
-		setRedoLabelPointerStack(new Stack<String>());
 		setHideList(new ArrayList<String>());
 		labelMap.put(currLabel, new ArrayList<Task>());
 		setAutoWords(new ArrayList<String>());
@@ -238,14 +234,7 @@ public class TDTStorage implements ITDTStorage {
 		this.undoStack = undoStack;
 	}
 
-	public Stack<String> getLabelPointerStack() {
-		return labelPointerStack;
-	}
 
-
-	public void setLabelPointerStack(Stack<String> labelPointerStack) {
-		this.labelPointerStack = labelPointerStack;
-	}
 
 
 	public Stack<Command> getRedoStack() {
@@ -258,14 +247,7 @@ public class TDTStorage implements ITDTStorage {
 	}
 
 
-	public Stack<String> getRedoLabelPointerStack() {
-		return redoLabelPointerStack;
-	}
 
-
-	public void setRedoLabelPointerStack(Stack<String> redoLabelPointerStack) {
-		this.redoLabelPointerStack = redoLabelPointerStack;
-	}
 
 
 	public ArrayList<String> getHideList() {

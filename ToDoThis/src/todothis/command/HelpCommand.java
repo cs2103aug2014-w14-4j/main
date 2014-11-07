@@ -1,7 +1,7 @@
 package todothis.command;
 
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class HelpCommand extends Command{
 	COMMANDTYPE commandTypeForHelp;
@@ -33,7 +33,7 @@ public class HelpCommand extends Command{
 	*/
 
 	@Override
-	public String execute(TDTStorage storage) {
+	public String execute(TDTDataStore data) {
 		switch(getCommandForHelp()){
 		case ADD:
 			return helpAdd();
@@ -64,7 +64,7 @@ public class HelpCommand extends Command{
 	}
 	
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		
 		return "";
 	}

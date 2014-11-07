@@ -1,7 +1,7 @@
 package todothis.command;
 
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 
 public abstract class Command {
@@ -11,8 +11,8 @@ public abstract class Command {
 		this.commandType = commandType;
 	}
 	
-	public abstract String execute(TDTStorage storage);
-	public abstract String undo(TDTStorage storage);
+	public abstract String execute(TDTDataStore data);
+	public abstract String undo(TDTDataStore data);
 	
 	public COMMANDTYPE getCommandType() {
 		return this.commandType;

@@ -3,9 +3,9 @@ package todothis.command;
 import java.util.ArrayList;
 
 import todothis.commons.Task;
-import todothis.logic.TDTDateAndTime;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.logic.TDTDateAndTime;
+import todothis.storage.TDTDataStore;
 
 public class EditCommand extends Command {
 	private int taskID;
@@ -32,7 +32,7 @@ public class EditCommand extends Command {
 	}
 
 	@Override
-	public String execute(TDTStorage storage) {
+	public String execute(TDTDataStore data) {
 		String label = getLabelName().toUpperCase();
 		int taskId = getTaskID();
 		String commandDetails = getCommandDetails();
@@ -41,8 +41,8 @@ public class EditCommand extends Command {
 
 		//edit task from current label
 		if(label.equals("") && taskId != -1) {
-			setLabelName(storage.getCurrLabel());
-			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
+			setLabelName(data.getCurrLabel());
+			ArrayList<Task> array = data.getTaskMap().get(getLabelName());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
 				editedTask.add(task);
@@ -54,7 +54,7 @@ public class EditCommand extends Command {
 				task.setHighPriority(isHighPriority);
 				
 				//setTaskID(TDTLogic.sort(array, task));
-				storage.insertToUndoStack(this);
+				data.insertToUndoStack(this);
 				return "Task edited";
 			} else {
 				return "Invalid Command. Label does not exist or invalid task number.";
@@ -63,8 +63,8 @@ public class EditCommand extends Command {
 
 		//edit task from specific label
 		if(!label.equals("") && taskId != -1) {
-			if(storage.getLabelMap().containsKey(label)) {
-				ArrayList<Task> array = storage.getLabelMap().get(label);
+			if(data.getTaskMap().containsKey(label)) {
+				ArrayList<Task> array = data.getTaskMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
 					editedTask.add(task);
@@ -76,7 +76,7 @@ public class EditCommand extends Command {
 					task.setHighPriority(isHighPriority);
 					
 					//setTaskID(TDTLogic.sort(array, task));
-					storage.insertToUndoStack(this);
+					data.insertToUndoStack(this);
 					return "Task edited";
 				} else {
 					return "Invalid Command. Label does not exist or invalid task number.";
@@ -91,12 +91,12 @@ public class EditCommand extends Command {
 	
 
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		EditCommand comd = new EditCommand(getLabelName(), getTaskID(), 
 								prevDetails, prevDNT, prevPriority);
-		comd.execute(storage);
-		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
-		storage.getUndoStack().pop();
+		comd.execute(data);
+		assert (data.getUndoStack().size() > 0) : "undostack is empty";
+		data.getUndoStack().pop();
 		return "Undo edit";
 	}
 	

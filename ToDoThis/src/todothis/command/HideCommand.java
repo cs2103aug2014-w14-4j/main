@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.storage.TDTDataStore;
 
 public class HideCommand extends Command {
 	private String labelName;
@@ -16,18 +16,18 @@ public class HideCommand extends Command {
 	}
 	/*
 	@Override
-	public String execute(TDTStorage storage) {
+	public String execute(TDTDataStore data) {
 		String[] labelNames = getLabelName().split(" ");
 		Iterator<Task> iter;
 
 		if(labelNames[0].equals("")){
-			iter = storage.getTaskIterator();
+			iter = data.getTaskIterator();
 			while(iter.hasNext()){
 				Task temp = iter.next();
 				temp.setHide(true);
 			}
 		}else {
-			iter = storage.getTaskIterator();
+			iter = data.getTaskIterator();
 			while(iter.hasNext()){
 				Task temp = iter.next();
 				if(containInArray(temp.getLabelName(), labelNames)){
@@ -40,33 +40,41 @@ public class HideCommand extends Command {
 	}*/
 	
 	@Override
-	public String execute(TDTStorage storage) {
-		prevHideList = storage.copyHideList();
+	public String execute(TDTDataStore data) {
+		prevHideList = copyHideList(data.getHideList());
 		String[] labelNames = getLabelName().split(" ");
-		Iterator<String> iter = storage.getLabelIterator();
+		Iterator<String> iter = data.getLabelIterator();
 
 		if(labelNames[0].equals("")){
 			while(iter.hasNext()){
 				String temp = iter.next();
-				storage.insertToHideList(temp);
+				data.insertToHideList(temp);
 			}
 		}else {
 			while(iter.hasNext()){
 				String temp = iter.next();
 				if(containInArray(temp, labelNames)){
-					storage.insertToHideList(temp);
+					data.insertToHideList(temp);
 				}
 			}
 		}
 		
-		storage.insertToUndoStack(this);
+		data.insertToUndoStack(this);
 		return "Hide selected labels.";
 	}
 	
 	@Override
-	public String undo(TDTStorage storage) {
-		storage.setHideList(prevHideList);
+	public String undo(TDTDataStore data) {
+		data.setHideList(prevHideList);
 		return "Undo hide";
+	}
+	
+	private ArrayList<String> copyHideList(ArrayList<String> hideList) {
+		ArrayList<String> list = new ArrayList<String>();
+		for(int i = 0 ; i < hideList.size(); i++) {
+			list.add(hideList.get(i));
+		}
+		return list;
 	}
 	
 	private static boolean containInArray(String label, String[] labelNames) {

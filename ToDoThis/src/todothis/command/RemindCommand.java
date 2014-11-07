@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import todothis.commons.TDTReminder;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
-import todothis.logic.TDTDateAndTime;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.storage.TDTStorage;
+import todothis.logic.TDTDateAndTime;
+import todothis.storage.TDTDataStore;
 
 public class RemindCommand extends Command {
 	private String labelName;
@@ -25,17 +25,17 @@ public class RemindCommand extends Command {
 	}
 
 	@Override
-	public String execute(TDTStorage storage) {
+	public String execute(TDTDataStore data) {
 		if(labelName.equalsIgnoreCase("")) {
-			setLabelName(storage.getCurrLabel());
+			setLabelName(data.getCurrLabel());
 		}
 		
 		if(getCommandDetails().equals("")) {
 			isRemoveReminder = true;
-			return removeReminder(storage);
+			return removeReminder(data);
 		}
-		if(storage.getLabelMap().containsKey(getLabelName())) {
-			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
+		if(data.getTaskMap().containsKey(getLabelName())) {
+			ArrayList<Task> array = data.getTaskMap().get(getLabelName());
 			if(getTaskID() > 0 && getTaskID() <= array.size()) {
 				Task temp = array.get(getTaskID() - 1);
 				String remindDateTime = TDTDateAndTime.decodeReminderDetails(getCommandDetails());
@@ -43,7 +43,7 @@ public class RemindCommand extends Command {
 					temp.setRemindDateTime(remindDateTime);
 					temp.setReminder(new TDTReminder(TDTTimeMethods.calculateRemainingTime(remindDateTime), temp));
 					setTask(temp);
-					storage.insertToUndoStack(this);
+					data.insertToUndoStack(this);
 					
 					return "Reminder set at " + remindDateTime;
 				} else {
@@ -57,9 +57,9 @@ public class RemindCommand extends Command {
 		}
 	}
 
-	private String removeReminder(TDTStorage storage) {
-		if(storage.getLabelMap().containsKey(getLabelName())) {
-			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
+	private String removeReminder(TDTDataStore data) {
+		if(data.getTaskMap().containsKey(getLabelName())) {
+			ArrayList<Task> array = data.getTaskMap().get(getLabelName());
 			if(getTaskID() > 0 && getTaskID() <= array.size()) {
 				Task temp = array.get(getTaskID() - 1);
 				if(temp.getReminder() == null) {
@@ -71,7 +71,7 @@ public class RemindCommand extends Command {
 				temp.getReminder().cancelReminder();
 				temp.setReminder(null);
 				temp.setRemindDateTime("null");
-				storage.insertToUndoStack(this);
+				data.insertToUndoStack(this);
 				return "Reminder at " + dateTime +  " removed.";
 			} else {
 				return "Invalid command. Invalid taskId.";
@@ -82,7 +82,7 @@ public class RemindCommand extends Command {
 	}
 
 	@Override
-	public String undo(TDTStorage storage) {
+	public String undo(TDTDataStore data) {
 		if(!isRemoveReminder) {
 			Task temp = getTask();
 			if(temp.getReminder() != null) {
