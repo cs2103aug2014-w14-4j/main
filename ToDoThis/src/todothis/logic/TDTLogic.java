@@ -5,28 +5,74 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import todothis.command.AddCommand;
 import todothis.command.Command;
+import todothis.command.EditCommand;
+import todothis.command.SearchCommand;
 import todothis.parser.ITDTParser.COMMANDTYPE;
+import todothis.parser.TDTParser;
 import todothis.storage.TDTStorage;
 
 
 
 public class TDTLogic implements ITDTLogic {
+	public static final int TASK_VIEW = 0;
+	public static final int SEARCH_VIEW = 1;
+	public static final int HELP_VIEW = 2;
+	
 	private TDTStorage storage;
+	private TDTParser parser;
+	private int viewMode = 0;
+	private int scrollVal = -1;
+	private ArrayList<Task> highlightTask;
+	private Task addedTask;
+	private ArrayList<Task> searchedTask;
 	
 	public TDTLogic(String fileName) {
-		TDTStorage storage = new TDTStorage(fileName);
-		this.storage = storage;
+		this.storage = new TDTStorage(fileName);
+		this.parser = new TDTParser();
+		
 	}
 	
 	@Override
-	public String executeCommand(Command command) {
+	public String executeCommand(String userCommand) {
+		Command command = parser.parse(userCommand);
+		String feedback = command.execute(storage);
+		
 		if(command.getCommandType() != COMMANDTYPE.UNDO &&
 				command.getCommandType() != COMMANDTYPE.REDO) {
 			storage.getRedoStack().clear();
 		}
+		
+		if(command.getCommandType() == COMMANDTYPE.SEARCH) {
+			setViewMode(SEARCH_VIEW);
+			setSearchedTask(((SearchCommand)command).getSearchedResult());
+		} else if(command.getCommandType() == COMMANDTYPE.HELP) {
+			setViewMode(HELP_VIEW);
+		} else {
+			setViewMode(TASK_VIEW);
+		}
+		
+		if(command.getCommandType() == COMMANDTYPE.EDIT) {
+			setHighlightTask(((EditCommand)command).getEditedTask());
+		} else if(command.getCommandType() == COMMANDTYPE.ADD) {
+			AddCommand comd = (AddCommand)command;
+			setHighlightTask(comd.getTargetTask());
+		} else {
+			setHighlightTask(null);
+		}
+		
+		if(command.getCommandType() == COMMANDTYPE.ADD) {
+			AddCommand comd = (AddCommand)command;
+			setScrollVal(comd.getTaskID());
+			setAddedTask(comd.getAddedTask());
+		} else if(command.getCommandType() == COMMANDTYPE.LABEL) {
+			setScrollVal(0);
+		} else {
+			setScrollVal(-1);
+		}
+		
 
-		String feedback = command.execute(storage);
 		storage.write();
 		return feedback;
 		
@@ -42,6 +88,10 @@ public class TDTLogic implements ITDTLogic {
 			}
 		}
 		return newNum;
+	}
+	
+	public Iterator<String> getHideIter() {
+		return storage.getHideList().iterator();
 	}
 	
 	public static int sort(ArrayList<Task> array, Task task) {
@@ -97,6 +147,46 @@ public class TDTLogic implements ITDTLogic {
 	
 	public ArrayList<String> getAutoWords() {
 		return storage.getAutoWords();
+	}
+
+	public int getViewMode() {
+		return viewMode;
+	}
+
+	public void setViewMode(int viewMode) {
+		this.viewMode = viewMode;
+	}
+
+	public ArrayList<Task> getHighlightTask() {
+		return highlightTask;
+	}
+
+	public void setHighlightTask(ArrayList<Task> highlightTask) {
+		this.highlightTask = highlightTask;
+	}
+
+	public int getScrollVal() {
+		return scrollVal;
+	}
+
+	public void setScrollVal(int scrollVal) {
+		this.scrollVal = scrollVal;
+	}
+
+	public ArrayList<Task> getSearchedTask() {
+		return searchedTask;
+	}
+
+	public void setSearchedTask(ArrayList<Task> searchedTask) {
+		this.searchedTask = searchedTask;
+	}
+
+	public Task getAddedTask() {
+		return addedTask;
+	}
+
+	public void setAddedTask(Task addedTask) {
+		this.addedTask = addedTask;
 	}
 
 

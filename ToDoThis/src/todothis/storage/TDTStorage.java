@@ -24,7 +24,6 @@ public class TDTStorage implements ITDTStorage {
 	private String fileName;
 	private HashMap<String, ArrayList<Task>> labelMap;
 	private String currLabel = TDTGUI.DEFAULT_LABEL;
-	//private Stack<HashMap<String, ArrayList<Task>>> undoStack;
 	private Stack<Command> undoStack;
 	private Stack<String> labelPointerStack;
 	private BufferedWriter bw;

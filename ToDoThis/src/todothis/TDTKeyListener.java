@@ -3,21 +3,12 @@ package todothis;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import todothis.command.AddCommand;
-import todothis.command.Command;
-import todothis.command.EditCommand;
-import todothis.command.HideCommand;
-import todothis.command.RedoCommand;
-import todothis.command.SearchCommand;
-import todothis.command.ShowCommand;
-import todothis.command.UndoCommand;
 import todothis.dateandtime.TDTDateAndTime;
+import todothis.logic.TDTLogic;
 import todothis.logic.Task;
-import todothis.parser.ITDTParser.COMMANDTYPE;
 
 public class TDTKeyListener implements KeyListener {
 	private static final int _SCROLLFACTOR = 30;
@@ -30,12 +21,11 @@ public class TDTKeyListener implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent arg0) {
 		int keyCode = arg0.getKeyCode();
-		int prevScrollVal = gui.scrollPane.getVerticalScrollBar().getValue();
+		int scrollVal = gui.scrollPane.getVerticalScrollBar().getValue();
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
-			UndoCommand undo = new UndoCommand();
-			String feedback = gui.getLogic().executeCommand(undo);
-			gui.updateGUI(feedback, gui.displayTask(null));
-			scrollTo(prevScrollVal);
+			String feedback = gui.getLogic().executeCommand("undo");
+			gui.updateGUI(feedback, gui.displayTask(null, null));
+			scrollTo(scrollVal);
 		}
 		
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_R) {
@@ -44,24 +34,21 @@ public class TDTKeyListener implements KeyListener {
 		}
 		
 		if (arg0.isAltDown()  && keyCode == KeyEvent.VK_S) {
-			ShowCommand show = new ShowCommand("");
-			String feedback = gui.getLogic().executeCommand(show);
-			gui.updateGUI(feedback, gui.displayTask(null));
+			String feedback = gui.getLogic().executeCommand("show");
+			gui.updateGUI(feedback, gui.displayTask(null, null));
 			scrollTo(0);
 		}
 		
 		if (arg0.isAltDown() && keyCode == KeyEvent.VK_H) {
-			HideCommand hide = new HideCommand("");
-			String feedback = gui.getLogic().executeCommand(hide);
-			gui.updateGUI(feedback, gui.displayTask(null));
+			String feedback = gui.getLogic().executeCommand("hide");
+			gui.updateGUI(feedback, gui.displayTask(null, null));
 			scrollTo(0);
 		}
 
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Y) {
-			RedoCommand redo = new RedoCommand();
-			String feedback = gui.getLogic().executeCommand(redo);
-			gui.updateGUI(feedback, gui.displayTask(null));
-			scrollTo(prevScrollVal);
+			String feedback = gui.getLogic().executeCommand("redo");
+			gui.updateGUI(feedback, gui.displayTask(null, null));
+			scrollTo(scrollVal);
 		}
 
 		switch (keyCode) {
@@ -70,39 +57,23 @@ public class TDTKeyListener implements KeyListener {
 			gui.getCommandHistory().add(gui.getUserCommand());
 			gui.setHistoryPointer(gui.getCommandHistory().size());
 			gui.commandField.setText("");
-			Command command = gui.getParser().parse(gui.getUserCommand());
 			
-			if(command.getCommandType() == COMMANDTYPE.HELP) { 
-				String feedback = gui.getLogic().executeCommand(command);
-				gui.updateGUI("Displaying Help text.", feedback);
-			} else if (command.getCommandType() != COMMANDTYPE.SEARCH) {
-				String feedback = gui.getLogic().executeCommand(command);
-				if(command.getCommandType() == COMMANDTYPE.ADD || 
-						command.getCommandType() == COMMANDTYPE.EDIT) {
-					Task task = null;
-					if(command.getCommandType() == COMMANDTYPE.ADD) {
-						task = ((AddCommand)command).getAddedTask();
-					} else {
-						task = ((EditCommand)command).getEditedTask();
-					}
-					gui.updateGUI(feedback, gui.displayTask(task));
-					if(task != null && command.getCommandType() == COMMANDTYPE.ADD) {
-						scrollTo(task.getTaskID() * _SCROLLFACTOR);
-					} else {
-						scrollTo(prevScrollVal);
-					}
-				} else {
-					gui.updateGUI(feedback, gui.displayTask(null));
-					scrollTo(prevScrollVal);
-				}
-			} else {
-				String feedback = gui.getLogic().executeCommand(command);
-				ArrayList<Task> searched = ((SearchCommand) command)
-						.getSearchedResult();
-				gui.updateGUI(feedback, gui.displaySearch(searched));
-				scrollTo(0);
+			String feedback = gui.getLogic().executeCommand(gui.getUserCommand());
+			int value = gui.getLogic().getScrollVal();
+			if(value != -1) {
+				scrollVal = value;
 			}
-
+			if(gui.getLogic().getViewMode() == TDTLogic.SEARCH_VIEW) {
+				gui.updateGUI(feedback, gui.displaySearch(gui.getLogic().getSearchedTask()));
+				scrollTo(0);
+			} else if(gui.getLogic().getViewMode() == TDTLogic.HELP_VIEW) {
+				gui.updateGUI("Displaying Help text.", feedback);
+				scrollTo(0);
+			} else {
+				gui.updateGUI(feedback, gui.displayTask(gui.getLogic().getHighlightTask(),
+						gui.getLogic().getAddedTask()));
+				scrollTo(scrollVal * _SCROLLFACTOR);
+			}
 			break;
 
 		case KeyEvent.VK_UP:

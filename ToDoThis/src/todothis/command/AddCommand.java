@@ -24,9 +24,9 @@ public class AddCommand extends Command {
 	private String commandDetails;
 	private TDTDateAndTime dateAndTime;
 	private boolean isHighPriority;
+	private ArrayList<Task> targetTask;
 	private Task addedTask;
 	private String feedback = "";
-	private ArrayList<Task> clashedTask = new ArrayList<Task>();
 	private boolean gotClashes = false;
 
 	public AddCommand(String commandDetails, TDTDateAndTime dateAndTime, boolean isHighPriority ) {
@@ -34,6 +34,7 @@ public class AddCommand extends Command {
 		this.setHighPriority(isHighPriority);
 		this.setCommandDetails(commandDetails);
 		this.setDateAndTime(dateAndTime);
+		this.setTargetTask(new ArrayList<Task>());
 	}
 
 	@Override
@@ -88,16 +89,20 @@ public class AddCommand extends Command {
 	}
 
 	private void checkForClash(Task target, Iterator<Task> iter) {
+		int numClash = 0;
 		while(iter.hasNext()) {
 			Task task = iter.next();
-			if(target.getDateAndTime().isClash(task.getDateAndTime())) {
-				clashedTask.add(task);
+			if(task != target && !task.isDone()) {
+				if(target.getDateAndTime().isClash(task.getDateAndTime())) {
+					targetTask.add(task);
+					numClash++;
+					gotClashes = true;
+				}
 			}
 		}
-		if(!clashedTask.isEmpty()) {
-			gotClashes = true;
+		if(gotClashes) {
 			String feedback = "Clashes detected. " + String.format(MESSAGE_ADD_FEEDBACK,
-					target.getLabelName()) + "\n" + clashedTask.size() 
+					target.getLabelName()) + "\n" + numClash 
 					+ " task(s) found to have same time range on " 
 					+ target.getDateAndTime().getStartDate();
 			this.setFeedback(feedback);
@@ -106,6 +111,7 @@ public class AddCommand extends Command {
 
 	@Override
 	public String undo(TDTStorage storage) {
+		targetTask.clear();
 		DeleteCommand comd = new DeleteCommand(getLabelName(), getTaskID());
 		comd.execute(storage);
 		assert (storage.getUndoStack().size() > 0) : "undostack is empty";
@@ -161,12 +167,12 @@ public class AddCommand extends Command {
 		this.isHighPriority = isHighPriority;
 	}
 
-	public Task getAddedTask() {
-		return addedTask;
+	public ArrayList<Task> getTargetTask() {
+		return targetTask;
 	}
 
-	public void setAddedTask(Task addedTask) {
-		this.addedTask = addedTask;
+	public void setTargetTask(ArrayList<Task> targetTask) {
+		this.targetTask = targetTask;
 	}
 
 	public String getFeedback() {
@@ -175,6 +181,14 @@ public class AddCommand extends Command {
 
 	public void setFeedback(String feedback) {
 		this.feedback = feedback;
+	}
+
+	public Task getAddedTask() {
+		return addedTask;
+	}
+
+	public void setAddedTask(Task addedTask) {
+		this.addedTask = addedTask;
 	}
 
 	

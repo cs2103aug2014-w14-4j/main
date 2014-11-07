@@ -28,7 +28,7 @@ public class LabelCommand extends Command {
 		
 		if(storage.getLabelMap().containsKey(label[0])) {
 			storage.setCurrLabel(label[0]);
-			
+			storage.getHideList().remove(label[0]);
 			setUndoFeedback("Current label change to: " + prevLabel);
 			storage.insertToUndoStack(this);
 			return "Current label change to: " + label[0];

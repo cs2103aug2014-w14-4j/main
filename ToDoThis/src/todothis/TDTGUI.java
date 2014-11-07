@@ -44,7 +44,6 @@ import todothis.dateandtime.TDTDateMethods;
 import todothis.dateandtime.TDTTimeMethods;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
-import todothis.parser.TDTParser;
 
 public class TDTGUI extends JFrame implements DocumentListener {
 	/**
@@ -62,7 +61,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	public static final String FILENAME = "todothis.txt";
 	public static final String DEFAULT_LABEL = "TODOTHIS";
 	private TDTLogic logic;
-	private TDTParser parser;
 	private String userCommand;
 	private ArrayList<String> commandHistory = new ArrayList<String>();
 	private int historyPointer = 0;
@@ -83,17 +81,21 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .heading{ border-left: 1px solid #5882FA;border-right: 1px solid #5882FA; background: #BDBDBD}"
 			+ ".datagrid table .heading th{ border: 1px solid white;}"
-			+ ".datagrid table .overdue td{ background: #F781D8; color: white}"
-			+ ".datagrid table .priority td{ background: #FE2E2E; color: white }"
+			+ ".datagrid table .overdue td{ background: #FC7C7C; color: white}"
+			+ ".datagrid table .priority td{ background: #ff4040; color: white }"
 			+ ".datagrid table tr .datetime{ font-size:12px }"
-			+ ".datagrid table .target td{ border: 3px solid #EEB111 }"
-			+ ".datagrid table .prioritytarget td{ border: 3px solid #EEB111; background: #FE2E2E; color: white }"
-			+ ".datagrid table .overduetarget td{ border: 3px solid #EEB111; background: #F781D8; color: white }"
-			+ ".datagrid table .alttarget { border: 3px solid #EEB111;background: #E1EEF4; color: #00496B; }"
+			+ ".datagrid table .target { border: 4px solid #0F0E0E }"
+			+ ".datagrid table .clash { border: 4px solid #EEB111 }"
+			+ ".datagrid table .priorityclash td{ border: 4px solid #EEB111; background: #ff4040; color: white }"
+			+ ".datagrid table .overdueclash td{ border: 4px solid #EEB111; background: #FC7C7C; color: white }"
+			+ ".datagrid table .altclash { border: 4px solid #EEB111; background: #E1EEF4; color: #00496B; }"
+			+ ".datagrid table .prioritytarget td{ border: 4px solid #0F0E0E; background: #ff4040; color: white }"
+			+ ".datagrid table .overduetarget td{ border: 4px solid #0F0E0E; background: #FC7C7C; color: white }"
+			+ ".datagrid table .alttarget { border: 4px solid #0F0E0E; background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .taskId { width: 10%; }"
-			+ ".datagrid table .dateTime { width: 30%; }"
+			+ ".datagrid table .dateTime { width: 35%; }"
 			+ ".datagrid table .labelhead { width: 10%; }"
-			+ ".datagrid table .done td{ background: #04B404; text-decoration: line-through}"
+			+ ".datagrid table .done td{ background: #00ff7f; text-decoration: line-through}"
 			+ ".label{ color: #0174DF; font-size:15px font-family: Candara;}"
 			+ ".helptable td { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
 			+ ".helptable tr { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
@@ -136,33 +138,39 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		initFeedbackArea();
 	}
 
-	String displayTask(Task target) {
+	String displayTask(ArrayList<Task> target, Task addedTask) {
 		StringBuilder sb = new StringBuilder();
 		String currLabel = logic.getCurrLabel();
 		Iterator<String> labelIter = logic.getLabelIterator();
 		ArrayList<Task> array;
+		Iterator<String> hideIter = logic.getHideIter();
 
 		// Display task from current label first
 		array = logic.getTaskListFromLabel(currLabel);
-		displayFormat(sb, currLabel, array, target);
+		displayFormat(sb, currLabel, array, target, addedTask);
 
 		while (labelIter.hasNext()) {
 			String label = labelIter.next();
 			if (!label.equals(currLabel)) {
 				array = logic.getTaskListFromLabel(label);
-				displayFormat(sb, label, array, target);
+				displayFormat(sb, label, array, target, addedTask);
 			}
+		}
+		while (hideIter.hasNext()) {
+			String label = hideIter.next();
+			array = logic.getTaskListFromLabel(label);
+			sb.append("<span class = label><b>" + label + "("
+					+ array.size() + ")" + "</b></span>: <br>");
 		}
 		return sb.toString();
 	}
 
 	private void displayFormat(StringBuilder sb, String currLabel,
-			ArrayList<Task> array, Task target) {
-		if (array != null) {
-			sb.append("<span class = label><b>" + currLabel + "("
-					+ array.size() + ")" + "</b></span>: <br>");
-					
+			ArrayList<Task> array, ArrayList<Task> target, Task addedTask) {
+		if (array != null) {	
 			if (!logic.isHideLabel(currLabel)) {
+				sb.append("<span class = label><b>" + currLabel + "("
+						+ array.size() + ")" + "</b></span>: <br>");
 				for (int i = 0; i < array.size(); i++) {
 					Task task = array.get(i);
 					if (i == 0) {
@@ -171,15 +179,15 @@ public class TDTGUI extends JFrame implements DocumentListener {
 								+ "<th class = dateTime>Date/Time</th> </tr>");
 					}
 					if (task.isDone()) {
-						sb.append(displayTaskInRow(task, " class = done", target));
+						sb.append(displayTaskInRow(task, " class = done", target, addedTask));
 					} else if (task.getDateAndTime().isOverdue()) {
-						sb.append(displayTaskInRow(task, " class = overdue", target));
+						sb.append(displayTaskInRow(task, " class = overdue", target, addedTask));
 					} else if (task.isHighPriority()) {
-						sb.append(displayTaskInRow(task, " class = priority", target));
+						sb.append(displayTaskInRow(task, " class = priority", target, addedTask));
 					} else if (i % 2 == 0) {
-						sb.append(displayTaskInRow(task, " class = alt", target));
+						sb.append(displayTaskInRow(task, " class = alt", target, addedTask));
 					} else {
-						sb.append(displayTaskInRow(task, " class =", target));
+						sb.append(displayTaskInRow(task, " class =", target, addedTask));
 					}
 				}
 				sb.append("</table></div>");
@@ -187,10 +195,15 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		}
 	}
 
-	private String displayTaskInRow(Task task, String type, Task target) {
-		if(task == target ) {
+	private String displayTaskInRow(Task task, String type, ArrayList<Task> target, Task addedTask) {
+		if(addedTask == task) {
 			type = type + "target";
 		}
+		if(target != null)  {
+			if(target.contains(task) ) {
+				type = type + "clash";
+			}
+		} 
 		return "<tr" + type + "><td>" + task.getTaskID() + "</td><td>"
 				+ task.getDetails() + "</td><td class = datetime>"
 				+ task.getDateAndTime().display()
@@ -198,21 +211,12 @@ public class TDTGUI extends JFrame implements DocumentListener {
 				+"</td></tr>";
 	}
 	
-	private int getTotalDoneTask( ArrayList<Task> array) {
-		int ans = 0;
-		for(int i = 0; i < array.size(); i++) {
-			Task task = array.get(i);
-			if(task.isDone()) {
-				ans++;
-			}
-		}
-		return ans;
-	}
 	
 	private String checkIfHaveReminder(String remind) {
 		String res = "";
 		if(!remind.equals("null")) {
 			String[] temp = remind.split(" ");
+			res = res + TDTDateMethods.changeToDayOfWeek(temp[0]) + " ";
 			res = res + TDTDateMethods.changeDateFormatDisplay(temp[0]) + " ";
 			res = res + TDTTimeMethods.changeTimeFormatDisplay(temp[1]);
 			res = "Reminder: " + res;
@@ -376,7 +380,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	private String doInit() {
-		setParser(new TDTParser());
 		logic = new TDTLogic(FILENAME);
 		try {			
 			logic.readAndInitialize();
@@ -388,7 +391,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		setIconImage(image);
 		setTitle("TodoThis");
 		
-		taskPane.setText(displayTask(null));
+		taskPane.setText(displayTask(null, null));
 		taskLabel.setText(" Current Label: "
 				+ logic.getCurrLabel());
 		return "Todo-This ready!\nType \"help\" for more information.";
@@ -420,13 +423,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		this.userCommand = userCommand;
 	}
 
-	public TDTParser getParser() {
-		return parser;
-	}
-
-	public void setParser(TDTParser parser) {
-		this.parser = parser;
-	}
 
 	public TDTLogic getLogic() {
 		return logic;

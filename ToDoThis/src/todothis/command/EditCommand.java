@@ -16,7 +16,7 @@ public class EditCommand extends Command {
 	private String prevDetails;
 	private TDTDateAndTime prevDNT;
 	private boolean prevPriority;
-	private Task editedTask;
+	private ArrayList<Task> editedTask;
 
 	
 	public EditCommand(String labelName, int taskID,
@@ -28,6 +28,7 @@ public class EditCommand extends Command {
 		this.setLabelName(labelName.toUpperCase());
 		this.setCommandDetails(commandDetails);
 		this.setDateAndTime(dateAndTime);
+		this.setEditedTask(new ArrayList<Task>());
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class EditCommand extends Command {
 			ArrayList<Task> array = storage.getLabelMap().get(getLabelName());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
-				setEditedTask(task);
+				editedTask.add(task);
 				prevDetails = task.getDetails();
 				prevDNT = task.getDateAndTime();
 				prevPriority = task.isHighPriority();
@@ -66,7 +67,7 @@ public class EditCommand extends Command {
 				ArrayList<Task> array = storage.getLabelMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
-					setEditedTask(task);
+					editedTask.add(task);
 					prevDetails = task.getDetails();
 					prevDNT = task.getDateAndTime();
 					prevPriority = task.isHighPriority();
@@ -139,11 +140,11 @@ public class EditCommand extends Command {
 		this.isHighPriority = isHighPriority;
 	}
 
-	public Task getEditedTask() {
+	public ArrayList<Task> getEditedTask() {
 		return editedTask;
 	}
 
-	public void setEditedTask(Task editedTask) {
+	public void setEditedTask(ArrayList<Task> editedTask) {
 		this.editedTask = editedTask;
 	}
 
