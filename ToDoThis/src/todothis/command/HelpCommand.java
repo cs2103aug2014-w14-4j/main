@@ -55,6 +55,8 @@ public class HelpCommand extends Command{
 			return helpHide();
 		case DONE:
 			return helpDone();
+		case REMIND:
+			return helpRemind();
 		default:
 			break;
 		}
@@ -226,7 +228,15 @@ public class HelpCommand extends Command{
 		sb.append("<br>");
 		sb.append("<b>To search for a keyword</b>: search <span color = blue>keyword</span>");
 		sb.append("<br>");
-		sb.append("<b>To search for a day/date</b>: search <span color = blue>@tmr</span> OR Search <span color = blur>@24/12/14</span>");
+		sb.append("<b>To search for a day/date</b>: search <span color = blue>@tmr</span> OR Search <span color = blue>@24/12/14</span>");
+		sb.append("<br>");
+		sb.append("<b>To search for a range of dates/days</b>: search <span color = blue>@day1/date1 till day2/date2</span>");
+		sb.append("<br>");
+		sb.append("<b>To search with both keyword and date</b>: search <span color = blue>keyword</span> <span color = green>@date</span>");
+		sb.append("<br>");
+		sb.append("<b>To search for done or overdue tasks</b>: search <span color = blue>done/overdue</span>");
+		sb.append("<br>");
+		sb.append("Note that for keywords such as done, \" \" have to be applied: search \"done\"");
 		sb.append("<br>");
 		sb.append("<br>");
 		
@@ -274,12 +284,47 @@ public class HelpCommand extends Command{
 		 
 		 return sb.toString();	
 	}
+	private String helpRemind(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>REMIND - set a reminder for task</b></span>");
+		sb.append("<br>");
+		sb.append("<b>To set a reminder for task from the current label</b>: remind <span color = blue>taskID</span> <span color = green>time date</span>");
+		sb.append("<br>");
+		sb.append("<b>To set a reminder for task from a different label</b>: remind <span color = blue>labelName</span> <span color = green>taskID</span> <span color = orange>time date</span>");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
 	private String helpAll(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<span color = red><b>HELP - List of available commands</b></span>");
 		sb.append("<br>");
 		sb.append("<b>For specific command help: help <span color = blue>commandName</span></b>");
-		// list of shortcuts!!!
+		sb.append("<br>");
+		sb.append("If the date and/or time of a newly added task clashes with existing tasks in TDT,");
+		sb.append("<br>");
+		sb.append("all these tasks will be highlighted in yellow");
+		sb.append("<br>");
+		sb.append("Overdue tasks (past deadlines) are highlighted in pink");
+		sb.append("<br>");
+		sb.append("<b>Some available shortcuts</b>");
+		sb.append("<br>");
+		sb.append("Ctrl + Z  -  Undo");
+		sb.append("<br>");
+		sb.append("Ctrl + Y  -  Redo");
+		sb.append("<br>");
+		sb.append("Alt + S  -  Show");
+		sb.append("<br>");
+		sb.append("Alt + H  -  Hide");
+		sb.append("<br>");
+		sb.append("Alt + E  -  Exit");
+		sb.append("<br>");
+		sb.append("F1  -  Stealth Mode");
+		sb.append("<br>");
+		sb.append("F2  -  Original Size");
+		sb.append("<br>");
+		sb.append("Up/Down  -  Look through previous commands at the command input field");
 		sb.append("<br>");
 		sb.append("<br>");
 		sb.append(helpAdd());
@@ -292,6 +337,7 @@ public class HelpCommand extends Command{
 		sb.append(helpShow());
 		sb.append(helpUndo());
 		sb.append(helpRedo());
+		sb.append(helpRemind());
 				
 		return sb.toString();
 	}
@@ -323,6 +369,8 @@ public class HelpCommand extends Command{
 			return COMMANDTYPE.DONE;
 		} else if (commandTypeString.equalsIgnoreCase("redo")) {
 			return COMMANDTYPE.REDO;
+		} else if (commandTypeString.equalsIgnoreCase("remind")) {
+			return COMMANDTYPE.REMIND;
 		} else if (commandTypeString == ""){
 			return COMMANDTYPE.HELP;
 		} else {
