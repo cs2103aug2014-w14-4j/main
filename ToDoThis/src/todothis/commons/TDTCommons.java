@@ -1,5 +1,8 @@
 package todothis.commons;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class TDTCommons {
 	public static String replaceEndStringPunctuation(String word) {
 		int length = word.length();
@@ -13,6 +16,23 @@ public class TDTCommons {
 			}
 		}
 		return replacedWord;
+	}
+	
+	public static int renumberTaskID(ArrayList<Task> array, Task t) {
+		int newNum = 0;
+		for(int i = 0; i < array.size(); i++) {
+			Task task = array.get(i);
+			task.setTaskID(i + 1);
+			if(task == t) {
+				newNum = i + 1;
+			}
+		}
+		return newNum;
+	}
+	
+	public static int sort(ArrayList<Task> array, Task task) {
+		Collections.sort(array);
+		return renumberTaskID(array, task);
 	}
 }
 
