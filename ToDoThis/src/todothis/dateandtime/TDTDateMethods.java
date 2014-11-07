@@ -149,6 +149,24 @@ public class TDTDateMethods {
 		return newDateString;
 	}
 	
+	public static String changeToDayOfWeek(String date){
+		final String OLD_FORMAT = "dd/MM/yyyy";
+		final String NEW_FORMAT = "EEE";
+		String oldDateString = date;
+		String dayOfWeek = "";
+		
+		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
+		Date d = new Date();
+		try {
+			d = sdf.parse(oldDateString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		sdf.applyPattern(NEW_FORMAT);
+		dayOfWeek = sdf.format(d);
+		return dayOfWeek;
+	}
+	
 	public static String changeDateFormat(String decodedDate) {
 		final String OLD_FORMAT = "dd/MM/yyyy";
 		final String NEW_FORMAT = "d/M/yyyy";
