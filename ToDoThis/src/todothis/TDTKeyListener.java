@@ -40,7 +40,7 @@ public class TDTKeyListener implements KeyListener {
 		
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_R) {
 			Toolkit.getDefaultToolkit().beep();
-			JOptionPane.showMessageDialog(null, "REMINDER!\nTask: Jermyn's SHOWTIME!!! =).");
+			JOptionPane.showMessageDialog(null, "REMINDER!\nTask: Reminder POPUP!.");
 		}
 		
 		if (arg0.isAltDown()  && keyCode == KeyEvent.VK_S) {
@@ -106,23 +106,27 @@ public class TDTKeyListener implements KeyListener {
 			break;
 
 		case KeyEvent.VK_UP:
-			gui.setHistoryPointer(gui.getHistoryPointer() - 1);
-			if (gui.getHistoryPointer() < 0) {
-				gui.commandField.setText("");
-				gui.setHistoryPointer(-1);
-			} else {
-				gui.commandField.setText(gui.getCommandHistory().get(
-						gui.getHistoryPointer()));
+			if(gui.commandField.hasFocus()) {
+				gui.setHistoryPointer(gui.getHistoryPointer() - 1);
+				if (gui.getHistoryPointer() < 0) {
+					gui.commandField.setText("");
+					gui.setHistoryPointer(-1);
+				} else {
+					gui.commandField.setText(gui.getCommandHistory().get(
+							gui.getHistoryPointer()));
+				}
 			}
 			break;
 		case KeyEvent.VK_DOWN:
-			gui.setHistoryPointer(gui.getHistoryPointer() + 1);
-			if (gui.getHistoryPointer() >= gui.getCommandHistory().size()) {
-				gui.commandField.setText("");
-				gui.setHistoryPointer(gui.getCommandHistory().size());
-			} else {
-				gui.commandField.setText(gui.getCommandHistory().get(
-						gui.getHistoryPointer()));
+			if(gui.commandField.hasFocus()) {
+				gui.setHistoryPointer(gui.getHistoryPointer() + 1);
+				if (gui.getHistoryPointer() >= gui.getCommandHistory().size()) {
+					gui.commandField.setText("");
+					gui.setHistoryPointer(gui.getCommandHistory().size());
+				} else {
+					gui.commandField.setText(gui.getCommandHistory().get(
+							gui.getHistoryPointer()));
+				}
 			}
 			break;
 		case KeyEvent.VK_SPACE:

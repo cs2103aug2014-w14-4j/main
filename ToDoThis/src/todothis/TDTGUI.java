@@ -376,7 +376,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	private String doInit() {
 		setParser(new TDTParser());
 		logic = new TDTLogic(FILENAME);
-		try {
+		try {			
 			logic.readAndInitialize();
 		} catch (Exception e) {
 			return "Unable to create todothis.txt";
