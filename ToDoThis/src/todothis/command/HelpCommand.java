@@ -75,6 +75,8 @@ public class HelpCommand extends Command{
 		sb.append("<br>");
 		sb.append("Note that the word 'add' can be omitted and the only required field is taskDetails");
 		sb.append("<br>");
+		sb.append("Note that the start date and/or time has to be typed in before the end date and/or time");
+		sb.append("<br>");
 		sb.append("List of preposition words available: ON, AT, BY, TO, FROM, TILL, UNTIL, ABOUT, THE, NEXT, FOLLOWING, THIS, '-'");
 		sb.append("<br>");
 		sb.append("Examples:");
@@ -84,7 +86,7 @@ public class HelpCommand extends Command{
 		sb.append("study in school from 6am - 8am on the following tuesday");
 		sb.append("<br>");
 		sb.append("<table class = helptable>");
-		sb.append("<caption>Date and Time formats</caption>");
+		sb.append("<caption><b>Date and Time formats</b></caption>");
 		sb.append("<tr>");
 	    sb.append("<th><b>Time</b></th>");
 	    sb.append("<th><b>Date</b></th>");
@@ -97,12 +99,58 @@ public class HelpCommand extends Command{
 	    sb.append("<td>3pm</td>");
 	    sb.append("<td>27 Oct 2014 / 27 Oct 14</td>");
 	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>3:00 / 3:00pm</td>");
+	    sb.append("<td>27 Oct</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>300pm</td>");
+	    sb.append("<td>DD/MM/YYYY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>3.00 / 3.00pm</td>");
+	    sb.append("<td>DD/MM/YY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>24 Hours Format</td>");
+	    sb.append("<td>DD-MM-YYYY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>15:00pm</td>");
+	    sb.append("<td>DD-MM-YY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>1500pm</td>");
+	    sb.append("<td>DDMMYYYY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>1500h/hr/hrs</td>");
+	    sb.append("<td>DDMMYY</td>");
+	    sb.append("</tr>");
 	    sb.append("</table>");
 	    sb.append("<br>");
+	    sb.append("The following words are accepted as keywords for input as well");
 	    sb.append("<br>");
-
+	    sb.append("TODAY, TOMORROW, NEXT DAY, FOLLOWING DAY, MONDAY, FRIDAY");
+	    sb.append("<br>");
+	    sb.append("<br>");
+	    sb.append("<b>Types of tasks supported</b>");
+	    sb.append("<br>");
+	    sb.append("Timed tasks - tasks with a specific range of time");
+	    sb.append("<br>");
+	    sb.append("Deadline tasks - tasks with a specific date of completion");
+	    sb.append("<br>");
+	    sb.append("Floating tasks - tasks without deadlines");
+	    sb.append("<br>");
+		sb.append("Note that the use of \" \" allows you to input key words such as edit or tomorrow in your task details");
+		sb.append("<br>");
+		sb.append("For priority tasks, simply include a ! within the task details");
+		sb.append("<br>");
+		sb.append("Note that the presence of a ! within \" \" would not be recognised as a priority task");
+		sb.append("<br>");
 	    
-		
+	    sb.append("<br>");
+	    sb.append("<br>");	
 		
 		return sb.toString();
 	}
