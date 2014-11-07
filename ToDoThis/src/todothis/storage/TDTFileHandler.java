@@ -10,10 +10,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTReminder;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
-import todothis.logic.TDTDateAndTime;
 
 public class TDTFileHandler {
 	private String fileName;

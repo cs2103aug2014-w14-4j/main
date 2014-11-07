@@ -5,13 +5,15 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Iterator;
+
 
 import org.junit.Test;
 
 import todothis.commons.Task;
-import todothis.logic.TDTDateAndTime;
-import todothis.storage.TDTStorage;
+
+import todothis.storage.TDTDataStore;
+import todothis.storage.TDTFileHandler;
+
 
 public class TDTStorageTest {
 
@@ -43,10 +45,11 @@ public class TDTStorageTest {
 	//Normal case of writing 2 labels to file.
 	@Test
 	public void testWrite1() throws Exception {
-		TDTStorage storage = new TDTStorage("TestStorage.txt");
-		storage.getLabelMap().put("TODAY", new ArrayList<Task>());
-		storage.getLabelMap().put("YTD", new ArrayList<Task>());
-		storage.write();
+		TDTDataStore storage = new TDTDataStore();
+		storage.getTaskMap().put("TODAY", new ArrayList<Task>());
+		storage.getTaskMap().put("YTD", new ArrayList<Task>());
+		TDTFileHandler fh = new TDTFileHandler("TestStorage.txt");
+		fh.write(storage);
 		
 		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
 		ArrayList<String> lines = new ArrayList<String>();
@@ -64,8 +67,9 @@ public class TDTStorageTest {
 	//Boundary case of writing no labels to file.
 	@Test
 	public void testWrite2() throws Exception {
-		TDTStorage storage = new TDTStorage("TestStorage.txt");
-		storage.write();
+		TDTDataStore storage = new TDTDataStore();
+		TDTFileHandler fh = new TDTFileHandler("TestStorage.txt");
+		fh.write(storage);
 
 		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
 		ArrayList<String> lines = new ArrayList<String>();

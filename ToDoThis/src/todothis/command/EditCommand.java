@@ -2,9 +2,9 @@ package todothis.command;
 
 import java.util.ArrayList;
 
+import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
 import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.logic.TDTDateAndTime;
 import todothis.storage.TDTDataStore;
 
 public class EditCommand extends Command {
