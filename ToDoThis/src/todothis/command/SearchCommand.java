@@ -67,7 +67,7 @@ public class SearchCommand extends Command {
 		//comd added to redo stack by undo
 		assert(!data.getRedoStack().isEmpty());
 		data.getRedoStack().pop();
-		return "";
+		return "Undo Search";
 	}
 	
 	//-------------------------------Private methods---------------------------------------

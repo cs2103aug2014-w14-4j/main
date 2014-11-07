@@ -42,8 +42,7 @@ public class ShowCommand extends Command {
 	}*/
 	
 	public String execute(TDTDataStore data) {
-		prevHideList = data.getHideList();
-		//prevHideList = data.copyHideList();
+		prevHideList = copyHideList(data.getHideList());
 		String[] labelNames = getLabelName().split(" ");
 		Iterator<String> iter = data.getLabelIterator();
 
@@ -69,7 +68,15 @@ public class ShowCommand extends Command {
 		data.setHideList(prevHideList);
 		return "Undo display";
 	}
-
+	
+	private ArrayList<String> copyHideList(ArrayList<String> hideList) {
+		ArrayList<String> list = new ArrayList<String>();
+		for(int i = 0 ; i < hideList.size(); i++) {
+			list.add(hideList.get(i));
+		}
+		return list;
+	}
+	
 	private static boolean containInArray(String label, String[] labelNames) {
 		for(int i = 0; i < labelNames.length; i++) {
 			if(labelNames[i].toUpperCase().equals(label)) {

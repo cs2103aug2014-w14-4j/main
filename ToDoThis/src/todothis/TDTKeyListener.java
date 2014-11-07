@@ -24,8 +24,7 @@ public class TDTKeyListener implements KeyListener {
 		int scrollVal = gui.scrollPane.getVerticalScrollBar().getValue();
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
 			String feedback = gui.getLogic().executeCommand("undo");
-			gui.updateGUI(feedback, gui.displayTask(null, null));
-			scrollTo(scrollVal);
+			updateView(scrollVal, feedback);
 		}
 		
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_R) {
@@ -47,8 +46,7 @@ public class TDTKeyListener implements KeyListener {
 
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Y) {
 			String feedback = gui.getLogic().executeCommand("redo");
-			gui.updateGUI(feedback, gui.displayTask(null, null));
-			scrollTo(scrollVal);
+			updateView(scrollVal, feedback);
 		}
 
 		switch (keyCode) {
@@ -59,21 +57,7 @@ public class TDTKeyListener implements KeyListener {
 			gui.commandField.setText("");
 			
 			String feedback = gui.getLogic().executeCommand(gui.getUserCommand());
-			int value = gui.getLogic().getScrollVal();
-			if(value != -1) {
-				scrollVal = value;
-			}
-			if(gui.getLogic().getViewMode() == TDTLogic.SEARCH_VIEW) {
-				gui.updateGUI(feedback, gui.displaySearch(gui.getLogic().getSearchedTask()));
-				scrollTo(0);
-			} else if(gui.getLogic().getViewMode() == TDTLogic.HELP_VIEW) {
-				gui.updateGUI("Displaying Help text.", feedback);
-				scrollTo(0);
-			} else {
-				gui.updateGUI(feedback, gui.displayTask(gui.getLogic().getHighlightTask(),
-						gui.getLogic().getAddedTask()));
-				scrollTo(scrollVal * _SCROLLFACTOR);
-			}
+			updateView(scrollVal, feedback);
 			break;
 
 		case KeyEvent.VK_UP:
@@ -171,6 +155,24 @@ public class TDTKeyListener implements KeyListener {
 			break;
 		default:
 			break;
+		}
+	}
+
+	private void updateView(int scrollVal, String feedback) {
+		int value = gui.getLogic().getScrollVal();
+		if(value != -1) {
+			scrollVal = value;
+		}
+		if(gui.getLogic().getViewMode() == TDTLogic.SEARCH_VIEW) {
+			gui.updateGUI(feedback, gui.displaySearch(gui.getLogic().getSearchedTask()));
+			scrollTo(0);
+		} else if(gui.getLogic().getViewMode() == TDTLogic.HELP_VIEW) {
+			gui.updateGUI("Displaying Help text.", feedback);
+			scrollTo(0);
+		} else {
+			gui.updateGUI(feedback, gui.displayTask(gui.getLogic().getHighlightTask(),
+					gui.getLogic().getAddedTask()));
+			scrollTo(scrollVal * _SCROLLFACTOR);
 		}
 	}
 
