@@ -1,6 +1,6 @@
 package todothis.logic;
 
-import todothis.dateandtime.TDTDateAndTime;
+import todothis.parser.TDTDateAndTime;
 
 public class Task implements Comparable<Task> {
 	private int taskID;

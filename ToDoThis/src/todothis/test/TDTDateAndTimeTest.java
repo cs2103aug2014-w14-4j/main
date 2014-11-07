@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import todothis.dateandtime.TDTDateAndTime;
-import todothis.dateandtime.TDTDateMethods;
-import todothis.dateandtime.TDTTimeMethods;
+import todothis.commons.TDTDateMethods;
+import todothis.commons.TDTTimeMethods;
+import todothis.parser.TDTDateAndTime;
 
 public class TDTDateAndTimeTest {
 	@Test
