@@ -1,13 +1,8 @@
 package todothis.dateandtime;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
-//import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	// store converted date format dd/mm/yyyy
@@ -21,25 +16,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private boolean isTimedTask = false;
 	private boolean isDeadlineTask = false;
-
-	private static Pattern[] pattern;
-	private static Matcher matcher;
-
-	// 2am 11pm --
-	private static final String TIME_PATTERN_1 = "(0?[1-9]|1[012])([aA][Mm]|[pP][mM])";
-	// 2:00 12:15 2.00 23:30 ----------
-	private static final String TIME_PATTERN_2 = "(0?[0-9]|1[0-9]|2[0-3])(0?[:.])(0?[0-5][0-9])";
-	// 2:00pm 12:15pm 2.00pm 12.15pm --
-	private static final String TIME_PATTERN_3 = "(0?[0-9]|1[012])(0?[:.])(0?[0-5][0-9])([aA][Mm]|[pP][mM])";
-	// 13:00pm 12:01pm
-	private static final String TIME_PATTERN_4 = "(0?1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
-	// 1200am to 1259pm
-	private static final String TIME_PATTERN_5 = "(0?[1-9]|1[012])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
-	// 1300pm onwards
-	private static final String TIME_PATTERN_6 = "(0?1[3-9]|2[0-3])(0?[0-5][0-9])([pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
-	// 000am 0000am
-	private static final String TIME_PATTERN_7 = "(0?0)(0?[0-5][0-9])([aA][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
-
+	
 	private static Calendar cal;
 
 	// constructor
@@ -83,20 +60,6 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		// System.out.println(TDTDateAndTime.changeTimeFormat("2:59"));
 		// System.out.println(calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("1/1 3.38am")));
 
-	}
-
-	public static String replaceEndStringPunctuation(String word) {
-		int length = word.length();
-		String replacedWord = word;
-		for (int i = length - 1; i >= 0; i--) {
-			if (word.charAt(i) == '.' || word.charAt(i) == '!'
-					|| word.charAt(i) == ',') {
-				replacedWord = word.substring(0, i);
-			} else {
-				return replacedWord;
-			}
-		}
-		return replacedWord;
 	}
 
 	private void decodeDetails(String details) {
@@ -145,27 +108,27 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				thisOrNextOrFollowing = 3;
 			}
 
-			if (checkDate(parts[a])) {
-				decodedDate = decodeDate(parts, a, currentYear, currentMonth);
+			if (TDTDateMethods.checkDate(parts[a])) {
+				decodedDate = TDTDateMethods.decodeDate(parts, a, currentYear, currentMonth);
 
 				storeDecodedDate(endTimeDate, deadlineEndTimeDate, decodedDate);
-			} else if (checkTime(parts[a])) {
-				decodedTime = decodeTime(parts, a);
+			} else if (TDTTimeMethods.checkTime(parts[a])) {
+				decodedTime = TDTTimeMethods.decodeTime(parts, a);
 
 				storeDecodedTime(endTimeDate, deadlineEndTimeDate, decodedTime);
-			} else if (checkDay(parts[a]) != 0) {
-				int numOfDaysToAdd = determineDaysToBeAdded(
+			} else if (TDTDateMethods.checkDay(parts[a]) != 0) {
+				int numOfDaysToAdd = TDTDateMethods.determineDaysToBeAdded(
 						thisOrNextOrFollowing, parts, a, currentDayOfWeek,
 						nextCount, followingCount);
 
-				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
+				decodedDate = TDTDateMethods.addDaysToCurrentDate(currentDay, currentMonth,
 						currentYear, numOfDaysToAdd);
 
 				decodedDate = adjustmentToDate(endTimeDate, decodedDate, parts,
 						a);
 
 				storeDecodedDate(endTimeDate, deadlineEndTimeDate, decodedDate);
-			} else if (checkMonth(parts[a].replaceAll("[0-9~]", "")) != 0) {
+			} else if (TDTDateMethods.checkMonth(parts[a].replaceAll("[0-9~]", "")) != 0) {
 				decodedDate = decodeMonthFormat(parts, a, currentYear,
 						currentMonth);
 
@@ -183,16 +146,16 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			String[] parts, int a) {
 		String[] toBeAddedDateParts = decodedDate.split("/");
 		if (endTimeDate == true) {
-			if (!startDate.equals("null") && checkDay(parts[a]) != 8) { // enddate
+			if (!startDate.equals("null") && TDTDateMethods.checkDay(parts[a]) != 8) { // enddate
 																		// !=
 																		// today
-				if (compareToDate(startDate, decodedDate) == -1
-						|| compareToDate(startDate, decodedDate) == 0) {
+				if (TDTDateMethods.compareToDate(startDate, decodedDate) == -1
+						|| TDTDateMethods.compareToDate(startDate, decodedDate) == 0) {
 					int dayTemp = Integer.parseInt(toBeAddedDateParts[0]);
 					int mthTemp = Integer.parseInt(toBeAddedDateParts[1]);
 					int yearTemp = Integer.parseInt(toBeAddedDateParts[2]);
 
-					decodedDate = addDaysToCurrentDate(dayTemp, mthTemp,
+					decodedDate = TDTDateMethods.addDaysToCurrentDate(dayTemp, mthTemp,
 							yearTemp, 7);
 				}
 			}
@@ -218,7 +181,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private void storeDecodedDate(boolean endTimeDate,
 			boolean deadlineEndTimeDate, String decodedDate) {
-		decodedDate = changeDateFormat(decodedDate);
+		decodedDate = TDTDateMethods.changeDateFormat(decodedDate);
 
 		if (deadlineEndTimeDate == true) {
 			endDate = decodedDate;
@@ -233,33 +196,12 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		}
 	}
 
-	private static String changeDateFormat(String decodedDate) {
-		final String OLD_FORMAT = "dd/MM/yyyy";
-		final String NEW_FORMAT = "d/M/yyyy";
-
-		String oldDateString = decodedDate;
-		String newDateString = "";
-
-		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-		Date d = new Date();
-		try {
-			d = sdf.parse(oldDateString);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		sdf.applyPattern(NEW_FORMAT);
-		newDateString = sdf.format(d);
-		decodedDate = newDateString;
-		return decodedDate;
-	}
-
 	private static String decodeMonthFormat(String[] parts, int a,
 			int currentYear, int currentMonth) {
 		String[] tempParts = parts[a].split("~");
 
 		int day = Integer.parseInt(tempParts[0]);
-		int month = checkMonth(tempParts[1]);
+		int month = TDTDateMethods.checkMonth(tempParts[1]);
 		int year = 0;
 
 		if (tempParts.length == 3) {
@@ -275,23 +217,6 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			}
 		}
 		return day + "/" + month + "/" + year;
-	}
-
-	private static String addDaysToCurrentDate(int currentDay,
-			int currentMonth, int currentYear, int numOfDaysToAdd) {
-		SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
-		Date d = new Date();
-		try {
-			d = sdf.parse(currentDay + "/" + currentMonth + "/" + currentYear);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Calendar c = Calendar.getInstance();
-		c.setTime(d);
-		c.add(Calendar.DATE, numOfDaysToAdd);
-		String newDateString = sdf.format(c.getTime());
-		return newDateString;
 	}
 
 	/*
@@ -310,174 +235,23 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	 * monthTemp + "/" + yearTemp; }
 	 */
 
-	private static int determineDaysToBeAdded(int thisOrNextOrFollowing,
-			String[] parts, int a, int currentDayOfWeek, int nextCount,
-			int followingCount) {
-		int numOfDaysToAdd = 0;
-		if (checkDay(parts[a]) <= 7 && checkDay(parts[a]) > 0) {
-			if (thisOrNextOrFollowing == 0) { // None of the above
-				if (checkDay(parts[a]) <= currentDayOfWeek) {
-					numOfDaysToAdd = 7 - (currentDayOfWeek - checkDay(parts[a]));
-				} else {
-					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
-				}
-			} else {// this
-				if (checkDay(parts[a]) == 1) {// sunday
-					if (currentDayOfWeek != 0) {
-						numOfDaysToAdd = 8 - currentDayOfWeek;
-					}
-				} else {
-					numOfDaysToAdd = checkDay(parts[a]) - currentDayOfWeek;
-				}
-			}
-			if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) { // next
-																			// or
-																			// following
-				numOfDaysToAdd = numOfDaysToAdd + (14 * followingCount)
-						+ (7 * nextCount);
-			}
-		} else if (checkDay(parts[a]) == 8) {
-			// numofdaystoadd already 0;
-		} else if (checkDay(parts[a]) == 9) {
-			numOfDaysToAdd++;
-		} else if (checkDay(parts[a]) == 10) {
-			if (thisOrNextOrFollowing == 2) {// next
-				numOfDaysToAdd = numOfDaysToAdd + (1 * nextCount);
-
-			} else if (thisOrNextOrFollowing == 3) {// following
-				numOfDaysToAdd = numOfDaysToAdd + (2 * followingCount);
-			}
-		}
-		return numOfDaysToAdd;
-	}
-
-	private static String decodeTime(String[] parts, int a) {
-		String[] timeParts = new String[2];
-		int temp;
-		if ((parts[a].substring(parts[a].length() - 2, parts[a].length())
-				.equals("am"))
-				|| (parts[a]
-						.substring(parts[a].length() - 2, parts[a].length())
-						.equals("pm") || (parts[a].substring(
-						parts[a].length() - 2, parts[a].length()).equals("hr")))) {
-			if (parts[a].length() > 4) {
-				if (parts[a].charAt(parts[a].length() - 5) == ':'
-						|| parts[a].charAt(parts[a].length() - 5) == '.') {
-					if (parts[a].length() == 6) {
-						timeParts[0] = parts[a].substring(0, 1);
-						timeParts[1] = parts[a].substring(2, 4);
-					} else {
-						timeParts[0] = parts[a].substring(0, 2);
-						timeParts[1] = parts[a].substring(3, 5);
-					}
-				}
-			}
-			if (parts[a].substring(0, parts[a].length() - 2).matches("\\d+")) {
-				if (parts[a].length() == 3 || parts[a].length() == 4) {
-					timeParts[0] = parts[a].substring(0, parts[a].length() - 2);
-					timeParts[1] = "00";
-				} else {
-					timeParts[0] = parts[a].substring(0, parts[a].length() - 4);
-					timeParts[1] = parts[a].substring(parts[a].length() - 4,
-							parts[a].length() - 2);
-				}
-			}
-
-			temp = Integer.parseInt(timeParts[0]);
-			if (parts[a].substring(parts[a].length() - 2, parts[a].length())
-					.equals("pm")) {
-				if (temp < 12) {
-					temp = temp + 12; // convert to 24hrs format
-				}
-				timeParts[0] = Integer.toString(temp);
-			} else if (parts[a].substring(parts[a].length() - 2,
-					parts[a].length()).equals("am")) {
-				if (temp == 12) {
-					timeParts[0] = "00";
-				}
-			}
-		} else if (parts[a].substring(parts[a].length() - 1, parts[a].length())
-				.equals("h")) {
-			timeParts[0] = parts[a].substring(0, parts[a].length() - 3);
-			timeParts[1] = parts[a].substring(parts[a].length() - 3,
-					parts[a].length() - 1);
-		} else if (parts[a].substring(parts[a].length() - 3, parts[a].length())
-				.equals("hrs")) {
-			timeParts[0] = parts[a].substring(0, parts[a].length() - 5);
-			timeParts[1] = parts[a].substring(parts[a].length() - 5,
-					parts[a].length() - 3);
-		} else {
-			if (parts[a].length() > 2) {
-				if (parts[a].charAt(parts[a].length() - 3) == ':'
-						|| parts[a].charAt(parts[a].length() - 3) == '.') {
-					timeParts[0] = parts[a].substring(0, parts[a].length() - 3);
-					timeParts[1] = parts[a].substring(parts[a].length() - 2,
-							parts[a].length());
-				} else {
-					timeParts[0] = parts[a].substring(0, parts[a].length() - 2);
-					timeParts[1] = parts[a].substring(parts[a].length() - 2,
-							parts[a].length());
-				}
-			}
-		}
-		return timeParts[0] + ":" + timeParts[1];
-	}
-
-	private static String decodeDate(String[] parts, int a, int currentYear,
-			int currentMonth) {
-		String[] dateParts = new String[3];
-		String[] datePartsTemp = null;
-		// 9/12, 9/12/2014, 8-11, 8-11-2015 9/12/12
-		if ((parts[a].split("/").length == 3)
-				|| (parts[a].split("/").length == 2)) {
-			datePartsTemp = parts[a].split("/");
-		} else if ((parts[a].split("-").length == 3)
-				|| (parts[a].split("-").length == 2)) {
-			datePartsTemp = parts[a].split("-");
-		} else {
-			dateParts[0] = parts[a].substring(0, 2);
-			dateParts[1] = parts[a].substring(2, 4);
-			if (parts[a].length() == 6) {
-				dateParts[2] = "20" + parts[a].substring(4, 6); // valid year
-																// 2014-2099
-			} else if (parts[a].length() == 8) {
-				dateParts[2] = parts[a].substring(4, 8);
-			}
-		}
-		// if 9/12 entered, add on to 9/12/2014
-		if (datePartsTemp != null) {
-			if (datePartsTemp.length == 2) {
-				boolean isMonthInt = true;
-				dateParts[0] = datePartsTemp[0];
-				dateParts[1] = datePartsTemp[1];
-
-				try {
-					Integer.parseInt(dateParts[1]);
-				} catch (NumberFormatException e) {
-					isMonthInt = false;
-				}
-				if (isMonthInt) {
-					if (currentMonth > Integer.parseInt(datePartsTemp[1])) {
-						dateParts[2] = Integer.toString(currentYear + 1);
-					} else {
-						dateParts[2] = Integer.toString(currentYear);
-					}
-				}
-			} else {
-				dateParts = datePartsTemp;
-			}
-			if (datePartsTemp.length == 3) {
-				if (datePartsTemp[2].length() == 2) {
-					dateParts[2] = "20" + datePartsTemp[2];
-				}
-			}
-		}
-		return dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
-	}
-
-	private static boolean isPrepositionTo(String[] parts, int a) {
+	public static boolean isPrepositionTo(String[] parts, int a) {
 		return parts[a].equals("to") || parts[a].equals("till")
 				|| parts[a].equals("until") || parts[a].equals("-");
+	}
+
+	public static String replaceEndStringPunctuation(String word) {
+		int length = word.length();
+		String replacedWord = word;
+		for (int i = length - 1; i >= 0; i--) {
+			if (word.charAt(i) == '.' || word.charAt(i) == '!'
+					|| word.charAt(i) == ',') {
+				replacedWord = word.substring(0, i);
+			} else {
+				return replacedWord;
+			}
+		}
+		return replacedWord;
 	}
 
 	// -----------------------GETTER-------------------------------
@@ -510,316 +284,44 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	}
 
 	// -------------------------------------------DISPLAY------------------------------------------------
-	public static String changeDateFormatDisplay(String date) {
-		final String OLD_FORMAT = "dd/MM/yyyy";
-		final String NEW_FORMAT = "d MMM yyyy";
-
-		String oldDateString = date;
-		String newDateString;
-
-		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-		Date d = new Date();
-		try {
-			d = sdf.parse(oldDateString);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		sdf.applyPattern(NEW_FORMAT);
-		newDateString = sdf.format(d);
-		return newDateString;
-	}
-
-	public static String changeTimeFormatDisplay(String time) {
-		final String OLD_FORMAT = "HH:mm";
-		final String NEW_FORMAT = "h:mm a";
-
-		String oldTimeString = time;
-		String newTimeString;
-
-		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-		Date d = new Date();
-		try {
-			d = sdf.parse(oldTimeString);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		sdf.applyPattern(NEW_FORMAT);
-		newTimeString = sdf.format(d);
-		return newTimeString;
-	}
-
-	public String displayDateTime() {
+	public String display() {
 		String dateAndTimeContents = "";
 		if (isDeadlineTask) {
 			dateAndTimeContents = dateAndTimeContents + "Due: ";
 			if (!getEndDate().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents
-						+ changeDateFormatDisplay(getEndDate()) + "\t";
+						+ TDTDateMethods.changeDateFormatDisplay(getEndDate()) + "\t";
 			}
 			if (!getEndTime().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents
-						+ changeTimeFormatDisplay(getEndTime());
+						+ TDTTimeMethods.changeTimeFormatDisplay(getEndTime());
 			}
 			dateAndTimeContents = dateAndTimeContents + "<br>";
 		} else if (isTimedTask) {
 			dateAndTimeContents = dateAndTimeContents + "Start: ";
 			if (!getStartDate().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents
-						+ changeDateFormatDisplay(getStartDate()) + "\t";
+						+ TDTDateMethods.changeDateFormatDisplay(getStartDate()) + "\t";
 			}
 			if (!getStartTime().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents
-						+ changeTimeFormatDisplay(getStartTime());
+						+ TDTTimeMethods.changeTimeFormatDisplay(getStartTime());
 			}
 			dateAndTimeContents = dateAndTimeContents + "<br>";
 			if (!getEndDate().equals("null") || !getEndTime().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "End: ";
 				if (!getEndDate().equals("null")) {
 					dateAndTimeContents = dateAndTimeContents
-							+ changeDateFormatDisplay(getEndDate()) + "\t";
+							+ TDTDateMethods.changeDateFormatDisplay(getEndDate()) + "\t";
 				}
 				if (!getEndTime().equals("null")) {
 					dateAndTimeContents = dateAndTimeContents
-							+ changeTimeFormatDisplay(getEndTime());
+							+ TDTTimeMethods.changeTimeFormatDisplay(getEndTime());
 				}
 				dateAndTimeContents = dateAndTimeContents + "<br>";
 			}
 		}
 		return dateAndTimeContents;
-	}
-
-	public String display() {
-		/*
-		 * String displayString = ""; if (!getStartDate().equals("null") ||
-		 * !getStartTime().equals("null")) { displayString = "(TIMED TASK)"; }
-		 * else if (!getEndDate().equals("null") ||
-		 * !getEndTime().equals("null")) { displayString = "(DEADLINE TASK)"; }
-		 * else { displayString = "(FLOATING TASK)"; } displayString =
-		 * displayString + "<br>" + displayDateTime(isDeadline);
-		 */
-
-		return displayDateTime();
-
-	}
-
-	// -------------------------------Time Related
-	// Methods------------------------------------------
-	public static boolean isValidTimeRange(String time) {
-		if (time.equals("null")) {
-			return true;
-		}
-		String[] timeParts = time.split(":");
-		int hours;
-		int minutes;
-		try {
-			hours = Integer.parseInt(timeParts[0]);
-			minutes = Integer.parseInt(timeParts[1]);
-		} catch (NumberFormatException e) {
-			return false;
-		}
-
-		if (hours < 24 && hours >= 0 && minutes < 60 && minutes >= 0) {
-			return true;
-		}
-		return false;
-	}
-
-	// use for "from Date1 to Date2" date1 and date2 same.
-	public static boolean isValidTimeCompare(String startTime, String endTime) {
-		String[] startTimeParts = startTime.split(":");
-		String[] endTimeParts = endTime.split(":");
-
-		int startHours = Integer.parseInt(startTimeParts[0]);
-		int startMinutes = Integer.parseInt(startTimeParts[1]);
-		int endHours = Integer.parseInt(endTimeParts[0]);
-		int endMinutes = Integer.parseInt(endTimeParts[1]);
-
-		if (endHours > startHours) {
-			return true;
-		} else if (endHours == startHours) {
-			if (endMinutes > startMinutes) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static int compareToTime(String time1, String time2) {
-		String[] time1Parts = time1.split(":");
-		String[] time2Parts = time2.split(":");
-
-		int time1Hours = Integer.parseInt(time1Parts[0]);
-		int time1Minutes = Integer.parseInt(time1Parts[1]);
-		int time2Hours = Integer.parseInt(time2Parts[0]);
-		int time2Minutes = Integer.parseInt(time2Parts[1]);
-
-		if (time2Hours > time1Hours) {
-			return 1;
-		} else if (time2Hours == time1Hours) {
-			if (time2Minutes > time1Minutes) {
-				return 1;
-			} else if (time2Minutes == time1Minutes) {
-				return 0;
-			} else {
-				return -1;
-			}
-		}
-		return -1;
-	}
-
-	// -------------------------------Date related
-	// methods-------------------------------------
-	public static boolean isValidDateRange(String date) {
-		String[] dateParts = date.split("/");
-		int day, month, year;
-		if (date.equals("null")) {
-			return true;
-		}
-
-		try {
-			day = Integer.parseInt(dateParts[0]);
-			month = Integer.parseInt(dateParts[1]);
-			year = Integer.parseInt(dateParts[2]);
-		} catch (NumberFormatException e) {
-			return false;
-		}
-
-		if ((year >= 2014) && (year <= 2099)) {
-			if ((month >= 1) && (month <= 12)) {
-				if ((day >= 1) && (day <= getNumOfDaysFromMonth(month, year))) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public static boolean isValidDateCompare(String startDate, String endDate) {
-		String[] startDateParts = startDate.split("/");
-		String[] endDateParts = endDate.split("/");
-
-		int startDay = Integer.parseInt(startDateParts[0]);
-		int startMonth = Integer.parseInt(startDateParts[1]);
-		int startYear = Integer.parseInt(startDateParts[2]);
-		int endDay = Integer.parseInt(endDateParts[0]);
-		int endMonth = Integer.parseInt(endDateParts[1]);
-		int endYear = Integer.parseInt(endDateParts[2]);
-
-		if (endYear > startYear) {
-			return true;
-		} else if (endYear == startYear) {
-			if (endMonth > startMonth) {
-				return true;
-			} else if (endMonth == startMonth) {
-				if (endDay >= startDay) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public static int compareToDate(String date1, String date2) {
-
-		if (date1.equals("null") && !date2.equals("null")) { // compareddate<thisdate
-			return -1;
-		} else if (date1.equals("null") && date2.equals("null")) {
-			return 0;
-		} else if (!date1.equals("null") && date2.equals("null")) {
-			return 1;
-		}
-
-		String[] date1Parts = date1.split("/");
-		String[] date2Parts = date2.split("/");
-
-		int date1Day = Integer.parseInt(date1Parts[0]);
-		int date1Month = Integer.parseInt(date1Parts[1]);
-		int date1Year = Integer.parseInt(date1Parts[2]);
-		int date2Day = Integer.parseInt(date2Parts[0]);
-		int date2Month = Integer.parseInt(date2Parts[1]);
-		int date2Year = Integer.parseInt(date2Parts[2]);
-
-		if (date2Year > date1Year) {
-			return 1;
-		} else if (date2Year == date1Year) {
-			if (date2Month > date1Month) {
-				return 1;
-			} else if (date2Month == date1Month) {
-				if (date2Day > date1Day) {
-					return 1;
-				} else if (date2Day == date1Day) {
-					return 0;
-				} else {
-					return -1;
-				}
-			}
-		}
-		return -1;
-	}
-
-	public static int getNumOfDaysFromMonth(int month, int year) {
-		int days = 0;
-		boolean isLeapYear = false;
-		switch (month) {
-		case 1:
-		case 3:
-		case 5:
-		case 7:
-		case 8:
-		case 10:
-		case 12:
-			days = 31;
-			break;
-		case 4:
-		case 6:
-		case 9:
-		case 11:
-			days = 30;
-			break;
-		case 2:
-			if (year % 400 == 0) {
-				isLeapYear = true;
-			} else if (year % 100 == 0) {
-				isLeapYear = false;
-			} else if (year % 4 == 0) {
-				isLeapYear = true;
-			} else {
-				isLeapYear = false;
-			}
-			if (isLeapYear) {
-				days = 29;
-				break;
-			} else {
-				days = 28;
-				break;
-			}
-		}
-		return days;
-	}
-
-	// ----------------------CHECK TIME--------------------------------
-
-	public static boolean checkTime(String time) {
-
-		time = replaceEndStringPunctuation(time);
-
-		pattern = new Pattern[8];
-		pattern[1] = Pattern.compile(TIME_PATTERN_1);
-		pattern[2] = Pattern.compile(TIME_PATTERN_2);
-		pattern[3] = Pattern.compile(TIME_PATTERN_3);
-		pattern[4] = Pattern.compile(TIME_PATTERN_4);
-		pattern[5] = Pattern.compile(TIME_PATTERN_5);
-		pattern[6] = Pattern.compile(TIME_PATTERN_6);
-		pattern[7] = Pattern.compile(TIME_PATTERN_7);
-		for (int i = 1; i <= 7; i++) {
-			matcher = pattern[i].matcher(time);
-			if (matcher.matches()) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/*
@@ -866,539 +368,15 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	 * return true; } return false; }
 	 */
 
-	// ---------------------------CHECK
-	// DATE------------------------------------------
-	public static boolean checkDate(String nextWord) {
-		nextWord = replaceEndStringPunctuation(nextWord);
-		String[] parts;
-		if ((nextWord.split("/").length == 3)
-				|| (nextWord.split("/").length == 2)) {
-			parts = nextWord.split("/");
-			try {
-				for (int i = 0; i < parts.length; i++) {
-					Integer.parseInt(parts[i]);
-				}
-			} catch (NumberFormatException e) {
-				return false;
-			}
-			return true;
-		} else if ((nextWord.split("-").length == 3)
-				|| (nextWord.split("-").length == 2)) {
-			parts = nextWord.split("-");
-			try {
-				for (int i = 0; i < parts.length; i++) {
-					Integer.parseInt(parts[i]);
-				}
-			} catch (NumberFormatException e) {
-				return false;
-			}
-			return true;
-		} else if ((nextWord.length() == 6) || (nextWord.length() == 8)) {
-			if (nextWord.matches("\\d+")) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static int checkDay(String day) {
-		day = replaceEndStringPunctuation(day);
-
-		if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
-			return 1;
-		} else if ((day.equalsIgnoreCase("Monday"))
-				|| (day.equalsIgnoreCase("Mon"))) {
-			return 2;
-		} else if ((day.equalsIgnoreCase("Tuesday"))
-				|| (day.equalsIgnoreCase("Tue"))
-				|| (day.equalsIgnoreCase("Tues"))) {
-			return 3;
-		} else if ((day.equalsIgnoreCase("Wednesday"))
-				|| (day.equalsIgnoreCase("Wed"))) {
-			return 4;
-		} else if ((day.equalsIgnoreCase("Thursday"))
-				|| (day.equalsIgnoreCase("Thur"))
-				|| (day.equalsIgnoreCase("Thurs"))) {
-			return 5;
-		} else if ((day.equalsIgnoreCase("Friday"))
-				|| (day.equalsIgnoreCase("Fri"))) {
-			return 6;
-		} else if ((day.equalsIgnoreCase("Saturday"))
-				|| (day.equalsIgnoreCase("Sat"))) {
-			return 7;
-		} else if ((day.equalsIgnoreCase("Today"))
-				|| (day.equalsIgnoreCase("Tdy"))) {
-			return 8;
-		} else if ((day.equalsIgnoreCase("Tomorrow"))
-				|| (day.equalsIgnoreCase("Tml"))
-				|| (day.equalsIgnoreCase("Tmw"))
-				|| (day.equalsIgnoreCase("Tmr"))
-				|| (day.equalsIgnoreCase("2moro"))) {
-			return 9;
-		} else if (day.equalsIgnoreCase("Day")) {
-			return 10;
-		} else {
-			return 0;
-		}
-
-	}
-
-	public static int checkMonth(String month) {
-		if ((month.equalsIgnoreCase("January"))
-				|| (month.equalsIgnoreCase("Jan"))) {
-			return 1;
-		} else if ((month.equalsIgnoreCase("February"))
-				|| (month.equalsIgnoreCase("Feb"))) {
-			return 2;
-		} else if ((month.equalsIgnoreCase("March"))
-				|| (month.equalsIgnoreCase("Mar"))) {
-			return 3;
-		} else if ((month.equalsIgnoreCase("April"))
-				|| (month.equalsIgnoreCase("Apr"))) {
-			return 4;
-		} else if ((month.equalsIgnoreCase("May"))) {
-			return 5;
-		} else if ((month.equalsIgnoreCase("June"))
-				|| (month.equalsIgnoreCase("Jun"))) {
-			return 6;
-		} else if ((month.equalsIgnoreCase("July"))
-				|| (month.equalsIgnoreCase("Jul"))) {
-			return 7;
-		} else if ((month.equalsIgnoreCase("August"))
-				|| (month.equalsIgnoreCase("Aug"))) {
-			return 8;
-		} else if ((month.equalsIgnoreCase("September"))
-				|| (month.equalsIgnoreCase("Sep"))
-				|| (month.equalsIgnoreCase("Sept"))) {
-			return 9;
-		} else if ((month.equalsIgnoreCase("October"))
-				|| (month.equalsIgnoreCase("Oct"))) {
-			return 10;
-		} else if ((month.equalsIgnoreCase("November"))
-				|| (month.equalsIgnoreCase("Nov"))) {
-			return 11;
-		} else if ((month.equalsIgnoreCase("December"))
-				|| (month.equalsIgnoreCase("Dec"))) {
-			return 12;
-		} else {
-			return 0;
-		}
-	}
-
-	public static int checkWeekMonthYear(String checkString) {
-		if ((checkString.equalsIgnoreCase("Week"))
-				|| (checkString.equalsIgnoreCase("Wk"))) {
-			return 1;
-		} else if ((checkString.equalsIgnoreCase("Month"))
-				|| (checkString.equalsIgnoreCase("Mth"))) {
-			return 2;
-		} else if ((checkString.equalsIgnoreCase("Year"))
-				|| (checkString.equalsIgnoreCase("Yr"))) {
-			return 3;
-		} else {
-			return 0;
-		}
-	}
-
-	// -------------------------Decode Search Details------------
-	public static String decodeSearchDetails(String searchString) {
-		String[] searchParts = searchString.toLowerCase().split(" ");
-		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
-		String decodedSearchString = "";
-		String decodedDate = "";
-		int nextCount = 0;
-		int followingCount = 0;
-		String startSearchDate = "";
-		String endSearchDate = "";
-		boolean isSearchDateRange = false;
-
-		cal = Calendar.getInstance(TimeZone.getDefault());
-		int currentDay = cal.get(Calendar.DATE);
-		int currentMonth = cal.get(Calendar.MONTH) + 1;
-		int currentYear = cal.get(Calendar.YEAR);
-		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-		int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-
-		for (int i = 0; i < searchParts.length; i++) {
-			searchParts[i] = replaceEndStringPunctuation(searchParts[i]);
-
-			if (isPrepositionTo(searchParts, i) && !startSearchDate.equals("")) {
-				isSearchDateRange = true;
-			}
-
-			if (searchParts[i].equals("this")) {
-				thisOrNextOrFollowing = 1;
-			} else if (searchParts[i].equals("next")) {
-				nextCount++;
-				thisOrNextOrFollowing = 2;
-			} else if (searchParts[i].equals("following")) {
-				followingCount++;
-				thisOrNextOrFollowing = 3;
-			}
-
-			if (checkDate(searchParts[i])) {
-				decodedDate = decodeDate(searchParts, i, currentYear,
-						currentMonth);
-				if (isValidDateRange(decodedDate)) {
-					decodedDate = changeDateFormat(decodedDate);
-				}
-				if (isSearchDateRange) {
-					endSearchDate = decodedDate;
-				} else {
-					startSearchDate = decodedDate;
-				}
-				decodedSearchString = decodedSearchString + decodedDate + " ";
-			} else if (checkDay(searchParts[i]) != 0) {
-				int numOfDaysToAdd = determineDaysToBeAdded(
-						thisOrNextOrFollowing, searchParts, i,
-						currentDayOfWeek, nextCount, followingCount);
-				decodedDate = addDaysToCurrentDate(currentDay, currentMonth,
-						currentYear, numOfDaysToAdd);
-				if (isValidDateRange(decodedDate)) {
-					decodedDate = changeDateFormat(decodedDate);
-				}
-				if (isSearchDateRange) {
-					endSearchDate = decodedDate;
-				} else {
-					startSearchDate = decodedDate;
-				}
-				decodedSearchString = decodedSearchString + decodedDate + " ";
-			} else if (checkMonth(searchParts[i]) != 0) {
-				boolean isValidDayYear = true;
-				if (i != 0 && i != searchParts.length - 1) {
-					String before = searchParts[i - 1];
-					String after = searchParts[i + 1];
-					try {
-						Integer.parseInt(before);
-						Integer.parseInt(after);
-					} catch (NumberFormatException e) {
-						isValidDayYear = false;
-					}
-					if (isValidDayYear) {
-						int day = Integer.parseInt(before);
-						int month = checkMonth(searchParts[i]);
-						int year = 0;
-
-						if (after.length() == 2) {
-							after = "20" + after;
-						}
-						year = Integer.parseInt(after);
-
-						decodedDate = day + "/" + month + "/" + year;
-						if (isValidDateRange(decodedDate)) {
-							decodedDate = changeDateFormat(decodedDate);
-						}
-						if (isSearchDateRange) {
-							endSearchDate = decodedDate;
-						} else {
-							startSearchDate = decodedDate;
-						}
-						decodedSearchString = decodedSearchString + decodedDate
-								+ " ";
-					}
-				}
-			} else if (checkWeekMonthYear(searchParts[i]) != 0) {
-				if (checkWeekMonthYear(searchParts[i]) == 1) {
-					// this week next week following week
-					decodedSearchString = searchWeek(thisOrNextOrFollowing,
-							decodedSearchString, currentDay, currentMonth,
-							currentYear, currentDayOfWeek, nextCount,
-							followingCount);
-				} else if (checkWeekMonthYear(searchParts[i]) == 2) {
-					// this month next month following month
-					decodedSearchString = searchMonth(thisOrNextOrFollowing,
-							decodedSearchString, currentDay, currentMonth,
-							currentYear, currentDayOfMonth, nextCount,
-							followingCount);
-				} else if (checkWeekMonthYear(searchParts[i]) == 3) {
-					// this year next year following year
-					decodedSearchString = searchYear(thisOrNextOrFollowing,
-							decodedSearchString, currentYear, nextCount,
-							followingCount);
-				}
-			}
-
-			if (isSearchDateRange && !endSearchDate.equals("")) {
-				if (isValidDateRange(startSearchDate)
-						&& isValidDateRange(endSearchDate)) {
-					if (compareToDate(startSearchDate, endSearchDate) == 1) {
-						decodedSearchString = searchDateRange(
-								decodedSearchString, startSearchDate,
-								endSearchDate);
-					}
-				}
-				isSearchDateRange = false;
-				startSearchDate = "";
-				endSearchDate = "";
-			}
-		}
-		return decodedSearchString.trim();
-	}
-
-	private static String searchDateRange(String decodedSearchString,
-			String startSearchDate, String endSearchDate) {
-		String dateTemp = "";
-		dateTemp = startSearchDate;
-		while (!dateTemp.equals(endSearchDate)) {
-			String[] dateParts = dateTemp.split("/");
-			int dayTemp = Integer.parseInt(dateParts[0]);
-			int monthTemp = Integer.parseInt(dateParts[1]);
-			int yearTemp = Integer.parseInt(dateParts[2]);
-			dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
-			decodedSearchString = decodedSearchString + dateTemp + " ";
-		}
-		return decodedSearchString;
-	}
-
-	private static String searchWeek(int thisOrNextOrFollowing,
-			String decodedSearchString, int currentDay, int currentMonth,
-			int currentYear, int currentDayOfWeek, int nextCount,
-			int followingCount) {
-		int dayOfWeek = currentDayOfWeek;
-		String startDayOfWeek = addDaysToCurrentDate(currentDay, currentMonth,
-				currentYear, Integer.parseInt("-" + (dayOfWeek - 1)));
-		String[] dateParts;
-		String dateTemp;
-		dateParts = startDayOfWeek.split("/");
-		int dayTemp = Integer.parseInt(dateParts[0]);
-		int monthTemp = Integer.parseInt(dateParts[1]);
-		int yearTemp = Integer.parseInt(dateParts[2]);
-		if (thisOrNextOrFollowing == 0) {
-			return decodedSearchString;
-		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
-			startDayOfWeek = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp,
-					(7 * nextCount) + (14 * followingCount));
-		}
-		decodedSearchString = decodedSearchString + startDayOfWeek + " ";
-		dateTemp = startDayOfWeek;
-		for (int z = 0; z < 6; z++) {
-			dateParts = dateTemp.split("/");
-			dayTemp = Integer.parseInt(dateParts[0]);
-			monthTemp = Integer.parseInt(dateParts[1]);
-			yearTemp = Integer.parseInt(dateParts[2]);
-
-			dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
-			decodedSearchString = decodedSearchString + dateTemp + " ";
-		}
-		return decodedSearchString;
-	}
-
-	private static String searchMonth(int thisOrNextOrFollowing,
-			String decodedSearchString, int currentDay, int currentMonth,
-			int currentYear, int currentDayOfMonth, int nextCount,
-			int followingCount) {
-		int dayOfMonth = currentDayOfMonth - 1;
-		String startDayOfMonth = addDaysToCurrentDate(currentDay, currentMonth,
-				currentYear, Integer.parseInt("-" + dayOfMonth));
-		String[] dateParts;
-		String dateTemp = "";
-		dateParts = startDayOfMonth.split("/");
-		int dayTemp = Integer.parseInt(dateParts[0]);
-		int monthTemp = Integer.parseInt(dateParts[1]);
-		int yearTemp = Integer.parseInt(dateParts[2]);
-
-		if (thisOrNextOrFollowing == 0) {
-			return decodedSearchString;
-		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
-			int numOfMthToAdd = nextCount + followingCount * 2;
-			for (int i = 0; i < numOfMthToAdd; i++) {
-				if (monthTemp == 12) {
-					monthTemp = 1;
-					yearTemp = yearTemp + 1;
-				} else {
-					monthTemp++;
-				}
-			}
-			startDayOfMonth = dayTemp + "/" + monthTemp + "/" + yearTemp;
-		}
-
-		decodedSearchString = decodedSearchString + startDayOfMonth + " ";
-		dateTemp = startDayOfMonth;
-		dateParts = dateTemp.split("/");
-		if (dateParts.length == 3) { // ensure dateTemp not = ""
-			int numDayOfMonth = getNumOfDaysFromMonth(
-					Integer.parseInt(dateParts[1]),
-					Integer.parseInt(dateParts[2]));
-			for (int z = 0; z < numDayOfMonth - 1; z++) {
-				dateParts = dateTemp.split("/");
-				dayTemp = Integer.parseInt(dateParts[0]);
-				monthTemp = Integer.parseInt(dateParts[1]);
-				yearTemp = Integer.parseInt(dateParts[2]);
-
-				dateTemp = addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
-				decodedSearchString = decodedSearchString + dateTemp + " ";
-			}
-		}
-		return decodedSearchString;
-	}
-
-	private static String searchYear(int thisOrNextOrFollowing,
-			String decodedSearchString, int currentYear, int nextCount,
-			int followingCount) {
-		int yearTemp = currentYear;
-		if (thisOrNextOrFollowing == 0) {
-			return decodedSearchString;
-		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
-			yearTemp = yearTemp + (nextCount + followingCount * 2);
-		}
-
-		for (int a = 1; a <= 12; a++) {
-			int numDayOfMonth = getNumOfDaysFromMonth(a, yearTemp);
-			for (int b = 1; b <= numDayOfMonth; b++) {
-				String date = b + "/" + a + "/" + yearTemp;
-				decodedSearchString = decodedSearchString + date + " ";
-			}
-		}
-		return decodedSearchString;
-	}
-
-	// ---------------CALCULATE REMAINING TIME FOR REMINDER--------------------
-
-	@SuppressWarnings("deprecation")
-	public static String decodeReminderDetails(String reminderString) {
-		String[] reminderParts = reminderString.toLowerCase().split(" ");
-		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
-		String decodedReminderDate = "null";
-		String decodedReminderTime = "null";
-		int nextCount = 0;
-		int followingCount = 0;
-
-		cal = Calendar.getInstance(TimeZone.getDefault());
-		int currentDay = cal.get(Calendar.DATE);
-		int currentMonth = cal.get(Calendar.MONTH) + 1;
-		int currentYear = cal.get(Calendar.YEAR);
-		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-
-		Date time = cal.getTime();
-		int currentHour = time.getHours();
-		int currentMinute = time.getMinutes();
-
-		String currentTime = currentHour + ":" + currentMinute;
-		String currentDate = currentDay + "/" + currentMonth + "/"
-				+ currentYear;
-
-		for (int i = 0; i < reminderParts.length; i++) {
-			reminderParts[i] = replaceEndStringPunctuation(reminderParts[i]);
-
-			if (reminderParts[i].equals("this")) {
-				thisOrNextOrFollowing = 1;
-			} else if (reminderParts[i].equals("next")) {
-				nextCount++;
-				thisOrNextOrFollowing = 2;
-			} else if (reminderParts[i].equals("following")) {
-				followingCount++;
-				thisOrNextOrFollowing = 3;
-			}
-
-			if (checkDate(reminderParts[i])) {
-				decodedReminderDate = decodeDate(reminderParts, i, currentYear,
-						currentMonth);
-			} else if (checkDay(reminderParts[i]) != 0) {
-				int numOfDaysToAdd = determineDaysToBeAdded(
-						thisOrNextOrFollowing, reminderParts, i,
-						currentDayOfWeek, nextCount, followingCount);
-				decodedReminderDate = addDaysToCurrentDate(currentDay,
-						currentMonth, currentYear, numOfDaysToAdd);
-			} else if (checkMonth(reminderParts[i]) != 0) {
-				boolean isValidDayYear = true;
-				if (i != 0 && i != reminderParts.length - 1) {
-					String before = reminderParts[i - 1];
-					int month = checkMonth(reminderParts[i]);
-					String after = reminderParts[i + 1];
-					try {
-						Integer.parseInt(before);
-						Integer.parseInt(after);
-					} catch (NumberFormatException e) {
-						isValidDayYear = false;
-					}
-					if (isValidDayYear) {
-						int day = Integer.parseInt(before);
-						int year = 0;
-
-						if (after.length() == 2) {
-							after = "20" + after;
-						}
-						year = Integer.parseInt(after);
-
-						decodedReminderDate = day + "/" + month + "/" + year;
-					} else {
-						decodedReminderDate = before + "/" + month + "/"
-								+ after;
-					}
-				}
-			} else if (checkTime(reminderParts[i])) {
-				decodedReminderTime = decodeTime(reminderParts, i);
-			}
-		}
-
-		if (decodedReminderTime.equals("null")) {
-			return "null";
-		} else if (decodedReminderDate.equals("null")) { // today
-			if (compareToTime(currentTime, decodedReminderTime) == 1) {
-				return currentDate + " " + decodedReminderTime;
-			}
-		} else {
-			if (isValidDateRange(decodedReminderDate)) {
-				if (compareToDate(currentDate, decodedReminderDate) == 0) {
-					if (compareToTime(currentTime, decodedReminderTime) == 1) {
-						return decodedReminderDate + " " + decodedReminderTime;
-					}
-				} else if (compareToDate(currentDate, decodedReminderDate) == 1) {
-					return decodedReminderDate + " " + decodedReminderTime;
-				}
-			}
-		}
-		return "null";
-	}
-
-	@SuppressWarnings("deprecation")
-	public static long calculateRemainingTime(String decodedString) {
-		cal = Calendar.getInstance(TimeZone.getDefault());
-		int currentDay = cal.get(Calendar.DATE);
-		int currentMonth = cal.get(Calendar.MONTH) + 1;
-		int currentYear = cal.get(Calendar.YEAR);
-
-		Date time = cal.getTime();
-		int currentHour = time.getHours();
-		int currentMinute = time.getMinutes();
-		int currentSeconds = time.getSeconds();
-
-		String reminder = decodedString + ":00";
-		String currentDateAndTime = currentDay + "/" + currentMonth + "/"
-				+ currentYear + " " + currentHour + ":" + currentMinute + ":"
-				+ currentSeconds;
-		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
-		Date d1 = null;
-		Date d2 = null;
-		long remainingTimeInSeconds = 0;
-
-		try {
-			d1 = format.parse(currentDateAndTime);
-			d2 = format.parse(reminder);
-
-			// in milliseconds
-			long diff = d2.getTime() - d1.getTime();
-
-			remainingTimeInSeconds = diff / 1000;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return remainingTimeInSeconds;
-	}
-
 	// -----------------------------------CHECK FOR OVERDUE TASK---------------
-	// NEED TESTING
-	@SuppressWarnings("deprecation")
 	public boolean isOverdue() {
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);
-		Date time = cal.getTime();
-		int currentHour = time.getHours();
-		int currentMinute = time.getMinutes();
+		
+		int currentHour = cal.get(Calendar.HOUR_OF_DAY);
+		int currentMinute = cal.get(Calendar.MINUTE);
 
 		String currentDate = currentDay + "/" + currentMonth + "/"
 				+ currentYear;
@@ -1423,11 +401,11 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		}
 
 		if (!checkDate.equals("null")) {
-			if (compareToDate(currentDate, checkDate) == -1) {
+			if (TDTDateMethods.compareToDate(currentDate, checkDate) == -1) {
 				return true;
-			} else if (compareToDate(currentDate, checkDate) == 0) {
+			} else if (TDTDateMethods.compareToDate(currentDate, checkDate) == 0) {
 				if (!checkTime.equals("null")) {
-					if (compareToTime(currentTime, checkTime) == -1) {
+					if (TDTTimeMethods.compareToTime(currentTime, checkTime) == -1) {
 						return true;
 					}
 				}
@@ -1448,32 +426,32 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 						return true;
 					} else {
 						if (!arg0.getEndDate().equals("null")) {
-							if (compareToDate(this.getStartDate(),
+							if (TDTDateMethods.compareToDate(this.getStartDate(),
 									arg0.getStartDate()) == -1
-									&& compareToDate(this.getStartDate(),
+									&& TDTDateMethods.compareToDate(this.getStartDate(),
 											arg0.getEndDate()) == 1) {
 								return true;
-							} else if (compareToDate(this.getStartDate(),
+							} else if (TDTDateMethods.compareToDate(this.getStartDate(),
 									arg0.getStartDate()) == 0
-									&& compareToDate(this.getStartDate(),
+									&& TDTDateMethods.compareToDate(this.getStartDate(),
 											arg0.getEndDate()) == 0) {
-								if (compareToTime(this.getStartTime(),
+								if (TDTTimeMethods.compareToTime(this.getStartTime(),
 										arg0.getStartTime()) == -1
-										&& compareToTime(this.getStartTime(),
+										&& TDTTimeMethods.compareToTime(this.getStartTime(),
 												arg0.getEndTime()) == 1) {
 									return true;
 								}
 							} else {
-								if (compareToDate(this.getStartDate(),
+								if (TDTDateMethods.compareToDate(this.getStartDate(),
 										arg0.getStartDate()) == 0) {
-									if (compareToTime(this.getStartTime(),
+									if (TDTTimeMethods.compareToTime(this.getStartTime(),
 											arg0.getStartTime()) == -1) {
 										return true;
 									}
 								}
-								if (compareToDate(this.getStartDate(),
+								if (TDTDateMethods.compareToDate(this.getStartDate(),
 										arg0.getEndDate()) == 0) {
-									if (compareToTime(this.getStartTime(),
+									if (TDTTimeMethods.compareToTime(this.getStartTime(),
 											arg0.getEndTime()) == 1) {
 										return true;
 									}
@@ -1486,141 +464,141 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 						.equals("null")) && !arg0.getStartDate().equals("null")) {
 					// condition where this->has SD ED ST ET and arg0->has SD
 					// may have ED may have ST ET
-					if (compareToDate(this.getStartDate(), arg0.getStartDate()) == 1
-							&& compareToDate(this.getEndDate(),
+					if (TDTDateMethods.compareToDate(this.getStartDate(), arg0.getStartDate()) == 1
+							&& TDTDateMethods.compareToDate(this.getEndDate(),
 									arg0.getStartDate()) == -1) {
 						// SDate = 8/10/2014 EDate = 11/10/2014 startArgdate =
 						// 10/10/2014
 						return true;
 					}
-					if (compareToDate(this.getStartDate(), arg0.getStartDate()) == 0
-							&& compareToDate(this.getEndDate(),
+					if (TDTDateMethods.compareToDate(this.getStartDate(), arg0.getStartDate()) == 0
+							&& TDTDateMethods.compareToDate(this.getEndDate(),
 									arg0.getStartDate()) == -1
 							&& !arg0.getStartTime().equals("null")) {
 						// SDate = 8/10/2014 EDate = 11/10/2014 Argdate =
 						// 8/10/2014 NEED CHECK TIMING
-						if (compareToTime(this.getStartTime(),
+						if (TDTTimeMethods.compareToTime(this.getStartTime(),
 								arg0.getStartTime()) == 1
-								|| compareToTime(this.getStartTime(),
+								|| TDTTimeMethods.compareToTime(this.getStartTime(),
 										arg0.getStartTime()) == 0) {
 							// Timing SDate 8/10/2014 0800 argdate 8/10/2014
 							// 0900/0800
 							return true;
 						}
 					}
-					if (compareToDate(this.getStartDate(), arg0.getStartDate()) == 1
-							&& compareToDate(this.getEndDate(),
+					if (TDTDateMethods.compareToDate(this.getStartDate(), arg0.getStartDate()) == 1
+							&& TDTDateMethods.compareToDate(this.getEndDate(),
 									arg0.getStartDate()) == 0
 							&& !arg0.getStartTime().equals("null")) {
 						// SDate = 8/10/2014 EDate = 11/10/2014 Argdate =
 						// 11/10/2014 NEED CHECK TIMING
-						if (compareToTime(this.getEndTime(),
+						if (TDTTimeMethods.compareToTime(this.getEndTime(),
 								arg0.getStartTime()) == -1) {
 							// Timing EDate 11/10/2014 0800 argdate 11/10/2014
 							// 0700
 							return true;
 						}
 					}
-					if (compareToDate(this.getStartDate(), arg0.getStartDate()) == 0
-							&& compareToDate(this.getEndDate(),
+					if (TDTDateMethods.compareToDate(this.getStartDate(), arg0.getStartDate()) == 0
+							&& TDTDateMethods.compareToDate(this.getEndDate(),
 									arg0.getStartDate()) == 0
 							&& !arg0.getStartTime().equals("null")) {
 						// SDate = 8/10/2014 EDate = 8/10/2014 Argdate =
 						// 8/10/2014 NEED CHECK TIMING
-						if ((compareToTime(this.getStartTime(),
-								arg0.getStartTime()) == 1 || compareToTime(
+						if ((TDTTimeMethods.compareToTime(this.getStartTime(),
+								arg0.getStartTime()) == 1 || TDTTimeMethods.compareToTime(
 								this.getStartTime(), arg0.getStartTime()) == 0)
-								&& compareToTime(this.getEndTime(),
+								&& TDTTimeMethods.compareToTime(this.getEndTime(),
 										arg0.getStartTime()) == -1) {
 							// Timing date same sTime = 0900 eTime = 1200
 							// argtime = 1000/0900
 							return true;
 						}
 						if (!arg0.getEndTime().equals("null")) {
-							if (compareToTime(this.getStartTime(),
+							if (TDTTimeMethods.compareToTime(this.getStartTime(),
 									arg0.getStartTime()) == -1
-									&& compareToTime(this.getEndTime(),
+									&& TDTTimeMethods.compareToTime(this.getEndTime(),
 											arg0.getEndTime()) == 1) {
 								return true;
 							}
 						}
 					}
 					if (!arg0.getEndDate().equals("null")) {
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getEndDate()) == 1
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == -1) {
 							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
 							// 10/10/2014
 							return true;
 						}
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getEndDate()) == 0
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == -1
 								&& !arg0.getEndTime().equals("null")) {
 							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
 							// 8/10/2014
-							if (compareToTime(this.getStartTime(),
+							if (TDTTimeMethods.compareToTime(this.getStartTime(),
 									arg0.getEndTime()) == 1) {
 								// Timing SDate 8/10/2014 0800 argdate 8/10/2014
 								// 0900
 								return true;
 							}
 						}
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getEndDate()) == 1
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == 0
 								&& !arg0.getEndTime().equals("null")) {
 							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
 							// 11/10/2014
-							if (compareToTime(this.getEndTime(),
+							if (TDTTimeMethods.compareToTime(this.getEndTime(),
 									arg0.getEndTime()) == -1
-									|| compareToTime(this.getEndTime(),
+									|| TDTTimeMethods.compareToTime(this.getEndTime(),
 											arg0.getEndTime()) == 0) {
 								// Timing EDate 11/10/2014 0800 endargdate
 								// 11/10/2014 0700/0800
 								return true;
 							}
 						}
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getEndDate()) == 0
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == 0
 								&& !arg0.getEndTime().equals("null")) {
 							// SDate = 8/10/2014 EDate = 8/10/2014 endArgdate =
 							// 8/10/2014
-							if (compareToTime(this.getStartTime(),
+							if (TDTTimeMethods.compareToTime(this.getStartTime(),
 									arg0.getEndTime()) == 1
-									&& (compareToTime(this.getEndTime(),
-											arg0.getEndTime()) == -1 || compareToTime(
+									&& (TDTTimeMethods.compareToTime(this.getEndTime(),
+											arg0.getEndTime()) == -1 || TDTTimeMethods.compareToTime(
 											this.getEndTime(),
 											arg0.getEndTime()) == 0)) {
 								return true;
 							}
 							if (!arg0.getStartTime().equals("null")) {
-								if (compareToTime(this.getStartTime(),
+								if (TDTTimeMethods.compareToTime(this.getStartTime(),
 										arg0.getStartTime()) == -1
-										&& compareToTime(this.getEndTime(),
+										&& TDTTimeMethods.compareToTime(this.getEndTime(),
 												arg0.getEndTime()) == 1) {
 									return true;
 								}
 							}
 						}
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getStartDate()) == -1
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == 1) {
 							return true;
 						}
 						// when startdate = arg0startdate & enddate<arg0enddate
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getStartDate()) == 0
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == 1) {
 							if (!arg0.getStartTime().equals("null")) {
-								if (compareToTime(this.getStartTime(),
+								if (TDTTimeMethods.compareToTime(this.getStartTime(),
 										arg0.getStartTime()) == -1) {
 									return true;
 								}
@@ -1629,12 +607,12 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 						// when startdate > arg0startdate & enddate =
 						// arg0enddate
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getStartDate()) == -1
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == 0) {
 							if (!arg0.getEndTime().equals("null")) {
-								if (compareToTime(this.getEndTime(),
+								if (TDTTimeMethods.compareToTime(this.getEndTime(),
 										arg0.getEndTime()) == 1) {
 									return true;
 								}
@@ -1644,15 +622,15 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 						// when startdate = arg0startdate & enddate =
 						// arg0enddate
 						// arg0 start ----- end arg0
-						if (compareToDate(this.getStartDate(),
+						if (TDTDateMethods.compareToDate(this.getStartDate(),
 								arg0.getStartDate()) == 0
-								&& compareToDate(this.getEndDate(),
+								&& TDTDateMethods.compareToDate(this.getEndDate(),
 										arg0.getEndDate()) == 0) {
 							if (!arg0.getStartTime().equals("null")
 									&& !arg0.getEndTime().equals("null")) {
-								if (compareToTime(this.getStartTime(),
+								if (TDTTimeMethods.compareToTime(this.getStartTime(),
 										arg0.getStartTime()) == -1
-										&& compareToTime(this.getEndTime(),
+										&& TDTTimeMethods.compareToTime(this.getEndTime(),
 												arg0.getEndTime()) == 1) {
 									return true;
 								}
@@ -1698,9 +676,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			comparedTime = arg0.getStartTime();
 		}
 
-		if (compareToDate(thisDate, comparedDate) == 1) { // thisdate<compareddate
+		if (TDTDateMethods.compareToDate(thisDate, comparedDate) == 1) { // thisdate<compareddate
 			return -1;
-		} else if (compareToDate(thisDate, comparedDate) == 0) {
+		} else if (TDTDateMethods.compareToDate(thisDate, comparedDate) == 0) {
 			if (thisTime.equals("null") && !comparedTime.equals("null")) {
 				return 1;
 			} else if (thisTime.equals("null") && comparedTime.equals("null")) {
@@ -1709,9 +687,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				return -1;
 			}
 
-			if (compareToTime(thisTime, comparedTime) == 1) { // thistime<comparedtime
+			if (TDTTimeMethods.compareToTime(thisTime, comparedTime) == 1) { // thistime<comparedtime
 				return -1;
-			} else if (compareToTime(thisTime, comparedTime) == 0) {
+			} else if (TDTTimeMethods.compareToTime(thisTime, comparedTime) == 0) {
 				return 0;
 			} else {
 				return 1;

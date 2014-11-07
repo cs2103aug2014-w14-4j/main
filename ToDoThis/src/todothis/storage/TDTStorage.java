@@ -16,6 +16,7 @@ import java.util.Stack;
 import todothis.TDTGUI;
 import todothis.command.Command;
 import todothis.dateandtime.TDTDateAndTime;
+import todothis.dateandtime.TDTTimeMethods;
 import todothis.logic.TDTReminder;
 import todothis.logic.Task;
 
@@ -77,7 +78,7 @@ public class TDTStorage implements ITDTStorage {
 				}
 				if(!params[8].equals("null")) {
 					task.setReminder(new TDTReminder(
-							TDTDateAndTime.calculateRemainingTime(params[8]), task));
+							TDTTimeMethods.calculateRemainingTime(params[8]), task));
 				}
 				this.addTask(task);	
 			}

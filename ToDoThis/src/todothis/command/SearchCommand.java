@@ -1,9 +1,12 @@
 package todothis.command;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 import todothis.dateandtime.TDTDateAndTime;
+import todothis.dateandtime.TDTDateMethods;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTStorage;
@@ -15,6 +18,7 @@ public class SearchCommand extends Command {
 	private ArrayList<Task> searchedResult;
 	private String searchDate;
 	
+	private static Calendar cal;
 	/**
 	 * Constructor for SearchCommand. Able to search by done, overdue, keywords, date.
 	 * @param searchedWords
@@ -42,7 +46,7 @@ public class SearchCommand extends Command {
 		} else {
 			this.setSearchedWords(getSearchedWords().replaceAll("\"", ""));
 			if(searchedWords.indexOf('@') != -1) {
-				this.setSearchDate(TDTDateAndTime.decodeSearchDetails(
+				this.setSearchDate(decodeSearchDetails(
 						searchedWords.substring(searchedWords.indexOf('@') + 1)));
 				this.setSearchedWords(searchedWords.substring(0, searchedWords.indexOf('@')));
 				
@@ -157,6 +161,258 @@ public class SearchCommand extends Command {
 		}
 	}
 	
+	// -------------------------Decode Search Details------------
+	private static String decodeSearchDetails(String searchString) {
+		String[] searchParts = searchString.toLowerCase().split(" ");
+		int thisOrNextOrFollowing = 0; // this = 1 next = 2 following = 3
+		String decodedSearchString = "";
+		String decodedDate = "";
+		int nextCount = 0;
+		int followingCount = 0;
+		String startSearchDate = "";
+		String endSearchDate = "";
+		boolean isSearchDateRange = false;
+
+		cal = Calendar.getInstance(TimeZone.getDefault());
+		int currentDay = cal.get(Calendar.DATE);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentYear = cal.get(Calendar.YEAR);
+		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+
+		for (int i = 0; i < searchParts.length; i++) {
+			searchParts[i] = TDTDateAndTime.replaceEndStringPunctuation(searchParts[i]);
+
+			if (TDTDateAndTime.isPrepositionTo(searchParts, i) && !startSearchDate.equals("")) {
+				isSearchDateRange = true;
+			}
+
+			if (searchParts[i].equals("this")) {
+				thisOrNextOrFollowing = 1;
+			} else if (searchParts[i].equals("next")) {
+				nextCount++;
+				thisOrNextOrFollowing = 2;
+			} else if (searchParts[i].equals("following")) {
+				followingCount++;
+				thisOrNextOrFollowing = 3;
+			}
+
+			if (TDTDateMethods.checkDate(searchParts[i])) {
+				decodedDate = TDTDateMethods.decodeDate(searchParts, i, currentYear,
+						currentMonth);
+				if (TDTDateMethods.isValidDateRange(decodedDate)) {
+					decodedDate = TDTDateMethods.changeDateFormat(decodedDate);
+				}
+				if (isSearchDateRange) {
+					endSearchDate = decodedDate;
+				} else {
+					startSearchDate = decodedDate;
+				}
+				decodedSearchString = decodedSearchString + decodedDate + " ";
+			} else if (TDTDateMethods.checkDay(searchParts[i]) != 0) {
+				int numOfDaysToAdd = TDTDateMethods.determineDaysToBeAdded(
+						thisOrNextOrFollowing, searchParts, i,
+						currentDayOfWeek, nextCount, followingCount);
+				decodedDate = TDTDateMethods.addDaysToCurrentDate(currentDay, currentMonth,
+						currentYear, numOfDaysToAdd);
+				if (TDTDateMethods.isValidDateRange(decodedDate)) {
+					decodedDate = TDTDateMethods.changeDateFormat(decodedDate);
+				}
+				if (isSearchDateRange) {
+					endSearchDate = decodedDate;
+				} else {
+					startSearchDate = decodedDate;
+				}
+				decodedSearchString = decodedSearchString + decodedDate + " ";
+			} else if (TDTDateMethods.checkMonth(searchParts[i]) != 0) {
+				boolean isValidDayYear = true;
+				if (i != 0 && i != searchParts.length - 1) {
+					String before = searchParts[i - 1];
+					String after = searchParts[i + 1];
+					try {
+						Integer.parseInt(before);
+						Integer.parseInt(after);
+					} catch (NumberFormatException e) {
+						isValidDayYear = false;
+					}
+					if (isValidDayYear) {
+						int day = Integer.parseInt(before);
+						int month = TDTDateMethods.checkMonth(searchParts[i]);
+						int year = 0;
+
+						if (after.length() == 2) {
+							after = "20" + after;
+						}
+						year = Integer.parseInt(after);
+
+						decodedDate = day + "/" + month + "/" + year;
+						if (TDTDateMethods.isValidDateRange(decodedDate)) {
+							decodedDate = TDTDateMethods.changeDateFormat(decodedDate);
+						}
+						if (isSearchDateRange) {
+							endSearchDate = decodedDate;
+						} else {
+							startSearchDate = decodedDate;
+						}
+						decodedSearchString = decodedSearchString + decodedDate
+								+ " ";
+					}
+				}
+			} else if (TDTDateMethods.checkWeekMonthYear(searchParts[i]) != 0) {
+				if (TDTDateMethods.checkWeekMonthYear(searchParts[i]) == 1) {
+					// this week next week following week
+					decodedSearchString = searchWeek(thisOrNextOrFollowing,
+							decodedSearchString, currentDay, currentMonth,
+							currentYear, currentDayOfWeek, nextCount,
+							followingCount);
+				} else if (TDTDateMethods.checkWeekMonthYear(searchParts[i]) == 2) {
+					// this month next month following month
+					decodedSearchString = searchMonth(thisOrNextOrFollowing,
+							decodedSearchString, currentDay, currentMonth,
+							currentYear, currentDayOfMonth, nextCount,
+							followingCount);
+				} else if (TDTDateMethods.checkWeekMonthYear(searchParts[i]) == 3) {
+					// this year next year following year
+					decodedSearchString = searchYear(thisOrNextOrFollowing,
+							decodedSearchString, currentYear, nextCount,
+							followingCount);
+				}
+			}
+
+			if (isSearchDateRange && !endSearchDate.equals("")) {
+				if (TDTDateMethods.isValidDateRange(startSearchDate)
+						&& TDTDateMethods.isValidDateRange(endSearchDate)) {
+					if (TDTDateMethods.compareToDate(startSearchDate, endSearchDate) == 1) {
+						decodedSearchString = searchDateRange(
+								decodedSearchString, startSearchDate,
+								endSearchDate);
+					}
+				}
+				isSearchDateRange = false;
+				startSearchDate = "";
+				endSearchDate = "";
+			}
+		}
+		return decodedSearchString.trim();
+	}
+
+	private static String searchDateRange(String decodedSearchString,
+			String startSearchDate, String endSearchDate) {
+		String dateTemp = "";
+		dateTemp = startSearchDate;
+		while (!dateTemp.equals(endSearchDate)) {
+			String[] dateParts = dateTemp.split("/");
+			int dayTemp = Integer.parseInt(dateParts[0]);
+			int monthTemp = Integer.parseInt(dateParts[1]);
+			int yearTemp = Integer.parseInt(dateParts[2]);
+			dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
+			decodedSearchString = decodedSearchString + dateTemp + " ";
+		}
+		return decodedSearchString;
+	}
+
+	private static String searchWeek(int thisOrNextOrFollowing,
+			String decodedSearchString, int currentDay, int currentMonth,
+			int currentYear, int currentDayOfWeek, int nextCount,
+			int followingCount) {
+		int dayOfWeek = currentDayOfWeek;
+		String startDayOfWeek = TDTDateMethods.addDaysToCurrentDate(currentDay, currentMonth,
+				currentYear, Integer.parseInt("-" + (dayOfWeek - 1)));
+		String[] dateParts;
+		String dateTemp;
+		dateParts = startDayOfWeek.split("/");
+		int dayTemp = Integer.parseInt(dateParts[0]);
+		int monthTemp = Integer.parseInt(dateParts[1]);
+		int yearTemp = Integer.parseInt(dateParts[2]);
+		if (thisOrNextOrFollowing == 0) {
+			return decodedSearchString;
+		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
+			startDayOfWeek = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp,
+					(7 * nextCount) + (14 * followingCount));
+		}
+		decodedSearchString = decodedSearchString + startDayOfWeek + " ";
+		dateTemp = startDayOfWeek;
+		for (int z = 0; z < 6; z++) {
+			dateParts = dateTemp.split("/");
+			dayTemp = Integer.parseInt(dateParts[0]);
+			monthTemp = Integer.parseInt(dateParts[1]);
+			yearTemp = Integer.parseInt(dateParts[2]);
+
+			dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
+			decodedSearchString = decodedSearchString + dateTemp + " ";
+		}
+		return decodedSearchString;
+	}
+
+	private static String searchMonth(int thisOrNextOrFollowing,
+			String decodedSearchString, int currentDay, int currentMonth,
+			int currentYear, int currentDayOfMonth, int nextCount,
+			int followingCount) {
+		int dayOfMonth = currentDayOfMonth - 1;
+		String startDayOfMonth = TDTDateMethods.addDaysToCurrentDate(currentDay, currentMonth,
+				currentYear, Integer.parseInt("-" + dayOfMonth));
+		String[] dateParts;
+		String dateTemp = "";
+		dateParts = startDayOfMonth.split("/");
+		int dayTemp = Integer.parseInt(dateParts[0]);
+		int monthTemp = Integer.parseInt(dateParts[1]);
+		int yearTemp = Integer.parseInt(dateParts[2]);
+
+		if (thisOrNextOrFollowing == 0) {
+			return decodedSearchString;
+		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
+			int numOfMthToAdd = nextCount + followingCount * 2;
+			for (int i = 0; i < numOfMthToAdd; i++) {
+				if (monthTemp == 12) {
+					monthTemp = 1;
+					yearTemp = yearTemp + 1;
+				} else {
+					monthTemp++;
+				}
+			}
+			startDayOfMonth = dayTemp + "/" + monthTemp + "/" + yearTemp;
+		}
+
+		decodedSearchString = decodedSearchString + startDayOfMonth + " ";
+		dateTemp = startDayOfMonth;
+		dateParts = dateTemp.split("/");
+		if (dateParts.length == 3) { // ensure dateTemp not = ""
+			int numDayOfMonth = TDTDateMethods.getNumOfDaysFromMonth(
+					Integer.parseInt(dateParts[1]),
+					Integer.parseInt(dateParts[2]));
+			for (int z = 0; z < numDayOfMonth - 1; z++) {
+				dateParts = dateTemp.split("/");
+				dayTemp = Integer.parseInt(dateParts[0]);
+				monthTemp = Integer.parseInt(dateParts[1]);
+				yearTemp = Integer.parseInt(dateParts[2]);
+
+				dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
+				decodedSearchString = decodedSearchString + dateTemp + " ";
+			}
+		}
+		return decodedSearchString;
+	}
+
+	private static String searchYear(int thisOrNextOrFollowing,
+			String decodedSearchString, int currentYear, int nextCount,
+			int followingCount) {
+		int yearTemp = currentYear;
+		if (thisOrNextOrFollowing == 0) {
+			return decodedSearchString;
+		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
+			yearTemp = yearTemp + (nextCount + followingCount * 2);
+		}
+
+		for (int a = 1; a <= 12; a++) {
+			int numDayOfMonth = TDTDateMethods.getNumOfDaysFromMonth(a, yearTemp);
+			for (int b = 1; b <= numDayOfMonth; b++) {
+				String date = b + "/" + a + "/" + yearTemp;
+				decodedSearchString = decodedSearchString + date + " ";
+			}
+		}
+		return decodedSearchString;
+	}
+
 	//-------------------------------Getters & Setters-----------------------------------
 	public String getSearchedWords() {
 		return searchedWords;
@@ -181,6 +437,6 @@ public class SearchCommand extends Command {
 		this.searchDate = searchDate;
 	}
 
-	
+
 
 }

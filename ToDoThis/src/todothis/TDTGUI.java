@@ -40,6 +40,8 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import todothis.dateandtime.TDTDateAndTime;
+import todothis.dateandtime.TDTDateMethods;
+import todothis.dateandtime.TDTTimeMethods;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
 import todothis.parser.TDTParser;
@@ -211,8 +213,8 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		String res = "";
 		if(!remind.equals("null")) {
 			String[] temp = remind.split(" ");
-			res = res + TDTDateAndTime.changeDateFormatDisplay(temp[0]) + " ";
-			res = res + TDTDateAndTime.changeTimeFormatDisplay(temp[1]);
+			res = res + TDTDateMethods.changeDateFormatDisplay(temp[0]) + " ";
+			res = res + TDTTimeMethods.changeTimeFormatDisplay(temp[1]);
 			res = "Reminder: " + res;
 		}
 		return res;

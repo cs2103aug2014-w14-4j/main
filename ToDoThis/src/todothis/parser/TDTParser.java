@@ -2,6 +2,8 @@ package todothis.parser;
 
 import java.util.ArrayList;
 
+
+
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 import todothis.command.AddCommand;
@@ -19,6 +21,8 @@ import todothis.command.SearchCommand;
 import todothis.command.ShowCommand;
 import todothis.command.UndoCommand;
 import todothis.dateandtime.TDTDateAndTime;
+import todothis.dateandtime.TDTDateMethods;
+import todothis.dateandtime.TDTTimeMethods;
 
 public class TDTParser implements ITDTParser {
 
@@ -400,15 +404,15 @@ public class TDTParser implements ITDTParser {
 	 */
 	private int usualAdd(int i, String checkWord) {
 		isPriority(checkWord , i);
-		if (TDTDateAndTime.checkDate(checkWord) || TDTDateAndTime.checkTime(checkWord)) {
+		if (TDTDateMethods.checkDate(checkWord) || TDTTimeMethods.checkTime(checkWord)) {
 			completeDateTimeDetails(i);
-		} else if (TDTDateAndTime.checkDay(checkWord)!=0) {
-			if (TDTDateAndTime.checkDay(checkWord) == 10) {
+		} else if (TDTDateMethods.checkDay(checkWord)!=0) {
+			if (TDTDateMethods.checkDay(checkWord) == 10) {
 				completeSpecialDayDetails(i, checkWord);
 			} else {
 				completeDayDetails(i);
 			}
-		} else if (TDTDateAndTime.checkMonth(checkWord)!=0) {
+		} else if (TDTDateMethods.checkMonth(checkWord)!=0) {
 			setSkipNextWord(false);
 			completeMonthDetails(i);
 		} 

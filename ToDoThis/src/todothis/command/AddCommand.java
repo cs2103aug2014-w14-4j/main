@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import todothis.dateandtime.TDTDateAndTime;
+import todothis.dateandtime.TDTDateMethods;
+import todothis.dateandtime.TDTTimeMethods;
 import todothis.logic.TDTLogic;
 import todothis.logic.Task;
 import todothis.parser.ITDTParser.COMMANDTYPE;
@@ -66,9 +68,9 @@ public class AddCommand extends Command {
 	}
 	
 	private boolean isValidStartEndTime(TDTDateAndTime dnt) {
-		if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
+		if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
 			if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
-				if(TDTDateAndTime.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
+				if(TDTTimeMethods.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
 					return false;
 				}
 			}
@@ -78,7 +80,7 @@ public class AddCommand extends Command {
 
 	private boolean isValidStartEndDate(TDTDateAndTime dnt) {
 		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")) {
-			if(TDTDateAndTime.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
+			if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
 				return false;
 			}
 		}
@@ -113,10 +115,10 @@ public class AddCommand extends Command {
 	
 	
 	private boolean isValidDateTimeRange(TDTDateAndTime dnt) {
-		return TDTDateAndTime.isValidDateRange(dnt.getStartDate()) && 
-			   TDTDateAndTime.isValidDateRange(dnt.getEndDate())   &&
-			   TDTDateAndTime.isValidTimeRange(dnt.getStartTime()) &&
-			   TDTDateAndTime.isValidTimeRange(dnt.getEndTime());
+		return TDTDateMethods.isValidDateRange(dnt.getStartDate())
+				&& TDTDateMethods.isValidDateRange(dnt.getEndDate())
+				&& TDTTimeMethods.isValidTimeRange(dnt.getStartTime())
+				&& TDTTimeMethods.isValidTimeRange(dnt.getEndTime());
 	}
 	
 	public int getTaskID() {
