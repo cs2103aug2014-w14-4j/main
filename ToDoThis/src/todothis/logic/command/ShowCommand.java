@@ -7,6 +7,8 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class ShowCommand extends Command {
+	private static final String MESSAGE_UNDO_SHOW = "Undo show";
+	private static final String MESSAGE_SHOW_FEEDBACK = "Show selected labels";
 	private String labelName;
 	private ArrayList<String> prevHideList;
 	
@@ -60,13 +62,13 @@ public class ShowCommand extends Command {
 		}
 		
 		data.insertToUndoStack(this);
-		return "Display selected labels";
+		return MESSAGE_SHOW_FEEDBACK;
 	}
 	
 	@Override
 	public String undo(TDTDataStore data) {
 		data.setHideList(prevHideList);
-		return "Undo display";
+		return MESSAGE_UNDO_SHOW;
 	}
 	
 	private ArrayList<String> copyHideList(ArrayList<String> hideList) {

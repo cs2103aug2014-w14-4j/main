@@ -4,13 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import todothis.TDTGUI;
 import todothis.commons.TDTCommons;
 import todothis.commons.Task;
 import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class DeleteCommand extends Command {
+	private static final String MESSAGE_UNDO_DELETE_TASK = "Undo delete task.";
+	private static final String MESSAGE_DELETE_TASK = "Task deleted";
+	private static final String MESSAGE_INVALID = "Invalid command.";
+	private static final String MESSAGE_INVALID_TASKID = "Invalid command. Invalid task number.";
+	private static final String MESSAGE_INVALID_LABEL = "Invalid command. Label does not exist.";
+	private static final String MESSAGE_DELETE_LABEL = "Label deleted.";
+	private static final String MESSAGE_UNDO_CLEAR = "Undo clear TodoThis.";
+	private static final String MESSAGE_CLEAR = "TodoThis is cleared!";
+	private static final String MESSAGE_DELETE_LABEL_TASK = "Task under %s deleted.";
+	private static final String MESSAGE_UNDO_DELETE_LABEL_TASK = "Undo delete %s.";
 	private static final int DELETE_ALL = 0;
 	private static final int DELETE_LABELTASK = 1;
 	private static final int DELETE_LABEL = 2;
@@ -44,8 +53,8 @@ public class DeleteCommand extends Command {
 		if(label.equals("") && taskId == -1) {
 			deleteEverything(data);
 			data.insertToUndoStack(this);
-			setUndoFeedback("Undo clear TodoThis.");
-			return "TodoThis is cleared!";
+			setUndoFeedback(MESSAGE_UNDO_CLEAR);
+			return MESSAGE_CLEAR;
 		}
 		
 		//delete label
@@ -55,17 +64,17 @@ public class DeleteCommand extends Command {
 				if(data.getLabelSize(label) == 0) {
 					deleteLabel(data, label);
 					data.insertToUndoStack(this);
-					setUndoFeedback("Undo delete " + label);
-					return "Label deleted.";
+					setUndoFeedback(String.format(MESSAGE_UNDO_DELETE_LABEL_TASK, label));
+					return MESSAGE_DELETE_LABEL;
 				} else {
 					//label not empty, clear task in label
 					deleteLabelTask(data, label);
 					data.insertToUndoStack(this);
-					setUndoFeedback("Undo delete " + label);
-					return "Task under " + label + " deleted.";
+					setUndoFeedback(String.format(MESSAGE_UNDO_DELETE_LABEL_TASK, label));
+					return String.format(MESSAGE_DELETE_LABEL_TASK, label);
 				}
 			} else {
-				return "Invalid command. Label does not exist.";
+				return MESSAGE_INVALID_LABEL;
 			}
 		}
 		
@@ -75,10 +84,10 @@ public class DeleteCommand extends Command {
 			if(taskId <= array.size() && getTaskID() > 0) {
 				deleteTask(data.getCurrLabel(),taskId, data);
 				data.insertToUndoStack(this);
-				setUndoFeedback("Undo delete task.");
-				return "Task deleted";
+				setUndoFeedback(MESSAGE_UNDO_DELETE_TASK);
+				return MESSAGE_DELETE_TASK;
 			} else {
-				return "Invalid command. Invalid task number.";
+				return MESSAGE_INVALID_TASKID;
 			}
 		}
 		
@@ -89,17 +98,17 @@ public class DeleteCommand extends Command {
 				if(taskId <= array.size() && getTaskID() > 0) {
 					deleteTask(label,taskId, data);
 					data.insertToUndoStack(this);
-					setUndoFeedback("Undo delete task.");
-					return "Task deleted";
+					setUndoFeedback(MESSAGE_UNDO_DELETE_TASK);
+					return MESSAGE_DELETE_TASK;
 				} else {
-					return "Invalid command. Invalid task number.";
+					return MESSAGE_INVALID_TASKID;
 				}
 			} else {
-				return "Invalid command. Label does not exist.";
+				return MESSAGE_INVALID_LABEL;
 			}
 		}
 		//Shouldnt reach here
-		return "Invalid command.";
+		return MESSAGE_INVALID;
 	}
 
 	private void deleteTask(String label, int taskId, TDTDataStore data) {
@@ -129,8 +138,8 @@ public class DeleteCommand extends Command {
 		}
 		
 		data.setTaskMap(new HashMap<String, ArrayList<Task>>());
-		data.getTaskMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
-		data.setCurrLabel(TDTGUI.DEFAULT_LABEL);
+		data.getTaskMap().put(TDTCommons.DEFAULT_LABEL, new ArrayList<Task>());
+		data.setCurrLabel(TDTCommons.DEFAULT_LABEL);
 	}
 	
 
@@ -139,10 +148,10 @@ public class DeleteCommand extends Command {
 		setDeleteState(DELETE_LABEL);
 		data.getTaskMap().remove(label);
 		data.getAutoWords().remove(label);
-		data.setCurrLabel(TDTGUI.DEFAULT_LABEL);
-		if(label.equals(TDTGUI.DEFAULT_LABEL)) {
-			data.getTaskMap().put(TDTGUI.DEFAULT_LABEL, new ArrayList<Task>());
-			data.insertToAutoWords(TDTGUI.DEFAULT_LABEL);
+		data.setCurrLabel(TDTCommons.DEFAULT_LABEL);
+		if(label.equals(TDTCommons.DEFAULT_LABEL)) {
+			data.getTaskMap().put(TDTCommons.DEFAULT_LABEL, new ArrayList<Task>());
+			data.insertToAutoWords(TDTCommons.DEFAULT_LABEL);
 		}
 	}
 	

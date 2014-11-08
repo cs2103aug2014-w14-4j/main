@@ -10,6 +10,15 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class RemindCommand extends Command {
+	private static final String MESSAGE_UNDO_REMOVE_REMIND = "Undo remove reminder.";
+	private static final String MESSAGE_UNDO_REMIND = "Undo reminder.";
+	private static final String MESSAGE_INVALID_REMOVE_REMIND = "Invalid command. No reminder to remove.";
+	private static final String MESSAGE_INVALID_LABEL = "Invalid command. Invalid label name.";
+	private static final String MESSAGE_INVALID_TASKID = "Invalid command. Invalid taskId.";
+	private static final String MESSAGE_INVALID_REMIND = "Invalid command. Invalid date/time for reminder.";
+	private static final String MESSAGE_REMIND_FEEDBACK = "Reminder set at %s" ;
+	private static final String MESSAGE__REMOVE_REMIND_FEEDBACK = "Reminder at %s removed." ;
+	
 	private String labelName;
 	private int taskID;
 	private String commandDetails;
@@ -41,19 +50,20 @@ public class RemindCommand extends Command {
 				String remindDateTime = TDTDateAndTimeParser.decodeReminderDetails(getCommandDetails());
 				if(!remindDateTime.equals("null")) {
 					temp.setRemindDateTime(remindDateTime);
-					temp.setReminder(new TDTReminder(TDTTimeMethods.calculateRemainingTime(remindDateTime), temp));
+					temp.setReminder(new TDTReminder(
+							TDTTimeMethods.calculateRemainingTime(remindDateTime), temp));
 					setTask(temp);
 					data.insertToUndoStack(this);
 					
-					return "Reminder set at " + remindDateTime;
+					return String.format(MESSAGE_REMIND_FEEDBACK, remindDateTime);
 				} else {
-					return "Invalid command. Invalid date/time for reminder.";
+					return MESSAGE_INVALID_REMIND;
 				}
 			} else {
-				return "Invalid command. Invalid taskId.";
+				return MESSAGE_INVALID_TASKID;
 			}
 		} else {
-			return "Invalid command.Invalid label name.";
+			return MESSAGE_INVALID_LABEL;
 		}
 	}
 
@@ -63,7 +73,7 @@ public class RemindCommand extends Command {
 			if(getTaskID() > 0 && getTaskID() <= array.size()) {
 				Task temp = array.get(getTaskID() - 1);
 				if(temp.getReminder() == null) {
-					return "Invalid command. No reminder to remove.";
+					return MESSAGE_INVALID_REMOVE_REMIND;
 				}
 				String dateTime = temp.getRemindDateTime();
 				prevReminder = dateTime;
@@ -72,12 +82,12 @@ public class RemindCommand extends Command {
 				temp.setReminder(null);
 				temp.setRemindDateTime("null");
 				data.insertToUndoStack(this);
-				return "Reminder at " + dateTime +  " removed.";
+				return String.format(MESSAGE__REMOVE_REMIND_FEEDBACK, dateTime);
 			} else {
-				return "Invalid command. Invalid taskId.";
+				return MESSAGE_INVALID_TASKID;
 			}
 		} else {
-			return "Invalid command.Invalid label name.";
+			return MESSAGE_INVALID_LABEL;
 		}
 	}
 
@@ -90,12 +100,12 @@ public class RemindCommand extends Command {
 				temp.setReminder(null);
 				temp.setRemindDateTime("null");
 			}
-			return "Undo reminder.";
+			return MESSAGE_UNDO_REMIND;
 		} else {
 			Task temp = getTask();
 			temp.setRemindDateTime(prevReminder);
 			temp.setReminder(new TDTReminder(TDTTimeMethods.calculateRemainingTime(prevReminder), temp));
-			return "Undo remove reminder.";
+			return MESSAGE_UNDO_REMOVE_REMIND;
 		}
 	}
 	

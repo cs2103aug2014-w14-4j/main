@@ -5,6 +5,8 @@ import todothis.storage.TDTDataStore;
 
 public class RedoCommand extends Command{
 	
+	private static final String MESSAGE_INVALID_REDO = "Invalid command. No command to redo.";
+
 	public RedoCommand() {
 		super(COMMANDTYPE.REDO);
 	}
@@ -15,7 +17,7 @@ public class RedoCommand extends Command{
 			Command comd = data.getRedoStack().pop();
 			return comd.execute(data);
 		} else {
-			return "Invalid command. No command to redo.";
+			return MESSAGE_INVALID_REDO;
 		}
 	}
 

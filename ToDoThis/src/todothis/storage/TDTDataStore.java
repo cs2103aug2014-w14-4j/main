@@ -1,5 +1,6 @@
 package todothis.storage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,13 +8,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
 
-import todothis.TDTGUI;
+import todothis.commons.TDTCommons;
 import todothis.commons.Task;
 import todothis.logic.command.Command;
 
 public class TDTDataStore {
 	private HashMap<String, ArrayList<Task>> taskMap;
-	private String currLabel = TDTGUI.DEFAULT_LABEL;
+	private String currLabel = TDTCommons.DEFAULT_LABEL;
 	private Stack<Command> undoStack;
 	private Stack<Command> redoStack;
 	private ArrayList<String> hideList;
@@ -31,7 +32,14 @@ public class TDTDataStore {
 		this.file = new TDTFileHandler(fileName);
 	}
 	
-
+	public void write() {
+		file.write(this);
+	}
+	
+	public void read() throws IOException {
+		file.readInitialise(this);
+	}
+	
 	public Iterator<Task> getTaskIterator() {
 		return new TaskIterator(this.getTaskMap());
 	}

@@ -10,10 +10,15 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class EditCommand extends Command {
+	private static final String MESSAGE_UNDO_EDIT = "Undo edit";
+	private static final String MESSAGE_INVALID_COMMAND = "Invalid Command";
+	private static final String MESSAGE_INVALID_LABEL_TASKID = "Invalid Command. Label does not exist or invalid task number.";
 	private static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
 	private static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
 	private static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
-	private static final String MESSAGE_EDIT_FEEDBACK = "\"%s\" edited to \"%s\".";
+	private static final String MESSAGE_EDIT_FEEDBACK = "Task edited.";
+	private static final String MESSAGE_EDIT_CLASH = "Clashes detected. Task edited.\n"
+			+ "%d task(s) found to have same time range on %s" ;
 	
 	private int taskID;
 	private String feedback;
@@ -55,27 +60,10 @@ public class EditCommand extends Command {
 			ArrayList<Task> array = data.getTaskMap().get(getLabelName());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
-				setEditDetails(commandDetails, isHighPriority, dateAndTime,
-						task);
-				
-				if(!TDTCommons.isValidDateTimeRange(dateAndTime)) {
-					return MESSAGE_INVALID_DATE_TIME_FORMAT;
-				}
-				
-				if(!TDTCommons.isValidStartEndDate(dateAndTime)) {
-					return MESSAGE_INVALID_END_DATE;
-				}
-				
-				if(!TDTCommons.isValidStartEndTime(dateAndTime)) {
-					return MESSAGE_INVALID_END_TIME;
-				}
-				
-				checkForClash(task, data.getTaskIterator());
-				data.insertToUndoStack(this);
-				return gotClashes?this.getFeedback():String.format(MESSAGE_EDIT_FEEDBACK,
-						prevDetails, commandDetails);
+				return editTask(data, commandDetails, isHighPriority,
+						dateAndTime, task);
 			} else {
-				return "Invalid Command. Label does not exist or invalid task number.";
+				return MESSAGE_INVALID_LABEL_TASKID;
 			}
 		}
 
@@ -85,34 +73,39 @@ public class EditCommand extends Command {
 				ArrayList<Task> array = data.getTaskMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
-					setEditDetails(commandDetails, isHighPriority, dateAndTime,
-							task);
-					
-					if(!TDTCommons.isValidDateTimeRange(dateAndTime)) {
-						return MESSAGE_INVALID_DATE_TIME_FORMAT;
-					}
-					
-					if(!TDTCommons.isValidStartEndDate(dateAndTime)) {
-						return MESSAGE_INVALID_END_DATE;
-					}
-					
-					if(!TDTCommons.isValidStartEndTime(dateAndTime)) {
-						return MESSAGE_INVALID_END_TIME;
-					}
-					
-					checkForClash(task, data.getTaskIterator());
-					data.insertToUndoStack(this);
-					return gotClashes?this.getFeedback():String.format(MESSAGE_EDIT_FEEDBACK,
-							prevDetails, commandDetails);
+					return editTask(data, commandDetails, isHighPriority,
+							dateAndTime, task);
 				} else {
-					return "Invalid Command. Label does not exist or invalid task number.";
+					return MESSAGE_INVALID_LABEL_TASKID;
 				}
 			} else {
-				return "Invalid Command. Label does not exist or invalid task number.";
+				return MESSAGE_INVALID_LABEL_TASKID;
 			}
 		}
 		
-		return "Invalid Command";
+		return MESSAGE_INVALID_COMMAND;
+	}
+
+	private String editTask(TDTDataStore data, String commandDetails,
+			boolean isHighPriority, TDTDateAndTime dateAndTime, Task task) {
+		setEditDetails(commandDetails, isHighPriority, dateAndTime,
+				task);
+
+		if(!TDTCommons.isValidDateTimeRange(dateAndTime)) {
+			return MESSAGE_INVALID_DATE_TIME_FORMAT;
+		}
+		
+		if(!TDTCommons.isValidStartEndDate(dateAndTime)) {
+			return MESSAGE_INVALID_END_DATE;
+		}
+		
+		if(!TDTCommons.isValidStartEndTime(dateAndTime)) {
+			return MESSAGE_INVALID_END_TIME;
+		}
+		
+		checkForClash(task, data.getTaskIterator());
+		data.insertToUndoStack(this);
+		return gotClashes?this.getFeedback():MESSAGE_EDIT_FEEDBACK;
 	}
 	
 	private void checkForClash(Task target, Iterator<Task> iter) {
@@ -128,10 +121,9 @@ public class EditCommand extends Command {
 			}
 		}
 		if(gotClashes) {
-			String feedback = "Clashes detected. " + String.format(MESSAGE_EDIT_FEEDBACK,
-					prevDetails, commandDetails) + "\n" + numClash 
-					+ " task(s) found to have same time range on " 
-					+ target.getDateAndTime().getStartDate();
+			String feedback = String.format(MESSAGE_EDIT_CLASH,
+				 numClash, target.getDateAndTime().getStartDate());
+
 			this.setFeedback(feedback);
 		}
 	}
@@ -156,7 +148,7 @@ public class EditCommand extends Command {
 		comd.execute(data);
 		assert (data.getUndoStack().size() > 0) : "undostack is empty";
 		data.getUndoStack().pop();
-		return "Undo edit";
+		return MESSAGE_UNDO_EDIT;
 	}
 	
 	public int getTaskID() {

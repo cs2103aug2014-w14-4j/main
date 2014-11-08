@@ -5,10 +5,13 @@ import todothis.storage.TDTDataStore;
 
 public class UndoCommand extends Command {
 
+	private static final String MESSAGE_INVALID_UNDO = "Invalid command. No command to undo.";
+
 	public UndoCommand() {
 		super(COMMANDTYPE.UNDO);
 	}
 	/*
+	Unused code. Previously undo copy the whole state of the program. Inefficient.
 	@Override
 	public String execute(TDTDataStore data) {
 		assert (data.getUndoStack().size() > 0) : "undostack is empty";
@@ -36,7 +39,7 @@ public class UndoCommand extends Command {
 			
 			return comd.undo(data);
 		} else {
-			return "Invalid command. No command to undo.";
+			return MESSAGE_INVALID_UNDO;
 		}
 	}
 

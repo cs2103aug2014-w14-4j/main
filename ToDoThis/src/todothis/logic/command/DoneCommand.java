@@ -8,8 +8,16 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class DoneCommand extends Command {
+	private static final String MESSAGE_DONE_TASK_FEEDBACK = "Task done";
+	private static final String MESSAGE_UNDO_DONE = "Undo done";
+	private static final String MESSAGE_INVALID_COMMAND = "Invalid command.";
+	private static final String MESAGE_INVALID_LABEL_TASKID = "Invalid Command. Label does not exist or invalid task number.";
+	private static final String MESSAGE_DONE_ALL_FEEDBACK = "All tasks are done!";
+	private static final String MESSAGE_DONE_LABEL_FEEDBACK = "Tasks under %s are done.";
+	
 	private int taskID;
 	private String labelName;
+	private boolean isDone = true;
 	
 	public DoneCommand(String labelName, int taskID) {
 		super(COMMANDTYPE.DONE);
@@ -26,11 +34,11 @@ public class DoneCommand extends Command {
 			Iterator<Task> iter = data.getTaskIterator();
 			while(iter.hasNext()) {
 				Task next = iter.next();
-				next.setDone(!next.isDone());
+				next.setDone(isDone);
 			}
 			
 			data.insertToUndoStack(this);
-			return "All tasks are done!";
+			return MESSAGE_DONE_ALL_FEEDBACK;
 		}
 		
 		//done label
@@ -39,13 +47,13 @@ public class DoneCommand extends Command {
 				ArrayList<Task> array = data.getTaskMap().get(label);
 				for(int i = 0 ; i < array.size(); i ++) {
 					Task task = array.get(i);
-					task.setDone(!task.isDone());
+					task.setDone(isDone);
 				}
 				
 				data.insertToUndoStack(this);
-				return "Tasks under " + label + "are done.";
+				return MESSAGE_DONE_LABEL_FEEDBACK;
 			} else {
-				return "Invalid Command. Label does not exist or invalid task number.";
+				return MESAGE_INVALID_LABEL_TASKID;
 			}
 		}
 		
@@ -54,12 +62,12 @@ public class DoneCommand extends Command {
 			ArrayList<Task> array = data.getTaskMap().get(data.getCurrLabel());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
-				task.setDone(!task.isDone());
+				task.setDone(isDone);
 				
 				data.insertToUndoStack(this);
-				return "Task done";
+				return MESSAGE_DONE_TASK_FEEDBACK;
 			} else {
-				return "Invalid Command. Label does not exist or invalid task number.";
+				return MESAGE_INVALID_LABEL_TASKID;
 			}
 		}
 		
@@ -69,28 +77,29 @@ public class DoneCommand extends Command {
 				ArrayList<Task> array = data.getTaskMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
-					task.setDone(!task.isDone());
+					task.setDone(isDone);
 					
 					data.insertToUndoStack(this);
-					return "Task done";
+					return MESSAGE_DONE_TASK_FEEDBACK;
 				} else {
-					return "Invalid Command. Label does not exist or invalid task number.";
+					return MESAGE_INVALID_LABEL_TASKID;
 				}
 			} else {
-				return "Invalid Command. Label does not exist or invalid task number.";
+				return MESAGE_INVALID_LABEL_TASKID;
 			}
 		}
 		//Shouldnt reach here
-		return "Invalid command.";
+		return MESSAGE_INVALID_COMMAND;
 	}
 	
 	@Override
 	public String undo(TDTDataStore data) {
 		DoneCommand comd = new DoneCommand(getLabelName(), getTaskID());
+		comd.setDone(false);
 		comd.execute(data);
 		assert (data.getUndoStack().size() > 0) : "undostack is empty";
 		data.getUndoStack().pop();
-		return "Undo done command";
+		return MESSAGE_UNDO_DONE;
 	}
 	
 	
@@ -106,6 +115,12 @@ public class DoneCommand extends Command {
 	}
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
+	}
+	public boolean isDone() {
+		return isDone;
+	}
+	public void setDone(boolean isDone) {
+		this.isDone = isDone;
 	}
 	
 

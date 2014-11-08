@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class TDTCommons {
+	public static final String FILENAME = "todothis.txt";
+	public static final String DEFAULT_LABEL = "TODOTHIS";
+	
+	
 	public static String replaceEndStringPunctuation(String word) {
 		int length = word.length();
 		String replacedWord = word;

@@ -16,6 +16,8 @@ public class AddCommand extends Command {
 	private static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
 	private static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
 	private static final String MESSAGE_ADD_FEEDBACK = "Task added to %s.";
+	private static final String MESSAGE_ADD_CLASH = "Clashes detected. %s \n"
+			+ "%d task(s) found to have same time range on %s" ;
 	
 	private int taskID;
 	private String labelName;
@@ -61,7 +63,6 @@ public class AddCommand extends Command {
 		setTaskID(TDTCommons.sort(data.getTaskMap().get(getLabelName()), task));
 		data.insertToUndoStack(this);
 		
-		//Proper return statement!
 		return gotClashes?this.getFeedback():String.format(MESSAGE_ADD_FEEDBACK,
 															data.getCurrLabel());
 	}
@@ -80,10 +81,8 @@ public class AddCommand extends Command {
 			}
 		}
 		if(gotClashes) {
-			String feedback = "Clashes detected. " + String.format(MESSAGE_ADD_FEEDBACK,
-					target.getLabelName()) + "\n" + numClash 
-					+ " task(s) found to have same time range on " 
-					+ target.getDateAndTime().getStartDate();
+			String feedback = String.format(MESSAGE_ADD_CLASH, String.format(MESSAGE_ADD_FEEDBACK,
+					target.getLabelName()), numClash, target.getDateAndTime().getStartDate());
 			this.setFeedback(feedback);
 		}
 	}
