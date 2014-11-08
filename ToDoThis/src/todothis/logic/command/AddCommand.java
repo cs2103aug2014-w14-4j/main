@@ -5,8 +5,6 @@ import java.util.Iterator;
 
 import todothis.commons.TDTCommons;
 import todothis.commons.TDTDateAndTime;
-import todothis.commons.TDTDateMethods;
-import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
 import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
@@ -46,15 +44,15 @@ public class AddCommand extends Command {
 		setAddedTask(task);
 		TDTDateAndTime dnt = getDateAndTime();
 		
-		if(!isValidDateTimeRange(dnt)) {
+		if(!TDTCommons.isValidDateTimeRange(dnt)) {
 			return MESSAGE_INVALID_DATE_TIME_FORMAT;
 		}
 		
-		if(!isValidStartEndDate(dnt)) {
+		if(!TDTCommons.isValidStartEndDate(dnt)) {
 			return MESSAGE_INVALID_END_DATE;
 		}
 		
-		if(!isValidStartEndTime(dnt)) {
+		if(!TDTCommons.isValidStartEndTime(dnt)) {
 			return MESSAGE_INVALID_END_TIME;
 		}
 		
@@ -68,26 +66,7 @@ public class AddCommand extends Command {
 															data.getCurrLabel());
 	}
 	
-	private boolean isValidStartEndTime(TDTDateAndTime dnt) {
-		if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
-			if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
-				if(TDTTimeMethods.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	private boolean isValidStartEndDate(TDTDateAndTime dnt) {
-		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")) {
-			if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
-				return false;
-			}
-		}
-		return true;
-	}
-
+	
 	private void checkForClash(Task target, Iterator<Task> iter) {
 		int numClash = 0;
 		while(iter.hasNext()) {
@@ -120,12 +99,7 @@ public class AddCommand extends Command {
 	}
 	
 	
-	private boolean isValidDateTimeRange(TDTDateAndTime dnt) {
-		return TDTDateMethods.isValidDateRange(dnt.getStartDate())
-				&& TDTDateMethods.isValidDateRange(dnt.getEndDate())
-				&& TDTTimeMethods.isValidTimeRange(dnt.getStartTime())
-				&& TDTTimeMethods.isValidTimeRange(dnt.getEndTime());
-	}
+	
 	
 	public int getTaskID() {
 		return taskID;

@@ -34,6 +34,34 @@ public class TDTCommons {
 		Collections.sort(array);
 		return renumberTaskID(array, task);
 	}
+	
+	public static boolean isValidStartEndDate(TDTDateAndTime dnt) {
+		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")) {
+			if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static boolean isValidStartEndTime(TDTDateAndTime dnt) {
+		if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
+			if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
+				if(TDTTimeMethods.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	public static boolean isValidDateTimeRange(TDTDateAndTime dnt) {
+		return TDTDateMethods.isValidDateRange(dnt.getStartDate())
+				&& TDTDateMethods.isValidDateRange(dnt.getEndDate())
+				&& TDTTimeMethods.isValidTimeRange(dnt.getStartTime())
+				&& TDTTimeMethods.isValidTimeRange(dnt.getEndTime());
+	}
+	
 }
 
 /*

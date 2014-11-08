@@ -18,8 +18,9 @@ public class TDTDataStore {
 	private Stack<Command> redoStack;
 	private ArrayList<String> hideList;
 	private ArrayList<String> autoWords;
+	private TDTFileHandler file;
 	
-	public TDTDataStore() {
+	public TDTDataStore(String fileName) {
 		setTaskMap(new HashMap<String, ArrayList<Task>>());
 		setUndoStack(new Stack<Command>());
 		setRedoStack(new Stack<Command>());
@@ -27,6 +28,7 @@ public class TDTDataStore {
 		taskMap.put(currLabel, new ArrayList<Task>());
 		setAutoWords(new ArrayList<String>());
 		initializeWordsForAutoComplete();
+		this.file = new TDTFileHandler(fileName);
 	}
 	
 
@@ -149,5 +151,15 @@ public class TDTDataStore {
 	}
 	public void setAutoWords(ArrayList<String> autoWords) {
 		this.autoWords = autoWords;
+	}
+
+
+	public TDTFileHandler getFile() {
+		return file;
+	}
+
+
+	public void setFile(TDTFileHandler file) {
+		this.file = file;
 	}
 }

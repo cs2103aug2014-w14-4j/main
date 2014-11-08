@@ -12,7 +12,6 @@ import todothis.logic.command.SearchCommand;
 import todothis.logic.parser.TDTParser;
 import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
-import todothis.storage.TDTFileHandler;
 
 
 
@@ -23,7 +22,6 @@ public class TDTLogic implements ITDTLogic {
 	
 	private TDTParser parser;
 	private TDTDataStore dataStore;
-	private TDTFileHandler fileHandler;
 	private int viewMode = 0;
 	private int scrollVal = -1;
 	private ArrayList<Task> highlightTask;
@@ -31,9 +29,8 @@ public class TDTLogic implements ITDTLogic {
 	private ArrayList<Task> searchedTask;
 	
 	public TDTLogic(String fileName) {
-		this.fileHandler = new TDTFileHandler(fileName);
 		this.parser = new TDTParser();
-		this.setData(new TDTDataStore());
+		this.setData(new TDTDataStore(fileName));
 		
 	}
 	
@@ -57,7 +54,8 @@ public class TDTLogic implements ITDTLogic {
 		}
 		
 		if(command.getCommandType() == COMMANDTYPE.EDIT) {
-			setHighlightTask(((EditCommand)command).getEditedTask());
+			EditCommand comd = (EditCommand)command;
+			setHighlightTask(comd.getTargetTask());
 		} else if(command.getCommandType() == COMMANDTYPE.ADD) {
 			AddCommand comd = (AddCommand)command;
 			setHighlightTask(comd.getTargetTask());
@@ -71,7 +69,11 @@ public class TDTLogic implements ITDTLogic {
 			setAddedTask(comd.getAddedTask());
 		} else if(command.getCommandType() == COMMANDTYPE.LABEL) {
 			setScrollVal(0);
-		} else {
+		} else if(command.getCommandType() == COMMANDTYPE.EDIT) {
+			EditCommand comd = (EditCommand)command;
+			setAddedTask(comd.getEditedTask());
+			setScrollVal(-1);
+		}else {
 			setScrollVal(-1);
 		}
 		
@@ -121,11 +123,11 @@ public class TDTLogic implements ITDTLogic {
 	}
 	
 	public void readAndInitialize() throws IOException {
-		fileHandler.readInitialise(dataStore);
+		this.getData().getFile().readInitialise(dataStore);
 	}
 	
 	public void writeToFile() {
-		fileHandler.write(dataStore);
+		this.getData().getFile().write(dataStore);
 	}
 	
 	public ArrayList<String> getAutoWords() {
@@ -180,13 +182,7 @@ public class TDTLogic implements ITDTLogic {
 		this.dataStore = data;
 	}
 
-	public TDTFileHandler getFileHandler() {
-		return fileHandler;
-	}
 
-	public void setFileHandler(TDTFileHandler fileHandler) {
-		this.fileHandler = fileHandler;
-	}
 
 
 }

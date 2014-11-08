@@ -112,6 +112,8 @@ public class TDTTimeMethods {
 		return false;
 	}
 	
+	
+	
 	public static int compareToTime(String time1, String time2) {
 		String[] time1Parts = time1.split(":");
 		String[] time2Parts = time2.split(":");

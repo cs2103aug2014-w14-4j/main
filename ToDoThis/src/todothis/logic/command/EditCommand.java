@@ -1,14 +1,22 @@
 package todothis.logic.command;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import todothis.commons.TDTCommons;
 import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
 import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class EditCommand extends Command {
+	private static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
+	private static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
+	private static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
+	private static final String MESSAGE_EDIT_FEEDBACK = "\"%s\" edited to \"%s\".";
+	
 	private int taskID;
+	private String feedback;
 	private String labelName;
 	private String commandDetails;
 	private TDTDateAndTime dateAndTime;
@@ -16,7 +24,9 @@ public class EditCommand extends Command {
 	private String prevDetails;
 	private TDTDateAndTime prevDNT;
 	private boolean prevPriority;
-	private ArrayList<Task> editedTask;
+	private Task editedTask;
+	private boolean gotClashes = false;
+	private ArrayList<Task> targetTask;
 
 	
 	public EditCommand(String labelName, int taskID,
@@ -28,7 +38,7 @@ public class EditCommand extends Command {
 		this.setLabelName(labelName.toUpperCase());
 		this.setCommandDetails(commandDetails);
 		this.setDateAndTime(dateAndTime);
-		this.setEditedTask(new ArrayList<Task>());
+		this.setTargetTask(new ArrayList<Task>());
 	}
 
 	@Override
@@ -45,17 +55,25 @@ public class EditCommand extends Command {
 			ArrayList<Task> array = data.getTaskMap().get(getLabelName());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				Task task = array.get(taskId - 1);
-				editedTask.add(task);
-				prevDetails = task.getDetails();
-				prevDNT = task.getDateAndTime();
-				prevPriority = task.isHighPriority();
-				task.setDetails(commandDetails);
-				task.setDateAndTime(dateAndTime);
-				task.setHighPriority(isHighPriority);
+				setEditDetails(commandDetails, isHighPriority, dateAndTime,
+						task);
 				
-				//setTaskID(TDTLogic.sort(array, task));
+				if(!TDTCommons.isValidDateTimeRange(dateAndTime)) {
+					return MESSAGE_INVALID_DATE_TIME_FORMAT;
+				}
+				
+				if(!TDTCommons.isValidStartEndDate(dateAndTime)) {
+					return MESSAGE_INVALID_END_DATE;
+				}
+				
+				if(!TDTCommons.isValidStartEndTime(dateAndTime)) {
+					return MESSAGE_INVALID_END_TIME;
+				}
+				
+				checkForClash(task, data.getTaskIterator());
 				data.insertToUndoStack(this);
-				return "Task edited";
+				return gotClashes?this.getFeedback():String.format(MESSAGE_EDIT_FEEDBACK,
+						prevDetails, commandDetails);
 			} else {
 				return "Invalid Command. Label does not exist or invalid task number.";
 			}
@@ -67,17 +85,25 @@ public class EditCommand extends Command {
 				ArrayList<Task> array = data.getTaskMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					Task task = array.get(taskId - 1);
-					editedTask.add(task);
-					prevDetails = task.getDetails();
-					prevDNT = task.getDateAndTime();
-					prevPriority = task.isHighPriority();
-					task.setDetails(commandDetails);
-					task.setDateAndTime(dateAndTime);
-					task.setHighPriority(isHighPriority);
+					setEditDetails(commandDetails, isHighPriority, dateAndTime,
+							task);
 					
-					//setTaskID(TDTLogic.sort(array, task));
+					if(!TDTCommons.isValidDateTimeRange(dateAndTime)) {
+						return MESSAGE_INVALID_DATE_TIME_FORMAT;
+					}
+					
+					if(!TDTCommons.isValidStartEndDate(dateAndTime)) {
+						return MESSAGE_INVALID_END_DATE;
+					}
+					
+					if(!TDTCommons.isValidStartEndTime(dateAndTime)) {
+						return MESSAGE_INVALID_END_TIME;
+					}
+					
+					checkForClash(task, data.getTaskIterator());
 					data.insertToUndoStack(this);
-					return "Task edited";
+					return gotClashes?this.getFeedback():String.format(MESSAGE_EDIT_FEEDBACK,
+							prevDetails, commandDetails);
 				} else {
 					return "Invalid Command. Label does not exist or invalid task number.";
 				}
@@ -89,9 +115,42 @@ public class EditCommand extends Command {
 		return "Invalid Command";
 	}
 	
+	private void checkForClash(Task target, Iterator<Task> iter) {
+		int numClash = 0;
+		while(iter.hasNext()) {
+			Task task = iter.next();
+			if(task != target && !task.isDone()) {
+				if(target.getDateAndTime().isClash(task.getDateAndTime())) {
+					targetTask.add(task);
+					numClash++;
+					gotClashes = true;
+				}
+			}
+		}
+		if(gotClashes) {
+			String feedback = "Clashes detected. " + String.format(MESSAGE_EDIT_FEEDBACK,
+					prevDetails, commandDetails) + "\n" + numClash 
+					+ " task(s) found to have same time range on " 
+					+ target.getDateAndTime().getStartDate();
+			this.setFeedback(feedback);
+		}
+	}
+
+	private void setEditDetails(String commandDetails, boolean isHighPriority,
+			TDTDateAndTime dateAndTime, Task task) {
+		setEditedTask(task);
+		prevDetails = task.getDetails();
+		prevDNT = task.getDateAndTime();
+		prevPriority = task.isHighPriority();
+		task.setDetails(commandDetails);
+		task.setDateAndTime(dateAndTime);
+		task.setHighPriority(isHighPriority);
+	}
+	
 
 	@Override
 	public String undo(TDTDataStore data) {
+		targetTask.clear();
 		EditCommand comd = new EditCommand(getLabelName(), getTaskID(), 
 								prevDetails, prevDNT, prevPriority);
 		comd.execute(data);
@@ -140,12 +199,28 @@ public class EditCommand extends Command {
 		this.isHighPriority = isHighPriority;
 	}
 
-	public ArrayList<Task> getEditedTask() {
+	public Task getEditedTask() {
 		return editedTask;
 	}
 
-	public void setEditedTask(ArrayList<Task> editedTask) {
+	public void setEditedTask(Task editedTask) {
 		this.editedTask = editedTask;
+	}
+
+	public ArrayList<Task> getTargetTask() {
+		return targetTask;
+	}
+
+	public void setTargetTask(ArrayList<Task> targetTask) {
+		this.targetTask = targetTask;
+	}
+
+	public String getFeedback() {
+		return feedback;
+	}
+
+	public void setFeedback(String feedback) {
+		this.feedback = feedback;
 	}
 
 
