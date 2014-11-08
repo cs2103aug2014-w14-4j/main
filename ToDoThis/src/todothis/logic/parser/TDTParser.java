@@ -1,7 +1,6 @@
 package todothis.logic.parser;
 
 import java.util.ArrayList;
-
 import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
@@ -37,11 +36,11 @@ public class TDTParser implements ITDTParser {
 	private String[] parts;
 	private ArrayList<String> prepositionWordsArr;
 	private int quotationMarks;
-	private int counter;
+	private int quotationCounter;
 	//private Logger logger = Logger.getLogger("TDTParser");
-	
+
 	public Command parse(String userCommand) {
-	//	logger.log(Level.INFO, "start parsing");
+		//logger.log(Level.INFO, "start parsing");
 		this.setCommandType(COMMANDTYPE.INVALID);
 		this.setLabelName("");
 		this.setIsHighPriority(false);
@@ -50,54 +49,54 @@ public class TDTParser implements ITDTParser {
 		this.setTaskID(-1);
 		this.setPrepositionWords();
 		this.setQuotationMarks(0);
-		this.setCounter(0);
-		dateAndTimeParts = "";
+		this.setQuotationCounter(0);
+		this.setDateAndTimeParts("");
 
 		this.setCommandType(determineCommandType(getFirstWord(userCommand.trim())));
 		this.setRemainingWords(removeFirstWord(userCommand));
+		
 		switch(getCommandType()) {
-			case ADD :
-				add(userCommand);
-				return new AddCommand(getCommandDetails(), getDateAndTime(), getIsHighPriority());
-			case DELETE :
-				delete();
-				return new DeleteCommand(getLabelName(), getTaskID());
-			case EDIT :
-				edit(userCommand);	
-				return new EditCommand(getLabelName(), getTaskID(),getCommandDetails(), getDateAndTime(), 
-						getIsHighPriority());
-			case LABEL :
-				label();
-				return new LabelCommand(getLabelName());
-			case UNDO :
-				return new UndoCommand();
-			case REDO :
-				return new RedoCommand();
-			case SEARCH :
-				search();
-				return new SearchCommand(getCommandDetails());
-			case SHOW :
-				show();
-				return new ShowCommand(getCommandDetails());
-			case HIDE :
-				hide();
-				return new HideCommand(getCommandDetails());
-			case DONE :
-				done();
-				return new DoneCommand(getLabelName(), getTaskID());
-			case REMIND :
-				remind();
-				return new RemindCommand(getLabelName(), getTaskID(), getCommandDetails());
-			case EXIT :
-				exit();
-				return new ExitCommand();
-			case HELP :
-				help();
-				return new HelpCommand(this.getRemainingWords());
-			case INVALID :
-				break;
-			default:
-				break;
+		case ADD :
+			add(userCommand);
+			return new AddCommand(getCommandDetails(), getDateAndTime(), getIsHighPriority());
+		case DELETE :
+			delete();
+			return new DeleteCommand(getLabelName(), getTaskID());
+		case EDIT :
+			edit(userCommand);	
+			return new EditCommand(getLabelName(), getTaskID(),getCommandDetails(), getDateAndTime(), 
+					getIsHighPriority());
+		case LABEL :
+			label();
+			return new LabelCommand(getLabelName());
+		case UNDO :
+			return new UndoCommand();
+		case REDO :
+			return new RedoCommand();
+		case SEARCH :
+			search();
+			return new SearchCommand(getCommandDetails());
+		case SHOW :
+			show();
+			return new ShowCommand(getCommandDetails());
+		case HIDE :
+			hide();
+			return new HideCommand(getCommandDetails());
+		case DONE :
+			done();
+			return new DoneCommand(getLabelName(), getTaskID());
+		case REMIND :
+			remind();
+			return new RemindCommand(getLabelName(), getTaskID(), getCommandDetails());
+		case HELP :
+			help();
+			return new HelpCommand(getCommandDetails());
+		case EXIT :
+			return new ExitCommand();
+		case INVALID :
+			break;
+		default:
+			break;
 		}
 		//logger.log(Level.INFO, "end of parsing");
 		return null;
@@ -139,30 +138,20 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.ADD;
 		}
 	}
-	
-//---------------------------------- Main Command Methods -------------------------------------
+
+	//---------------------------------- Main Command Methods -------------------------------------
 	private void add(String userCommand) {
-		if (getFirstWord(userCommand).equalsIgnoreCase("add")) {
-			setRemainingWords(removeFirstWord(userCommand));
-		} else {
-			this.setRemainingWords(userCommand);
-		}
+		checkFirstWord(userCommand);
 		parts = getRemainingWords().split(" ");
 		isCommandDetails = new boolean[parts.length];
 		setQuotationMarks(0);
-		setCounter(0);
+		setQuotationCounter(0);
+
 		for (int i=0; i<parts.length; i++) {
 			isCommandDetails[i] = true;
 			String checkWord = parts[i];
-			if (checkWord.contains("\"") && (getQuotationMarks() == 0)) {
-				setQuotationMarks(1);
-			}
-			if (getQuotationMarks()!= 0) {
-				setCounter(getCounter()+1);
-				specialAdd(checkWord , i);
-				if (getQuotationMarks() == 2) {
-					setQuotationMarks(0);
-				}
+			if (hasQuotationMarks(checkWord, i)) {
+				quotationAdd(checkWord , i);
 			} else {
 				usualAdd(i, checkWord);
 				if (isSkipNextWord()) {
@@ -177,55 +166,35 @@ public class TDTParser implements ITDTParser {
 	private void done() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			// Only taskID OR labelName 
-			if (parts.length == 1) {
-				if (parts[0].matches("\\d+")) {
-					setTaskID(Integer.parseInt(parts[0]));
-				} else {
-					setLabelName(parts[0]);
-				}
-			// Both taskID AND labelName
-			} else if (parts.length == 2) {
-				if (parts[1].matches("\\d+")) {
-					setTaskID(Integer.parseInt(parts[1]));
-					setLabelName(parts[0]);
-				} else if (parts[0].matches("\\d+")) {
-					setTaskID(Integer.parseInt(parts[0]));
-					setLabelName(parts[1]);
-				} else {
-					setTaskID(-1);
-					setLabelName(" ");
-				}
-			// Invalid
-			} else {
-				setTaskID(-1);
+			if (parts.length == 1) { 		// Only taskID OR labelName 
+				completeTaskIdOrLabelName();
+			} else if (parts.length == 2) { // Both taskID and labelName 
+				completeTaskIdAndLabelName();
+			} else { 						// Invalid
 				setLabelName(" ");
 			}
 		}
 	}
-	
+
 	private void remind() {
 		String details = "";
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			// Only taskID or labelName or invalid inputs
-			if (parts.length == 1) {
+			if (parts.length == 1) { 			// Only taskID or labelName or invalid inputs
 				if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
 				} else {
 					setCommandDetails(parts[0]);
 				}
 			} else if (parts.length > 1) {
-				// taskID followed by date and time
-				if (parts[0].matches("\\d+")) {
+				if (parts[0].matches("\\d+")) { // taskID followed by date and time
 					setTaskID(Integer.parseInt(parts[0]));
 					if (parts.length > 1) {
 						for (int i=1; i<parts.length; i++) {
 							details += parts[i] + " ";
 						}
 					}
-				// labelName, taskID followed by date and time
-				} else if (parts[1].matches("\\d+")) {
+				} else if (parts[1].matches("\\d+")) { // labelName, taskID followed by date and time
 					setLabelName(parts[0]);
 					setTaskID(Integer.parseInt(parts[1]));
 					if (parts.length > 2) {
@@ -242,16 +211,14 @@ public class TDTParser implements ITDTParser {
 	private void edit(String userCommand) {
 		boolean isValidEdit = false;
 		parts = getRemainingWords().split(" ");
-		if (isValidPartsLength()) {
-			// taskID then details. 
-			if (parts[0].matches("\\d+")) {
+		if (isValidPartsLength()) { 
+			if (parts[0].matches("\\d+")) { // taskID then details.
 				setTaskID(Integer.parseInt(parts[0]));
 				if (parts.length > 1) {
 					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
 					isValidEdit = true;
 				}
-			// labelName, taskID, then details.
-			} else if (parts.length > 1) {
+			} else if (parts.length > 1) { // labelName, taskID, then details.
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
 					setLabelName(parts[0]);
@@ -269,38 +236,20 @@ public class TDTParser implements ITDTParser {
 	private void delete() {
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			// Only taskID or labelName
-			if (parts.length == 1) {
-				if (parts[0].matches("\\d+")) {
-					setTaskID(Integer.parseInt(parts[0]));
-				} else {
-					setLabelName(parts[0]);
-				}
-			}
-			// Both taskID and labelName
-			else if (parts.length == 2) {
-				if (parts[1].matches("\\d+")) {
-					setTaskID(Integer.parseInt(parts[1]));
-					setLabelName(parts[0]);
-				} else if (parts[0].matches("\\d+")) {
-					setTaskID(Integer.parseInt(parts[0]));
-					setLabelName(parts[1]);
-				} else {
-					setTaskID(-1);
-					setLabelName(" ");
-				}
-			// Invalid. 
-			} else {
-				setTaskID(-1);
+			if (parts.length == 1) { 		// Only taskID or labelName
+				completeTaskIdOrLabelName();
+			} else if (parts.length == 2) { // Both taskID and labelName 
+				completeTaskIdAndLabelName();
+			} else { 						// Invalid
 				setLabelName(" ");
 			}
 		}
 	}
-	
+
 	private void show() {
 		setCommandDetails(getRemainingWords());
 	}
-	
+
 	private void hide() {
 		setCommandDetails(getRemainingWords());
 	}
@@ -314,36 +263,67 @@ public class TDTParser implements ITDTParser {
 	}
 
 	private void help() {
-		
+		setCommandDetails(getRemainingWords());
 	}
 
-	private void exit() {
-		
-	}
-//------------------------------ Other Methods -----------------------------------------------
+	//------------------------------ Other Methods -----------------------------------------------
 	/**
-	 * This function removes the first word of the userCommand. 
+	 * This function removes the first word of the userCommand.
+	 * @param userCommand
+	 * @return String without the first word
 	 */
 	private static String removeFirstWord(String userCommand) {
 		return userCommand.replaceFirst(getFirstWord(userCommand), "").trim();
 	}
 
 	/**
-	 * This function gets the first word (CommandWord) of the userCommand
+	 * This function gets the first word of the userCommand
+	 * @param userCommand
+	 * @return String of the first word.
 	 */
 	private static String getFirstWord(String userCommand) {
 		if(userCommand.indexOf(" ") == -1) {
 			userCommand = userCommand.replaceAll(("\\W"), "");
 			return userCommand;
 		} else {
-			String userWord = userCommand.substring(0, userCommand.indexOf(" "));
-			if (!userWord.contains("\"")) { 
-				userWord = userWord.replaceAll(("\\W"), "");
+			String userCommandTemp = userCommand.substring(0, userCommand.indexOf(" "));
+			if (!userCommandTemp.contains("\"")) { 
+				userCommandTemp = userCommandTemp.replaceAll(("\\W"), "");
 			}
-			return userWord;
+			return userCommandTemp;
 		}
 	}
-	
+
+	/**
+	 * This function checks if the word contains a quotation mark.
+	 * @param checkWord
+	 * @param i
+	 * @return boolean. True if present, False is not. 
+	 */
+	private boolean hasQuotationMarks(String checkWord, int i) {
+		if (checkWord.contains("\"") && (getQuotationMarks() == 0)) {
+			setQuotationMarks(1);
+		}
+		if (getQuotationMarks()!=0) {
+			setQuotationCounter(getQuotationCounter()+1);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * This function checks if the first word of the user command is ADD and 
+	 * removes the word if it is present.
+	 * @param userCommand
+	 */
+	private void checkFirstWord(String userCommand) {
+		if (getFirstWord(userCommand).equalsIgnoreCase("add")) {
+			setRemainingWords(removeFirstWord(userCommand));
+		} else {
+			this.setRemainingWords(userCommand);
+		}
+	}
+
 	/**
 	 * This function fills in all the correct commandDetails and the DateAndTimeParts
 	 * after the whole user input has been processed
@@ -354,9 +334,9 @@ public class TDTParser implements ITDTParser {
 				commandDetails += " " + parts[i];
 			} else {
 				if (parts[i].contains("~")) {
-					dateAndTimeParts += parts[i];
+					setDateAndTimeParts( getDateAndTimeParts() + parts[i] );
 				} else {
-					dateAndTimeParts += " " + parts[i];
+					setDateAndTimeParts( getDateAndTimeParts() +" " + parts[i] );
 				}
 			}
 		}
@@ -366,63 +346,69 @@ public class TDTParser implements ITDTParser {
 	}
 
 	/**
-	 * This function does the ADD for words contained inside the " ".
+	 * This function does the ADD COMMAND for words contained inside the " ".
 	 * All the words will be included in commandDetails.
+	 * @param checkWord
+	 * @param i
 	 */
-	private void specialAdd(String checkWord, int i) {
+	private void quotationAdd(String checkWord, int i) {
 		if (checkWord.contains("\"")) {
 			String check = checkWord.replaceAll("[^\"]", "");
 			// words after the first "
-			if (getCounter() > 1 && getQuotationMarks() > 0) {
+			if (getQuotationCounter() > 1 && getQuotationMarks() > 0) {
 				// second "
 				if (check.length()== 1 && getQuotationMarks()== 1) {
 					setQuotationMarks(0);
-					setCounter(0);
-				// more than 1 " in a word
+					setQuotationCounter(0);
+					// more than 1 " in a word
 				} else if (check.length() > 1) {
 					int num = check.length()%2;
 					if (num==0) {
 						setQuotationMarks(1);
 					} else if (num==1) {
 						setQuotationMarks(0);
-						setCounter(0);
+						setQuotationCounter(0);
 					}
 				}
-			// first word has 2 "
-			} else if ( getCounter() == 1 && (check.length()==2)) {
+				// first word has 2 "
+			} else if (getQuotationCounter() == 1 && (check.length()==2)) {
 				setQuotationMarks(0);
-				setCounter(0);
+				setQuotationCounter(0);
 			}
 			parts[i] = checkWord.replace("\"", "");
+		}
+		if (getQuotationMarks() == 2) {
+			setQuotationMarks(0);
+		}
+	}
+
+	/**
+	 * This function does the ADD COMMAND normally for words no within quotation marks. 
+	 * It checks if the word is a date/time/day/month and is then processed accordingly.
+	 * @param i
+	 * @param checkWord
+	 */
+	private void usualAdd(int i, String checkWord) {
+		isPriority(checkWord , i);
+		if (TDTDateMethods.checkDate(checkWord) || TDTTimeMethods.checkTime(checkWord)) {
+			parseDateTimeDetails(i);
+		} else if (TDTDateMethods.checkDay(checkWord)!=0) {
+			if (TDTDateMethods.checkDay(checkWord) == 10) {
+				parseDayWordDetails(i, checkWord);
+			} else {
+				parseDayDetails(i);
+			}
+		} else if (TDTDateMethods.checkMonth(checkWord)!=0) {
+			setSkipNextWord(false);
+			parseMonthDetails(i);
 		} 
 	}
 
 	/**
-	 * This function does the ADD normally. It checks if the word is a date/time/day/month
-	 * and is then processed accordingly 
-	 */
-	private int usualAdd(int i, String checkWord) {
-		isPriority(checkWord , i);
-		if (TDTDateMethods.checkDate(checkWord) || TDTTimeMethods.checkTime(checkWord)) {
-			completeDateTimeDetails(i);
-		} else if (TDTDateMethods.checkDay(checkWord)!=0) {
-			if (TDTDateMethods.checkDay(checkWord) == 10) {
-				completeSpecialDayDetails(i, checkWord);
-			} else {
-				completeDayDetails(i);
-			}
-		} else if (TDTDateMethods.checkMonth(checkWord)!=0) {
-			setSkipNextWord(false);
-			completeMonthDetails(i);
-		} 
-		return i;
-	}
-	
-	/**
 	 * This function completes the commandDetails for an input that contains a date format
-	 * with the month spelled out. Eg. 4 August 2014 and 4 Aug. 
+	 * with the month spelled out. Eg. 4 August 2014 or 4 Aug. 
 	 */
-	private void completeMonthDetails(int i) {
+	private void parseMonthDetails(int i) {
 		// checks it the word before the month is a number (date)
 		if ((i>0) && parts[i-1].matches("\\d+")) {
 			if ((i>1) && getPrepositionWords().contains(parts[i-2])) {
@@ -439,11 +425,13 @@ public class TDTParser implements ITDTParser {
 			}
 		} 
 	}
-	
+
 	/**
-	 * This function completes the commandDetails for words that is of a date or time. 
+	 * This function completes the commandDetails for words that is
+	 * of a date (date format consisting of all digits ) or time. 
+	 * @param i
 	 */
-	private void completeDateTimeDetails(int i) {
+	private void parseDateTimeDetails(int i) {
 		if (i>0) {	
 			if (getPrepositionWords().contains(parts[i-1])) {
 				isCommandDetails[i-1] = false;
@@ -451,12 +439,12 @@ public class TDTParser implements ITDTParser {
 		} 
 		isCommandDetails[i] = false;
 	}
-	
+
 	/**
-	 * This function completes the commandDetails for words that are days such as
-	 * Monday Tuesday etc
+	 * This function completes the commandDetails for words that are days such as Monday Tuesday etc
+	 * @param i
 	 */
-	private void completeDayDetails(int i) {
+	private void parseDayDetails(int i) {
 		int firstOccurance = 0;
 		for (int j=i-1; j>=0; j--) {
 			if (parts[j].equals("next") || parts[j].equals("following") ) {
@@ -483,8 +471,10 @@ public class TDTParser implements ITDTParser {
 
 	/**
 	 * This function checks for the words 'next' and 'following' before the word 'day'
+	 * @param i
+	 * @param checkWord
 	 */
-	private void completeSpecialDayDetails(int i, String checkWord) {
+	private void parseDayWordDetails(int i, String checkWord) {
 		int firstOccurance = 0;
 		for (int j=i-1; j>=0; j--) {
 			if (parts[j].equals("next") || parts[j].equals("following") ) {
@@ -497,18 +487,19 @@ public class TDTParser implements ITDTParser {
 		if (firstOccurance!=i) {
 			isCommandDetails[i] = false;
 			if ((firstOccurance > 0) 
-				&& getPrepositionWords().contains(parts[firstOccurance-1])) {
+					&& getPrepositionWords().contains(parts[firstOccurance-1])) {
 				isCommandDetails[firstOccurance-1] = false;
-					if ((firstOccurance > 1) 
-							&& getPrepositionWords().contains(parts[firstOccurance-2])) {
-							isCommandDetails[firstOccurance-2] = false;
-					}
+				if ((firstOccurance > 1) 
+						&& getPrepositionWords().contains(parts[firstOccurance-2])) {
+					isCommandDetails[firstOccurance-2] = false;
+				}
 			} 
 		} 
 	}
-	
+
 	/**
 	 * This function checks if the array parts is of valid length (!=0)
+	 * @return boolean. True if not empty (>0), False if otherwise. 
 	 */
 	private boolean isValidPartsLength() {
 		if (parts.length == 0) {
@@ -516,10 +507,12 @@ public class TDTParser implements ITDTParser {
 		}
 		return true;
 	}
-	
+
 	/**
-	 * This function checks if the command input is of priority
-	 * Presence of '!' shows priority and '!' will not appear in commandDetails. 
+	 * This function checks if the command input is of priority - presence of '!'
+	 * '!' will not appear in commandDetails. 
+	 * @param word
+	 * @param i
 	 */
 	private void isPriority(String word, int i) {
 		if (word.contains("!")) {
@@ -528,8 +521,38 @@ public class TDTParser implements ITDTParser {
 		}
 	}
 	
-//--------------------------------- Getters and Setters -----------------------------------------
-	public ArrayList<String> getPrepositionWords() {
+	/**
+	 * This function completes both the taskID and labelName accordingly
+	 * for the Delete and Done commands. 
+	 */
+	private void completeTaskIdAndLabelName() {
+		if (parts[1].matches("\\d+")) {
+			setTaskID(Integer.parseInt(parts[1]));
+			setLabelName(parts[0]);
+		} else if (parts[0].matches("\\d+")) {
+			setTaskID(Integer.parseInt(parts[0]));
+			setLabelName(parts[1]);
+		} else {
+			setTaskID(-1);
+			setLabelName(" ");
+		}
+	}
+
+	/**
+	 * This function completes either the taskID or labelName according to whether
+	 * the input is a digit. 
+	 * for the Delete and Done commands.
+	 */
+	private void completeTaskIdOrLabelName() {
+		if (parts[0].matches("\\d+")) {
+			setTaskID(Integer.parseInt(parts[0]));
+		} else {
+			setLabelName(parts[0]);
+		}
+	}
+
+	//--------------------------------- Getters and Setters -----------------------------------------
+	private ArrayList<String> getPrepositionWords() {
 		return prepositionWordsArr;
 	}
 
@@ -537,7 +560,7 @@ public class TDTParser implements ITDTParser {
 	 * This function sets the list of "Preposition" words used in
 	 * day, date, time checking.
 	 */
-	public void setPrepositionWords() {
+	private void setPrepositionWords() {
 		ArrayList<String> prepositionWords = new ArrayList<String>();
 		prepositionWords.add("on");
 		prepositionWords.add("at");
@@ -552,9 +575,11 @@ public class TDTParser implements ITDTParser {
 		prepositionWords.add("following");
 		prepositionWords.add("this");
 		prepositionWords.add("the");
+		prepositionWords.add("due");
+		prepositionWords.add("before");
 		this.prepositionWordsArr = prepositionWords;
 	}
-	
+
 	private String getRemainingWords() {
 		return remainingWords;
 	}
@@ -610,7 +635,7 @@ public class TDTParser implements ITDTParser {
 	private void setDateAndTime(TDTDateAndTime dateAndTime) {
 		this.dateAndTime = dateAndTime;
 	}
-	
+
 	private boolean isSkipNextWord() {
 		return isSkipNextWord;
 	}
@@ -627,12 +652,19 @@ public class TDTParser implements ITDTParser {
 		this.quotationMarks = quotationMarks;
 	}
 
-	private int getCounter() {
-		return counter;
+	private int getQuotationCounter() {
+		return quotationCounter;
 	}
 
-	private void setCounter(int counter) {
-		this.counter = counter;
+	private void setQuotationCounter(int counter) {
+		this.quotationCounter = counter;
 	}
-	
+
+	public String getDateAndTimeParts() {
+		return dateAndTimeParts;
+	}
+
+	private void setDateAndTimeParts(String dateAndTimeParts) {
+		this.dateAndTimeParts = dateAndTimeParts;
+	}
 }
