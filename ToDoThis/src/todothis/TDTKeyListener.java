@@ -22,6 +22,15 @@ public class TDTKeyListener implements KeyListener {
 	public void keyPressed(KeyEvent arg0) {
 		int keyCode = arg0.getKeyCode();
 		int scrollVal = gui.scrollPane.getVerticalScrollBar().getValue();
+		
+		if (arg0.isShiftDown() && keyCode == KeyEvent.VK_UP) {
+			scrollTo(scrollVal - _SCROLLFACTOR);
+		}
+		
+		if (arg0.isShiftDown() && keyCode == KeyEvent.VK_DOWN) {
+			scrollTo(scrollVal + _SCROLLFACTOR);
+		}
+		
 		if (arg0.isControlDown() && keyCode == KeyEvent.VK_Z) {
 			String feedback = gui.getLogic().executeCommand("undo");
 			updateView(scrollVal, feedback);
@@ -36,6 +45,10 @@ public class TDTKeyListener implements KeyListener {
 			String feedback = gui.getLogic().executeCommand("show");
 			gui.updateGUI(feedback, gui.displayTask(null, null));
 			scrollTo(0);
+		}
+		
+		if (arg0.isAltDown()  && keyCode == KeyEvent.VK_E) {
+			gui.getLogic().executeCommand("exit");
 		}
 		
 		if (arg0.isAltDown() && keyCode == KeyEvent.VK_H) {

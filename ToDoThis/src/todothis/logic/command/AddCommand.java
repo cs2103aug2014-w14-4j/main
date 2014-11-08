@@ -1,4 +1,4 @@
-package todothis.command;
+package todothis.logic.command;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,7 +8,7 @@ import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
-import todothis.logic.ITDTParser.COMMANDTYPE;
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 

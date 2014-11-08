@@ -1,4 +1,4 @@
-package todothis.command;
+package todothis.logic.command;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Iterator;
 import todothis.TDTGUI;
 import todothis.commons.TDTCommons;
 import todothis.commons.Task;
-import todothis.logic.ITDTParser.COMMANDTYPE;
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class DeleteCommand extends Command {

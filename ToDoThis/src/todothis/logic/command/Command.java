@@ -1,6 +1,6 @@
-package todothis.command;
+package todothis.logic.command;
 
-import todothis.logic.ITDTParser.COMMANDTYPE;
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 

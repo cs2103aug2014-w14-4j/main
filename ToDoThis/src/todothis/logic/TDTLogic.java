@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import todothis.command.AddCommand;
-import todothis.command.Command;
-import todothis.command.EditCommand;
-import todothis.command.SearchCommand;
 import todothis.commons.Task;
-import todothis.logic.ITDTParser.COMMANDTYPE;
+import todothis.logic.command.AddCommand;
+import todothis.logic.command.Command;
+import todothis.logic.command.EditCommand;
+import todothis.logic.command.SearchCommand;
+import todothis.logic.parser.TDTParser;
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 import todothis.storage.TDTFileHandler;
 

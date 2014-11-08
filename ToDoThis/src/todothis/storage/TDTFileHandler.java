@@ -61,6 +61,7 @@ public class TDTFileHandler {
 			br.close();
 		} catch(Exception e) {
 			bw = new BufferedWriter(new FileWriter(fileName));
+			bw.close();
 		}
 	}
 	

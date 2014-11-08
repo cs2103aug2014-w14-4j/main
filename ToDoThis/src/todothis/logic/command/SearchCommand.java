@@ -1,12 +1,12 @@
-package todothis.command;
+package todothis.logic.command;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
-import todothis.logic.ITDTParser.COMMANDTYPE;
-import todothis.logic.TDTDateAndTimeParser;
+import todothis.logic.parser.TDTDateAndTimeParser;
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class SearchCommand extends Command {

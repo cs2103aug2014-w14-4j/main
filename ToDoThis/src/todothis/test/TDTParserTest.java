@@ -1,8 +1,8 @@
 package todothis.test;
 
 import static org.junit.Assert.*;
-import todothis.logic.TDTParser;
-import todothis.logic.ITDTParser.COMMANDTYPE;
+import todothis.logic.parser.TDTParser;
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 
 import org.junit.Test;
 

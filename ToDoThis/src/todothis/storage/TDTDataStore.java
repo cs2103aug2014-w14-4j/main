@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 import todothis.TDTGUI;
-import todothis.command.Command;
 import todothis.commons.Task;
+import todothis.logic.command.Command;
 
 public class TDTDataStore {
 	private HashMap<String, ArrayList<Task>> taskMap;
@@ -75,6 +75,7 @@ public class TDTDataStore {
 		autoWords.add("EXIT");
 		autoWords.add("HELP");
 		autoWords.add("TODOTHIS");
+		Collections.sort(autoWords);
 	}
 	
 	private class TaskIterator implements Iterator<Task>{

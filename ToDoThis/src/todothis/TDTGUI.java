@@ -81,21 +81,21 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .heading{ border-left: 1px solid #5882FA;border-right: 1px solid #5882FA; background: #BDBDBD}"
 			+ ".datagrid table .heading th{ border: 1px solid white;}"
-			+ ".datagrid table .overdue td{ background: #FC7C7C; color: white}"
-			+ ".datagrid table .priority td{ background: #ff4040; color: white }"
+			+ ".datagrid table .overdue { background: #FC7C7C; color: white}"
+			+ ".datagrid table .priority { background: #ff4040; color: white }"
 			+ ".datagrid table tr .datetime{ font-size:12px }"
 			+ ".datagrid table .target { border: 4px solid #0F0E0E }"
 			+ ".datagrid table .clash { border: 4px solid #EEB111 }"
-			+ ".datagrid table .priorityclash td{ border: 4px solid #EEB111; background: #ff4040; color: white }"
-			+ ".datagrid table .overdueclash td{ border: 4px solid #EEB111; background: #FC7C7C; color: white }"
+			+ ".datagrid table .priorityclash { border: 4px solid #EEB111; background: #ff4040; color: white }"
+			+ ".datagrid table .overdueclash { border: 4px solid #EEB111; background: #FC7C7C; color: white }"
 			+ ".datagrid table .altclash { border: 4px solid #EEB111; background: #E1EEF4; color: #00496B; }"
-			+ ".datagrid table .prioritytarget td{ border: 4px solid #0F0E0E; background: #ff4040; color: white }"
-			+ ".datagrid table .overduetarget td{ border: 4px solid #0F0E0E; background: #FC7C7C; color: white }"
+			+ ".datagrid table .prioritytarget { border: 4px solid #0F0E0E; background: #ff4040; color: white }"
+			+ ".datagrid table .overduetarget { border: 4px solid #0F0E0E; background: #FC7C7C; color: white }"
 			+ ".datagrid table .alttarget { border: 4px solid #0F0E0E; background: #E1EEF4; color: #00496B; }"
 			+ ".datagrid table .taskId { width: 10%; }"
 			+ ".datagrid table .dateTime { width: 35%; }"
 			+ ".datagrid table .labelhead { width: 10%; }"
-			+ ".datagrid table .done td{ background: #00ff7f; text-decoration: line-through}"
+			+ ".datagrid table .done { background: #00ff7f; text-decoration: line-through}"
 			+ ".label{ color: #0174DF; font-size:15px font-family: Candara;}"
 			+ ".helptable td { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
 			+ ".helptable tr { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
@@ -129,6 +129,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	 * Create the frame.
 	 */
 	public TDTGUI() {
+		logic = new TDTLogic(FILENAME);
 		initContentPane();
 		initCommandLabel();
 		initCommandField();
@@ -382,7 +383,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	private String doInit() {
-		logic = new TDTLogic(FILENAME);
 		try {			
 			logic.readAndInitialize();
 		} catch (Exception e) {
