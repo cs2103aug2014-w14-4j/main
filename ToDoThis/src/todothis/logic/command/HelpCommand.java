@@ -326,6 +326,8 @@ public class HelpCommand extends Command{
 		sb.append("<br>");
 		sb.append("Up/Down  -  Look through previous commands at the command input field");
 		sb.append("<br>");
+		sb.append("Shift + Up/Down  -  Scroll through list of tasks");
+		sb.append("<br>");
 		sb.append("<br>");
 		sb.append(helpAdd());
 		sb.append(helpLabel());
