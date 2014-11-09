@@ -45,6 +45,29 @@ public class TDTSystemTest {
 	}
 	
 	@Test
+	public void quotationTaskTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("\"the day after tomorrow at 5pm!\" movie showing at 8pm ");
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()) {
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "20:00");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, " the day after tomorrow at 5pm! movie showing");
+			
+			assertFalse(isPriority);
+		}
+		
+	}
+	
+	@Test
 	public void deadlineTaskTest() {
 		TDTController control = new TDTController(fileName);
 		String feedback = control.executeCommand("cs2106 homework done by 31-10-14 2359hrs");
@@ -114,6 +137,38 @@ public class TDTSystemTest {
 		}
 		
 	}
+	
+	/**
+	 * Done a task twice doesnt change to undone 
+	 */
+	@Test
+	public void doneTaskTest2() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("test done");
+		String feedback1 = control.executeCommand("done 1");
+		String feedback2 = control.executeCommand("done 1");
+		Iterator<Task> i = control.getTaskIterator();
+
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, " test done");
+			
+			assertFalse(isPriority);
+			assertTrue(isDone);
+		}
+		
+	}
+	
 	@Test
 	public void labelTest() {
 		TDTController control = new TDTController(fileName);

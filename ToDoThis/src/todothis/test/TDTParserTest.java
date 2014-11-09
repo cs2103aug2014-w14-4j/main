@@ -7,8 +7,10 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import org.junit.Test;
 
 public class TDTParserTest {
-
+	
+	//----------------------------------------ADD----------------------------------------------
 	/**
+	 * This test that the commandDetails are correct.
 	 * The command word 'add' is present
 	 * 'at 3pm today' will not be included in commandDetails
 	 */
@@ -20,12 +22,12 @@ public class TDTParserTest {
 		assertEquals(parser.getCommandDetails().trim(),"buy eggs");
 		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
 		assertEquals(parser.getLabelName(), "");
-		assertEquals(parser.getDateAndTimeParts(), "at 3pm today");
+		assertEquals(parser.getDateAndTimeParts(), " at 3pm today");
 	}
 
 	/**
 	 * The command word 'add' is not present. 
-	 * Order of words does not matter. 
+	 * This test that order of words does not matter. 
 	 * '3:00pm on 20/11/2014' will not be included in commandDetails
 	 */
 	@Test
@@ -35,11 +37,11 @@ public class TDTParserTest {
 		parser.parse(testInput2);
 		assertEquals(parser.getCommandDetails().trim(),"buy a lot of eggs");
 		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
-		assertEquals(parser.getDateAndTimeParts(), "3:00pm on 20/11/2014");
+		assertEquals(parser.getDateAndTimeParts(), " 3:00pm on 20/11/2014");
 	}
 	
 	/**
-	 * This tests ADD without adding anything. 
+	 * This test that the default command is add even when adding nothing. 
 	 */
 	@Test
 	public void testAdd3() {
@@ -52,7 +54,7 @@ public class TDTParserTest {
 	}
 	
 	/**
-	 * This input is of priority 
+	 * This test that the input is of priority 
 	 */
 	@Test
 	public void testAdd4() {
@@ -62,11 +64,12 @@ public class TDTParserTest {
 		assertEquals(parser.getCommandDetails().trim(),"go shopping");
 		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
 		assertEquals(parser.getIsHighPriority(), true);
-		assertEquals(parser.getDateAndTimeParts(), "at 3pm today");
+		assertEquals(parser.getDateAndTimeParts(), " at 3pm today");
 	}
 	
 	/**
-	 * This tests the input "command word, time, date" date time
+	 * This test that the words between quotation marks appear as commandDetails and
+	 * does not get parsed as date / time / priority.
 	 */
 	@Test
 	public void testAdd5() {
@@ -76,12 +79,14 @@ public class TDTParserTest {
 		assertEquals(parser.getCommandDetails().trim(),"edit everything 4pm today!");
 		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
 		assertEquals(parser.getIsHighPriority(), false);
-		assertEquals(parser.getDateAndTimeParts(), "6pm 23~nov");
+		assertEquals(parser.getDateAndTimeParts(), " 6pm 23~nov");
 	}
 	
+	//----------------------------------------DELETE----------------------------------------------
 	/**
-	 * Delete valid taskID
+	 * This tests that Delete valid taskID
 	 */
+	@Test
 	public void testDelete1() {
 		TDTParser parser = new TDTParser();
 		String testInput1 = "buy eggs";
@@ -96,53 +101,47 @@ public class TDTParserTest {
 		String testInput5 = "delete 2";
 		parser.parse(testInput5);
 		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
-		assertEquals(parser.getTaskID(), "2");
-	}
-
-	/**
-	 * This deletes an invalid taskID but still passes the correct info. 
-	 */
-	public void testDelete2() {
-		TDTParser parser = new TDTParser();
-		String testInput6 = "delete 6";
-		parser.parse(testInput6);
-		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
-		assertEquals(parser.getTaskID(), "6");
+		assertEquals(parser.getTaskID(), 2);
 	}
 	
 	/**
-	 * The order in which words are placed after the command word DELETE does not matter.
+	 * This test that the order in which the label name and task id
+	 * are placed after the command word DELETE does not matter.
 	 */
-	public void testDelete3() {
+	@Test
+	public void testDelete2() {
 		TDTParser parser = new TDTParser();
 		String testInput7 = "delete 1 today";
 		parser.parse(testInput7);
 		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
-		assertEquals(parser.getTaskID(), "1");
+		assertEquals(parser.getTaskID(), 1);
 		assertEquals(parser.getLabelName(), "today");
 		
 		String testInput8 = "delete tmr 1";
 		parser.parse(testInput8);
 		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
-		assertEquals(parser.getTaskID(), "1");
+		assertEquals(parser.getTaskID(), 1);
 		assertEquals(parser.getLabelName(), "tmr");
 	}
 	
 	/**
-	 * This is an invalid delete. 
+	 * This tests that there cannot be more than 2 fields 
+	 * (label name and task id) entered for a delete command. 
 	 */
-	public void testDelete5() {
+	@Test
+	public void testDelete3() {
 		TDTParser parser = new TDTParser();
 		String testInput9 = "delete 1 todothis todothisss";
 		parser.parse(testInput9);
 		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
-		assertEquals(parser.getTaskID(), "");
-		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getTaskID(), -1);
+		assertEquals(parser.getLabelName(), " ");
 	}
 	
 	/**
-	 * Delete label 
+	 * This tests the deletion of a label 
 	 */
+	@Test
 	public void testDelete4() {
 		TDTParser parser = new TDTParser();
 		String testInput10 = "delete todothis";
@@ -151,9 +150,11 @@ public class TDTParserTest {
 		assertEquals(parser.getLabelName(), "todothis");
 	}
 	
+	//----------------------------------------LABEL----------------------------------------------
 	/**
 	 * Create valid label (1word)
 	 */
+	@Test
 	public void testLabel1() {
 		TDTParser parser = new TDTParser();
 		String testInput1 = "label school";
@@ -165,47 +166,125 @@ public class TDTParserTest {
 	/**
 	 * Create invalid label (2words)
 	 */
+	@Test
 	public void testLabel2() {
 		TDTParser parser = new TDTParser();
 		String testInput2 = "label school work";
 		parser.parse(testInput2);
 		assertEquals(parser.getCommandType(), COMMANDTYPE.LABEL);
-		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getLabelName(), "school work");
 	}
 	
+	//----------------------------------------DONE----------------------------------------------
 	/**
-	 * Valid done 
+	 * This test that the order in which the label name and task id
+	 * are placed after the command word DONE does not matter.
 	 */
+	@Test
 	public void testDone1() {
 		TDTParser parser = new TDTParser();
 		String testInput1 = "done todothis 1";
 		parser.parse(testInput1);
 		assertEquals(parser.getCommandType(), COMMANDTYPE.DONE);
 		assertEquals(parser.getLabelName(), "todothis");
-		assertEquals(parser.getTaskID(), "1");
+		assertEquals(parser.getTaskID(), 1);
+		
+		String testInput3 = "done 2 todothis";
+		parser.parse(testInput3);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.DONE);
+		assertEquals(parser.getLabelName(), "todothis");
+		assertEquals(parser.getTaskID(), 2);
 	}
 	
 	/**
-	 * Invalid done 
+	 * This tests that there cannot be more than 2 fields 
+	 * (label name and task id) entered for a done command. 
 	 */
+	@Test
 	public void testDone2() {
 		TDTParser parser = new TDTParser();
-		String testInput2 = "done todothis 1 today";
+		String testInput2 = "done todothis today 1";
 		parser.parse(testInput2);
 		assertEquals(parser.getCommandType(), COMMANDTYPE.DONE);
-		assertEquals(parser.getLabelName(), "");
-		assertEquals(parser.getTaskID(), "");
+		assertEquals(parser.getLabelName(), " ");
+		assertEquals(parser.getTaskID(), -1);
 	}
-	
+	//----------------------------------------EDIT----------------------------------------------
 	/**
-	 * Edit
+	 * This tests that the edit is valid without a label name 
 	 */
+	@Test
 	public void testEdit1() {
 		TDTParser parser = new TDTParser();
-		String testInput2 = "edit 1 ";
+		String testInput2 = "edit 1 lets test edit command";
 		parser.parse(testInput2);
-		assertEquals(parser.getCommandType(), COMMANDTYPE.DONE);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.EDIT);
 		assertEquals(parser.getLabelName(), "");
-		assertEquals(parser.getTaskID(), "");
+		assertEquals(parser.getTaskID(), 1);
+		assertEquals(parser.getCommandDetails(), " lets test edit command");
+	}
+	
+	//----------------------------------------HIDE----------------------------------------------
+	/**
+	 * This tests that hide command parse the label names as command details. 
+	 */
+	@Test
+	public void testHide1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "hide label1 label2";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.HIDE);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getCommandDetails(), "label1 label2");
+	}
+	
+	//----------------------------------------SHOW----------------------------------------------
+	/**
+	 * This tests that show command parse the label names as command details. 
+	 */
+	@Test
+	public void testShow1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "show label1 label2";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.SHOW);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getCommandDetails(), "label1 label2");
+	}
+	
+	//----------------------------------------REMIND----------------------------------------------
+	/**
+	 * This tests that remind command parse everything after the taskID as command details.
+	 */
+	@Test
+	public void testRemind1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "remind todothis 3 4pm";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.REMIND);
+		assertEquals(parser.getLabelName(), "todothis");
+		assertEquals(parser.getCommandDetails(), "4pm");
+		assertEquals(parser.getDateAndTimeParts(), "");
+		
+		String testInput2 = "remind 3 todothis 4pm";
+		parser.parse(testInput2);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.REMIND);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getCommandDetails(), "todothis 4pm");
+		assertEquals(parser.getDateAndTimeParts(), "");
+	}
+	
+	//----------------------------------------SEARCH----------------------------------------------
+	/**
+	 * This tests that search command parse everything as command details
+	 */
+	@Test
+	public void testSearch1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "search apples @5pm next week";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.SEARCH);
+		assertEquals(parser.getCommandDetails(), "apples @5pm next week");
+		assertEquals(parser.getDateAndTimeParts(), "");
 	}
 }
