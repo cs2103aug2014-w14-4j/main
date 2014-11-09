@@ -12,6 +12,11 @@ import todothis.commons.TDTCommons;
 import todothis.commons.Task;
 import todothis.logic.command.Command;
 
+/**
+ * 
+ * TDTDataStore holds all the data required by TodoThis during runtime.
+ *
+ */
 public class TDTDataStore {
 	private HashMap<String, ArrayList<Task>> taskMap;
 	private String currLabel = TDTCommons.DEFAULT_LABEL;
@@ -19,9 +24,15 @@ public class TDTDataStore {
 	private Stack<Command> redoStack;
 	private ArrayList<String> hideList;
 	private ArrayList<String> autoWords;
+	private String fileName;
 	private TDTFileHandler file;
 	
+	/**
+	 * Construct a new TDTDataStore. All read and write operations will be at the fileName provided
+	 * @param fileName
+	 */
 	public TDTDataStore(String fileName) {
+		setFileName(fileName);
 		setTaskMap(new HashMap<String, ArrayList<Task>>());
 		setUndoStack(new Stack<Command>());
 		setRedoStack(new Stack<Command>());
@@ -29,47 +40,94 @@ public class TDTDataStore {
 		taskMap.put(currLabel, new ArrayList<Task>());
 		setAutoWords(new ArrayList<String>());
 		initializeWordsForAutoComplete();
-		this.file = new TDTFileHandler(fileName);
+		this.file = new TDTFileHandler(this);
 	}
 	
-	public void write() {
-		file.write(this);
+	/**
+	 * Write to the file at fileName.txt
+	 */
+	public void writeToFile() {
+		file.write();
 	}
 	
-	public void read() throws IOException {
-		file.readInitialise(this);
+	/**
+	 * Read from the file fileName.txt and store the content in the TDTDataStore object .
+	 * @throws IOException if unable to initialize
+	 */
+	public void readAndInitialize() throws IOException {
+		file.readAndInitialize();
 	}
 	
+	/**
+	 * Get all the task in the taskMap and return as a iterator.
+	 * @return the iterator containing all the task
+	 */
 	public Iterator<Task> getTaskIterator() {
 		return new TaskIterator(this.getTaskMap());
 	}
 	
+	/**
+	 * Insert word to the auto complete dictionary.
+	 * @param label - The word to added to autocomplete
+	 */
 	public void insertToAutoWords(String label) {
 		autoWords.add(label);
 		Collections.sort(autoWords);
 	}
 	
+	/**
+	 * Return the number or task in the label.
+	 * @param labelName
+	 * @return the number or task in the label
+	 */
 	public int getLabelSize(String labelName) {
 		return this.getTaskMap().get(labelName).size();
 	}
 	
+	
+	/**
+	 * Insert the command to undoStack
+	 * @param comd - The command that have just been executed.
+	 */
 	public void insertToUndoStack(Command comd) {
 		undoStack.add(comd);
 	}
 	
+	/**
+	 * Get all the label in the taskMap and return it as a iterator
+	 * @return the iterator containing all the labels in taskMap.
+	 */
 	public Iterator<String> getLabelIterator() {
 		return taskMap.keySet().iterator();
 	}	
 	
+	/**
+	 * Insert the label to HideList
+	 * @param label - to be hidden from view
+	 */
 	public void insertToHideList(String label) {
 		if(!hideList.contains(label)) {
 			hideList.add(label);
 		}
 	}
 	
+	/**
+	 * Return the taskList associated with the labelname.
+	 * @param label
+	 * @return Return the taskList associated with the labelname.
+	 */
+	public ArrayList<Task> getTaskListFromLabel(String label) {
+		return this.getTaskMap().get(label.toUpperCase());
+	}
+	
+	/**
+	 * Add task to the taskMap
+	 * @param task
+	 */
 	public void addTask(Task task) {
 		this.getTaskMap().get(task.getLabelName()).add(task);
 	}
+	
 	
 	private void initializeWordsForAutoComplete() {
 		autoWords.add("DELETE");
@@ -122,8 +180,6 @@ public class TDTDataStore {
 	}
 	
 	
-	
-	
 	public HashMap<String, ArrayList<Task>> getTaskMap() {
 		return taskMap;
 	}
@@ -161,13 +217,19 @@ public class TDTDataStore {
 		this.autoWords = autoWords;
 	}
 
-
 	public TDTFileHandler getFile() {
 		return file;
 	}
 
-
 	public void setFile(TDTFileHandler file) {
 		this.file = file;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }

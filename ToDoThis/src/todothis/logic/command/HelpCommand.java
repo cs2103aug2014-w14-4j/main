@@ -34,6 +34,7 @@ public class HelpCommand extends Command{
 
 	@Override
 	public String execute(TDTDataStore data) {
+		data.insertToUndoStack(this);
 		switch(getCommandForHelp()){
 		case ADD:
 			return helpAdd();
@@ -65,8 +66,7 @@ public class HelpCommand extends Command{
 	
 	@Override
 	public String undo(TDTDataStore data) {
-		
-		return "";
+		return "Undo Help";
 	}
 	
 	private String helpAdd(){

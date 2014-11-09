@@ -10,12 +10,10 @@ import org.junit.Test;
 
 import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
-import todothis.logic.command.Command;
-import todothis.logic.parser.TDTParser;
+import todothis.logic.TDTController;
 
 public class TDTSystemTest {
-	private TDTStorage testStorage = new TDTStorage("testing.txt");
-	private TDTParser testParser = new TDTParser();
+	private String fileName = "testing.txt";
 	private Task current;
 	private TDTDateAndTime dnt;
 	private String details = "";
@@ -25,9 +23,9 @@ public class TDTSystemTest {
 	private boolean isPriority = false;
 	@Test
 	public void floatingTaskWithPriorityTest() {
-		Command cmd = testParser.parse("lets play games!");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("lets play games!");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -48,9 +46,9 @@ public class TDTSystemTest {
 	
 	@Test
 	public void deadlineTaskTest() {
-		Command cmd = testParser.parse("cs2106 homework done by 31-10-14 2359hrs");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("cs2106 homework done by 31-10-14 2359hrs");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -70,9 +68,9 @@ public class TDTSystemTest {
 	}
 	@Test
 	public void timedTaskTest() {
-		Command cmd = testParser.parse("incamp training from 29/10/2014 8am to 3/11/2014 9pm");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("incamp training from 29/10/2014 8am to 3/11/2014 9pm");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -93,11 +91,10 @@ public class TDTSystemTest {
 	
 	@Test
 	public void doneTaskTest() {
-		Command cmd = testParser.parse("test done");
-		cmd.execute(testStorage);
-		cmd = testParser.parse("done 1");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("test done");
+		String feedback1 = control.executeCommand("done 1");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -119,11 +116,10 @@ public class TDTSystemTest {
 	}
 	@Test
 	public void labelTest() {
-		Command cmd = testParser.parse("label homework");
-		cmd.execute(testStorage);
-		cmd = testParser.parse("label check!");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		control.executeCommand("label homework");
+		control.executeCommand("label check!");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -146,13 +142,15 @@ public class TDTSystemTest {
 		}
 		
 	}
+	
+	
+	
 	@Test
 	public void editTest() {
-		Command cmd = testParser.parse("do homework from 1pm - 3pm");
-		cmd.execute(testStorage);
-		cmd = testParser.parse("edit 1 dun wan do homework liao");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		control.executeCommand("do homework from 1pm - 3pm");
+		control.executeCommand("edit 1 dun wan do homework liao");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -174,13 +172,11 @@ public class TDTSystemTest {
 	}
 	@Test
 	public void deleteTest() {
-		Command cmd = testParser.parse("testing delete task 1");
-		cmd.execute(testStorage);
-		cmd = testParser.parse("testing delete task 2");
-		cmd.execute(testStorage);
-		cmd = testParser.parse("delete 1");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		control.executeCommand("testing delete task 1");
+		control.executeCommand("testing delete task 2");
+		control.executeCommand("delete 1");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -203,11 +199,10 @@ public class TDTSystemTest {
 	}
 	@Test
 	public void reminderTest() {
-		Command cmd = testParser.parse("testing reminder task");
-		cmd.execute(testStorage);
-		cmd = testParser.parse("remind 1 20-12-14 330pm");
-		cmd.execute(testStorage);
-		Iterator<Task> i = testStorage.getTaskIterator();
+		TDTController control = new TDTController(fileName);
+		control.executeCommand("testing reminder task");
+		control.executeCommand("remind 1 20-12-14 330pm");
+		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();

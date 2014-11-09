@@ -12,36 +12,18 @@ public class HideCommand extends Command {
 	private String labelName;
 	private ArrayList<String> prevHideList;
 	
+	/**
+	 * Construct a HideCommand
+	 * @param labelName
+	 */
 	public HideCommand(String labelName) {
 		super(COMMANDTYPE.HIDE);
 		this.setLabelName(labelName.toUpperCase());
 	}
-	/*
-	Unused code. Previously able to hide specific task. Changed to able to hide labels only.
-	@Override
-	public String execute(TDTDataStore data) {
-		String[] labelNames = getLabelName().split(" ");
-		Iterator<Task> iter;
-
-		if(labelNames[0].equals("")){
-			iter = data.getTaskIterator();
-			while(iter.hasNext()){
-				Task temp = iter.next();
-				temp.setHide(true);
-			}
-		}else {
-			iter = data.getTaskIterator();
-			while(iter.hasNext()){
-				Task temp = iter.next();
-				if(containInArray(temp.getLabelName(), labelNames)){
-					temp.setHide(true);
-				}
-			}
-		}
-		
-		return "";
-	}*/
 	
+	/**
+	 * Hides a label from view.
+	 */
 	@Override
 	public String execute(TDTDataStore data) {
 		prevHideList = copyHideList(data.getHideList());
@@ -66,6 +48,9 @@ public class HideCommand extends Command {
 		return MESSAGE_HIDE_FEEDBACK;
 	}
 	
+	/**
+	 * Reverses the effect of execute
+	 */
 	@Override
 	public String undo(TDTDataStore data) {
 		data.setHideList(prevHideList);
@@ -97,6 +82,31 @@ public class HideCommand extends Command {
 		this.labelName = labelName;
 	}
 
+	/*
+	Unused code. Previously able to hide specific task. Changed to able to hide labels only.
+	@Override
+	public String execute(TDTDataStore data) {
+		String[] labelNames = getLabelName().split(" ");
+		Iterator<Task> iter;
+
+		if(labelNames[0].equals("")){
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				temp.setHide(true);
+			}
+		}else {
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				if(containInArray(temp.getLabelName(), labelNames)){
+					temp.setHide(true);
+				}
+			}
+		}
+		
+		return "";
+	}*/
 	
 
 }

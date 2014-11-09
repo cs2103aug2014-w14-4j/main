@@ -14,20 +14,35 @@ import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTReminder;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
-
+/**
+ * 
+ * TDTFileHandler is the servant class of TDTDataStore.
+ * Its sole purpose is to help initialise TDTDataStore 
+ * as well as saving the contents of TDTDataStore to the file.
+ *
+ */
 public class TDTFileHandler {
-	private String fileName;
 	private BufferedWriter bw;
+	private TDTDataStore data;
 	
-	public TDTFileHandler(String fileName) {
-		setFileName(fileName);
+	/**
+	 * Construct a new FileHandler. 
+	 * @param data
+	 */
+	public TDTFileHandler(TDTDataStore data) {
+		this.setData(data);
 	}
 	
-	public void readInitialise(TDTDataStore data) throws IOException {
+	/**
+	 * Read from the file associated with TDTDataStore and initialize it. If error occur while reading
+	 * the file, create a new file.
+	 * @throws IOException if unable to create the file.
+	 */
+	public void readAndInitialize() throws IOException {
 		HashMap<String,ArrayList<Task>> taskMap = data.getTaskMap();
 		ArrayList<String> autoWords = data.getAutoWords();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(fileName));
+			BufferedReader br = new BufferedReader(new FileReader(data.getFileName()));
 			int totalLabel = Integer.parseInt(br.readLine());
 			for(int i = 0; i < totalLabel; i ++) {
 				String label = br.readLine();
@@ -60,14 +75,17 @@ public class TDTFileHandler {
 			}
 			br.close();
 		} catch(Exception e) {
-			bw = new BufferedWriter(new FileWriter(fileName));
+			bw = new BufferedWriter(new FileWriter(data.getFileName()));
 			bw.close();
 		}
 	}
 	
-	public void write(TDTDataStore data){
+	/**
+	 * Write the content of TDTDataStore to the file associated with it.
+	 */
+	public void write(){
 		try {
-			bw = new BufferedWriter(new FileWriter(fileName));
+			bw = new BufferedWriter(new FileWriter(data.getFileName()));
 			bw.write(data.getTaskMap().size()+ "");
 			bw.newLine();
 			Iterator<String> labelIter = data.getLabelIterator();
@@ -93,12 +111,12 @@ public class TDTFileHandler {
 			System.out.println("Error. Unable to initialise write file.");
 		}
 	}
-
-	public String getFileName() {
-		return fileName;
+	
+	public TDTDataStore getData() {
+		return data;
 	}
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setData(TDTDataStore data) {
+		this.data = data;
 	}
 }

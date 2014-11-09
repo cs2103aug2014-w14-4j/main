@@ -9,16 +9,13 @@ import todothis.commons.Task;
 import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
-
-
 public class AddCommand extends Command {
 	private static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
 	private static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
 	private static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
 	private static final String MESSAGE_ADD_FEEDBACK = "Task added to %s.";
-	private static final String MESSAGE_ADD_CLASH = "Clashes detected. %s \n"
-			+ "%d task(s) found to have same time range on %s" ;
-	
+	private static final String MESSAGE_ADD_CLASH = "Clashes detected. %s \n%d task(s) found to have same time range on %s";
+
 	private int taskID;
 	private String labelName;
 	private String commandDetails;
@@ -28,15 +25,25 @@ public class AddCommand extends Command {
 	private Task addedTask;
 	private String feedback = "";
 	private boolean gotClashes = false;
-
-	public AddCommand(String commandDetails, TDTDateAndTime dateAndTime, boolean isHighPriority ) {
+	
+	/**
+	 * Construct the AddCommand object.
+	 * @param commandDetails
+	 * @param dateAndTime
+	 * @param isHighPriority
+	 */
+	public AddCommand(String commandDetails, TDTDateAndTime dateAndTime,
+			boolean isHighPriority) {
 		super(COMMANDTYPE.ADD);
 		this.setHighPriority(isHighPriority);
 		this.setCommandDetails(commandDetails);
 		this.setDateAndTime(dateAndTime);
 		this.setTargetTask(new ArrayList<Task>());
 	}
-
+	
+	/**
+	 * Create a Task object and add into the TDTdataStore 
+	 */
 	@Override
 	public String execute(TDTDataStore data) {
 		setLabelName(data.getCurrLabel());
@@ -45,48 +52,51 @@ public class AddCommand extends Command {
 				getDateAndTime(), isHighPriority());
 		setAddedTask(task);
 		TDTDateAndTime dnt = getDateAndTime();
-		
-		if(!TDTCommons.isValidDateTimeRange(dnt)) {
+
+		if (!TDTCommons.isValidDateTimeRange(dnt)) {
 			return MESSAGE_INVALID_DATE_TIME_FORMAT;
 		}
-		
-		if(!TDTCommons.isValidStartEndDate(dnt)) {
+
+		if (!TDTCommons.isValidStartEndDate(dnt)) {
 			return MESSAGE_INVALID_END_DATE;
 		}
-		
-		if(!TDTCommons.isValidStartEndTime(dnt)) {
+
+		if (!TDTCommons.isValidStartEndTime(dnt)) {
 			return MESSAGE_INVALID_END_TIME;
 		}
-		
+
 		checkForClash(task, data.getTaskIterator());
 		data.addTask(task);
 		setTaskID(TDTCommons.sort(data.getTaskMap().get(getLabelName()), task));
 		data.insertToUndoStack(this);
-		
-		return gotClashes?this.getFeedback():String.format(MESSAGE_ADD_FEEDBACK,
-															data.getCurrLabel());
+
+		return gotClashes ? this.getFeedback() : String.format(
+				MESSAGE_ADD_FEEDBACK, data.getCurrLabel());
 	}
-	
-	
+
 	private void checkForClash(Task target, Iterator<Task> iter) {
 		int numClash = 0;
-		while(iter.hasNext()) {
+		while (iter.hasNext()) {
 			Task task = iter.next();
-			if(task != target && !task.isDone()) {
-				if(target.getDateAndTime().isClash(task.getDateAndTime())) {
+			if (task != target && !task.isDone()) {
+				if (target.getDateAndTime().isClash(task.getDateAndTime())) {
 					targetTask.add(task);
 					numClash++;
 					gotClashes = true;
 				}
 			}
 		}
-		if(gotClashes) {
-			String feedback = String.format(MESSAGE_ADD_CLASH, String.format(MESSAGE_ADD_FEEDBACK,
-					target.getLabelName()), numClash, target.getDateAndTime().getStartDate());
+		if (gotClashes) {
+			String feedback = String.format(MESSAGE_ADD_CLASH,
+					String.format(MESSAGE_ADD_FEEDBACK, target.getLabelName()),
+					numClash, target.getDateAndTime().getStartDate());
 			this.setFeedback(feedback);
 		}
 	}
-
+	
+	/**
+	 * Reverses the effect of execute
+	 */
 	@Override
 	public String undo(TDTDataStore data) {
 		targetTask.clear();
@@ -96,10 +106,7 @@ public class AddCommand extends Command {
 		data.getUndoStack().pop();
 		return "Undo add!";
 	}
-	
-	
-	
-	
+
 	public int getTaskID() {
 		return taskID;
 	}
@@ -163,7 +170,5 @@ public class AddCommand extends Command {
 	public void setAddedTask(Task addedTask) {
 		this.addedTask = addedTask;
 	}
-
-	
 
 }

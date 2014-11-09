@@ -60,14 +60,10 @@ public class SearchCommand extends Command {
 	
 	/**
 	 * Undo method for search. Undoing search will just return to the main screen.
-	 * Unable to redo search.
 	 */
 	@Override
 	public String undo(TDTDataStore data) {
-		//Since we do not allow to redo search, we need to pop the 
-		//comd added to redo stack by undo
-		assert(!data.getRedoStack().isEmpty());
-		data.getRedoStack().pop();
+		searchedResult.clear();
 		return MESSAGE_UNDO_SEARCH;
 	}
 	
@@ -99,12 +95,10 @@ public class SearchCommand extends Command {
 	//narrow the search result will be.
 	private void searchKeyWords(Iterator<Task> iter) {
 		boolean found = false;
-		//String[] keyWords = searchedWords.replaceAll("[\\W]", " ").split(" ");
 		String[] keyWords = searchedWords.split(" ");
 		
 		while(iter.hasNext()) {
 			Task task = iter.next();
-			//String[] details = task.getDetails().replaceAll("[\\W]", " ").split(" ");
 			String[] details = task.getDetails().split(" ");
 			
 			//For each of the keywords, compare with each word of task details. 

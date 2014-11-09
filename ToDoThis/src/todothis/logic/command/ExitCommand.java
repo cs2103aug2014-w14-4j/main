@@ -4,16 +4,16 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class ExitCommand extends Command {
-	
+
 	/**
 	 * Constructor for ExitCommand
 	 */
 	public ExitCommand() {
 		super(COMMANDTYPE.EXIT);
 	}
-	
+
 	/**
-	 * Executing ExitCommand will save the file and exits.
+	 * Executing ExitCommand will exit TodoThis
 	 */
 	@Override
 	public String execute(TDTDataStore data) {
@@ -25,5 +25,5 @@ public class ExitCommand extends Command {
 	public String undo(TDTDataStore data) {
 		return "";
 	}
-	
+
 }

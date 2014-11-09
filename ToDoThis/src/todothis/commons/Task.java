@@ -12,6 +12,14 @@ public class Task implements Comparable<Task> {
 	private TDTReminder reminder;
 	
 //---------------------Task constructor---------------------------------------
+	/**
+	 * Construct a Task object
+	 * @param taskID
+	 * @param labelName
+	 * @param details
+	 * @param dateAndTime
+	 * @param p
+	 */
 	public Task(int taskID, String labelName, String details, TDTDateAndTime dateAndTime, boolean p) {
 		this.setDetails(details);
 		this.setTaskID(taskID);
@@ -22,7 +30,16 @@ public class Task implements Comparable<Task> {
 		this.setRemindDateTime("null");
 	}
 
-	
+	/**
+	 * Construct a Task object
+	 * @param taskID
+	 * @param labelName
+	 * @param details
+	 * @param dateAndTime
+	 * @param p
+	 * @param done
+	 * @param remindDateTime
+	 */
 	public Task(int taskID, String labelName, String details,
 			TDTDateAndTime dateAndTime, boolean p,
 			boolean done, String remindDateTime) {
@@ -60,6 +77,10 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
+	/**
+	 * Check if the task has a reminder.
+	 * @return true if have reminder else false
+	 */
 	public boolean hasReminder() {
 		return reminder != null;
 	}

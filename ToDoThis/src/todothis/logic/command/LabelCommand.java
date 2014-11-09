@@ -18,11 +18,18 @@ public class LabelCommand extends Command {
 	private String undoFeedback;
 	private boolean newLabelCreated = false;
 	
+	/**
+	 * Construct a LabelCommand
+	 * @param labelName
+	 */
 	public LabelCommand(String labelName) {
 		super(COMMANDTYPE.LABEL);
 		this.setLabelName(labelName);
 	}
 
+	/**
+	 * Change the directory of current label or create a new label.
+	 */
 	@Override
 	public String execute(TDTDataStore data) {
 		prevLabel = data.getCurrLabel();
@@ -33,25 +40,35 @@ public class LabelCommand extends Command {
 		}
 		
 		if(data.getTaskMap().containsKey(label[0])) {
-			data.setCurrLabel(label[0]);
-			data.getHideList().remove(label[0]);
-			setUndoFeedback(String.format(MESSAGE_LABEL_FEEDBACK, prevLabel));
-			data.insertToUndoStack(this);
+			changeLabelDirectory(data, label);
 			return String.format(MESSAGE_LABEL_FEEDBACK, label[0]);
 		} else if(label[0].equals("") || label[0].matches("\\d+")) {
 			return MESSAGE_INVALID_ADD_LABEL;
 		} else {
-			data.getTaskMap().put(label[0], new ArrayList<Task>());
-			data.insertToAutoWords(label[0]);
-			data.setCurrLabel(label[0]);
-			newLabelCreated = true;
-			
-			setUndoFeedback(String.format(MESSAGE_UNDO_LABEL_FEEDBACK, label[0]));
-			data.insertToUndoStack(this);
+			createNewLabel(data, label);
 			return String.format(MESSAGE_CREATE_LABEL_FEEDBACK, label[0]);
 		}
 	}
+
+	private void createNewLabel(TDTDataStore data, String[] label) {
+		data.getTaskMap().put(label[0], new ArrayList<Task>());
+		data.insertToAutoWords(label[0]);
+		data.setCurrLabel(label[0]);
+		newLabelCreated = true;
+		setUndoFeedback(String.format(MESSAGE_UNDO_LABEL_FEEDBACK, label[0]));
+		data.insertToUndoStack(this);
+	}
+
+	private void changeLabelDirectory(TDTDataStore data, String[] label) {
+		data.setCurrLabel(label[0]);
+		data.getHideList().remove(label[0]);
+		setUndoFeedback(String.format(MESSAGE_LABEL_FEEDBACK, prevLabel));
+		data.insertToUndoStack(this);
+	}
 	
+	/**
+	 * Reverses the effect of execute.
+	 */
 	@Override
 	public String undo(TDTDataStore data) {
 		data.setCurrLabel(prevLabel);

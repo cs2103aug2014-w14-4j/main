@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
+import java.awt.Rectangle;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -38,15 +39,16 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import todothis.commons.TDTCommons;
-import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
 import todothis.commons.Task;
 import todothis.logic.TDTController;
 
 public class TDTGUI extends JFrame implements DocumentListener {
-
+	public static final Rectangle MINIMODE_SIZE = new Rectangle(300, 0, 500, 125);
+	public static final Rectangle ORIGINAL_SIZE = new Rectangle(300, 100, 800, 600);
 	private static final String COMMIT_ACTION = "commit";
+	private static final long serialVersionUID = 1L;
 
 	private static enum Mode {
 		INSERT, COMPLETION
@@ -54,7 +56,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 
 	private Mode mode = Mode.INSERT;
 
-	private static final long serialVersionUID = 1L;
 	private TDTController control;
 	private String userCommand;
 	private ArrayList<String> commandHistory = new ArrayList<String>();
@@ -68,8 +69,8 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	private JScrollPane scrollPane = new JScrollPane();
 	private JPanel top1 = new JPanel();
 	private JPanel top2 = new JPanel();
-			   
-	String css = ".datagrid table {background: \"white\"; text-align: center; width: 100%; } "
+
+	private String css = ".datagrid table {background: \"white\"; text-align: center; width: 100%; } "
 			+ ".datagrid {font: normal 12px/150% Candara, Helvetica, sans-serif; overflow: hidden; border: 4px solid #006699; }"
 			+ ".datagrid table td  { text-align: left; color: #00496B; border: 1px solid white;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
 			+ ".datagrid table .alt { background: #E1EEF4; color: #00496B; }"
@@ -95,7 +96,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			+ ".helptable td { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
 			+ ".helptable tr { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }"
 			+ ".helptable th { text-align: left; color: #00496B; border: 1px solid black;border-left: 1px solid #5882FA; font-size: 13px; font-weight: normal; }";
-			
 
 	/**
 	 * Create the frame.
@@ -111,7 +111,45 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		initFeedbackArea();
 	}
 
-	String displayTask(ArrayList<Task> target, Task addedTask) {
+	/**
+	 * Initialize TodoThis
+	 * 
+	 * @return feedback/Welcome message
+	 */
+	public String doInit() {
+		try {
+			control.readAndInitialize();
+		} catch (Exception e) {
+			return "Unable to create todothis.txt";
+		}
+		setVisible(true);
+		Image image = Toolkit.getDefaultToolkit().getImage("src/taeyeon.jpg");
+		setIconImage(image);
+		setTitle("TodoThis");
+
+		taskPane.setText(displayTask(null, null));
+		taskLabel.setText(" Current Label: " + control.getCurrLabel());
+		return "Welcome to TodoThis!\nType \"help\" to learn more.";
+	}
+
+	/**
+	 * Updates GUI
+	 * 
+	 * @param feedback
+	 *  To be display at feedbackArea
+	 * @param text
+	 *  To be display at taskPane
+	 */
+	public void updateGUI(String feedback, String text) {
+		taskLabel.setText(" Current Label: " + control.getCurrLabel());
+		getFeedbackArea().setText(feedback);
+		taskPane.setText(text);
+		changeColorOfFeedbackArea(feedback);
+	}
+
+	// -------------------------------Display Format------------------------------
+
+	protected String displayTask(ArrayList<Task> target, Task addedTask) {
 		StringBuilder sb = new StringBuilder();
 		String currLabel = control.getCurrLabel();
 		Iterator<String> labelIter = control.getLabelIterator();
@@ -132,7 +170,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		while (hideIter.hasNext()) {
 			String label = hideIter.next();
 			array = control.getTaskListFromLabel(label);
-			if(array != null) {
+			if (array != null) {
 				sb.append("<span class = label><b>" + label + "("
 						+ array.size() + ")" + "</b></span>: <br>");
 			}
@@ -142,7 +180,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 
 	private void displayFormat(StringBuilder sb, String currLabel,
 			ArrayList<Task> array, ArrayList<Task> target, Task addedTask) {
-		if (array != null) {	
+		if (array != null) {
 			if (!control.isHideLabel(currLabel)) {
 				sb.append("<span class = label><b>" + currLabel + "("
 						+ array.size() + ")" + "</b></span>: <br>");
@@ -150,19 +188,25 @@ public class TDTGUI extends JFrame implements DocumentListener {
 					Task task = array.get(i);
 					if (i == 0) {
 						sb.append("<div class= datagrid><table>");
-						sb.append("<tr class = heading> <th class = taskId>TaskID</th> <th>TaskDetails</th> "
+						sb.append("<tr class = heading> <th class = taskId>TaskID</th> "
+								+ "<th>TaskDetails</th> "
 								+ "<th class = dateTime>Date/Time</th> </tr>");
 					}
 					if (task.isDone()) {
-						sb.append(displayTaskInRow(task, " class = done", target, addedTask));
+						sb.append(displayTaskInRow(task, " class = done",
+								target, addedTask));
 					} else if (task.getDateAndTime().isOverdue()) {
-						sb.append(displayTaskInRow(task, " class = overdue", target, addedTask));
+						sb.append(displayTaskInRow(task, " class = overdue",
+								target, addedTask));
 					} else if (task.isHighPriority()) {
-						sb.append(displayTaskInRow(task, " class = priority", target, addedTask));
+						sb.append(displayTaskInRow(task, " class = priority",
+								target, addedTask));
 					} else if (i % 2 == 0) {
-						sb.append(displayTaskInRow(task, " class = alt", target, addedTask));
+						sb.append(displayTaskInRow(task, " class = alt",
+								target, addedTask));
 					} else {
-						sb.append(displayTaskInRow(task, " class =", target, addedTask));
+						sb.append(displayTaskInRow(task, " class =", target,
+								addedTask));
 					}
 				}
 				sb.append("</table></div>");
@@ -170,26 +214,25 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		}
 	}
 
-	private String displayTaskInRow(Task task, String type, ArrayList<Task> target, Task addedTask) {
-		if(addedTask == task) {
+	private String displayTaskInRow(Task task, String type,
+			ArrayList<Task> target, Task addedTask) {
+		if (addedTask == task) {
 			type = type + "target";
 		}
-		if(target != null)  {
-			if(target.contains(task) ) {
+		if (target != null) {
+			if (target.contains(task)) {
 				type = type + "clash";
 			}
-		} 
+		}
 		return "<tr" + type + "><td>" + task.getTaskID() + "</td><td>"
 				+ task.getDetails() + "</td><td class = datetime>"
 				+ task.getDateAndTime().display()
-				+ checkIfHaveReminder(task.getRemindDateTime()) 
-				+"</td></tr>";
+				+ checkIfHaveReminder(task.getRemindDateTime()) + "</td></tr>";
 	}
-	
-	
+
 	private String checkIfHaveReminder(String remind) {
 		String res = "";
-		if(!remind.equals("null")) {
+		if (!remind.equals("null")) {
 			String[] temp = remind.split(" ");
 			res = res + TDTDateMethods.changeToDayOfWeek(temp[0]) + " ";
 			res = res + TDTDateMethods.changeDateFormatDisplay(temp[0]) + " ";
@@ -199,7 +242,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		return res;
 	}
 
-	String displaySearch(ArrayList<Task> searched) {
+	protected String displaySearch(ArrayList<Task> searched) {
 		Collections.sort(searched);
 		Iterator<Task> iter = searched.iterator();
 		StringBuilder res = new StringBuilder();
@@ -227,60 +270,20 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	}
 
 	private String displaySearchTaskInRow(Task next, String type) {
-		return "<tr" + type + "><td>" + next.getLabelName()
-				+ "</td><td>" + next.getTaskID() + "</td><td>"
-				+ next.getDetails() + "</td><td class = \"datetime\">"
-				+ next.getDateAndTime().display() 
-				+ checkIfHaveReminder(next.getRemindDateTime()) 
-				+"</td></tr>";
-	}
-
-	String getDateTimeStringForEdit(TDTDateAndTime dat) {
-		String datString = "";
-		if (dat.isTimedTask()) {
-			datString = " from";
-			if (!dat.getStartDate().equals("null")) {
-				datString = datString + " " + dat.getStartDate();
-			}
-			if (!dat.getStartTime().equals("null")) {
-				datString = datString + " " + dat.getStartTime();
-			}
-			if (!dat.getEndDate().equals("null") || !dat.getEndTime().equals("null")) {
-				datString = datString + " to";
-				if (!dat.getEndDate().equals("null")) {
-					datString = datString + " " + dat.getEndDate();
-				}
-				if (!dat.getEndTime().equals("null")) {
-					datString = datString + " " + dat.getEndTime();
-				}
-			}
-		}
-		if (dat.isDeadlineTask()) {
-			datString = " by";
-			if (!dat.getEndDate().equals("null")) {
-				datString = datString + " " + dat.getEndDate();
-			}
-			if (!dat.getEndTime().equals("null")) {
-				datString = datString + " " + dat.getEndTime();
-			}
-		}
-		return datString;
-	}
-
-	public void updateGUI(String feedback, String text) {
-		taskLabel.setText(" Current Label: " + control.getCurrLabel());
-		getFeedbackArea().setText(feedback);
-		taskPane.setText(text);
-		changeColorOfFeedbackArea(feedback);
+		return "<tr" + type + "><td>" + next.getLabelName() + "</td><td>"
+				+ next.getTaskID() + "</td><td>" + next.getDetails()
+				+ "</td><td class = \"datetime\">"
+				+ next.getDateAndTime().display()
+				+ checkIfHaveReminder(next.getRemindDateTime()) + "</td></tr>";
 	}
 
 	private void changeColorOfFeedbackArea(String feedback) {
 		String[] feedbackParams = feedback.split(" ");
-		if(feedbackParams.length > 0) {
+		if (feedbackParams.length > 0) {
 			String firstWord = feedbackParams[0];
-			if(firstWord.equals("Invalid")) {
+			if (firstWord.equals("Invalid")) {
 				getFeedbackArea().setBackground(Color.pink);
-			} else if(firstWord.equals("Clashes")){
+			} else if (firstWord.equals("Clashes")) {
 				getFeedbackArea().setBackground(Color.yellow);
 			} else {
 				getFeedbackArea().setBackground(Color.green);
@@ -289,8 +292,8 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			getFeedbackArea().setBackground(Color.green);
 		}
 	}
-	
-	//----------------Component Initialisaiton------------------------------------
+
+	// ----------------Component Initialization------------------------------------
 
 	private void initTaskLabel() {
 		top1.add(taskLabel, BorderLayout.SOUTH);
@@ -342,7 +345,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 
 	private void initContentPane() {
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		setBounds(300, 100, 800, 600);
+		setBounds(ORIGINAL_SIZE);
 		contentPane = new JPanel();
 		contentPane.setBorder(new MatteBorder(3, 3, 3, 3, (Color) new Color(0,
 				0, 0)));
@@ -354,26 +357,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		top2.setLayout(new BoxLayout(top2, BoxLayout.X_AXIS));
 	}
 
-	public String doInit() {
-		try {			
-			control.readAndInitialize();
-		} catch (Exception e) {
-			return "Unable to create todothis.txt";
-		}
-		setVisible(true);
-		Image image = Toolkit.getDefaultToolkit().getImage("src/taeyeon.jpg");
-		setIconImage(image);
-		setTitle("TodoThis");
-		
-		taskPane.setText(displayTask(null, null));
-		taskLabel.setText(" Current Label: "
-				+ control.getCurrLabel());
-		return "Todo-This ready!\nType \"help\" for more information.";
-	}
-	
-	
-
-	//----------------------------- DocumentListener -----------------------------------
+	// ----------------------------- DocumentListener -----------------------------------
 	@Override
 	public void changedUpdate(DocumentEvent arg0) {
 	}
@@ -436,8 +420,8 @@ public class TDTGUI extends JFrame implements DocumentListener {
 
 		public void run() {
 			try {
-				getCommandField().getDocument().insertString(position, completion,
-						null);
+				getCommandField().getDocument().insertString(position,
+						completion, null);
 			} catch (BadLocationException e) {
 				System.out.println("Bad location error.");
 			}
@@ -461,16 +445,17 @@ public class TDTGUI extends JFrame implements DocumentListener {
 				getCommandField().setCaretPosition(pos);
 				mode = Mode.INSERT;
 			} else {
-				getCommandField().setCaretPosition(Math.min(getCommandField()
-						.getCaretPosition() + 1, getCommandField().getText()
-						.length()));
+				getCommandField().setCaretPosition(
+						Math.min(getCommandField().getCaretPosition() + 1,
+								getCommandField().getText().length()));
 			}
 		}
 	}
-	//--------------------------------System Tray -----------------------------
-	public void sysTray(){
+
+	// --------------------------------System Tray -----------------------------
+	public void sysTray() {
 		final TDTGUI gui = this;
-		if(!SystemTray.isSupported()){
+		if (!SystemTray.isSupported()) {
 			System.out.println("System tray is not supported !!! ");
 			gui.control.writeToFile();
 			System.exit(0);
@@ -484,7 +469,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				gui.control.writeToFile();
-				System.exit(0);             
+				System.exit(0);
 			}
 		});
 		trayPopupMenu.add(close);
@@ -493,7 +478,7 @@ public class TDTGUI extends JFrame implements DocumentListener {
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if(arg0.getButton() == MouseEvent.BUTTON1) {
+				if (arg0.getButton() == MouseEvent.BUTTON1) {
 					gui.setVisible(true);
 				}
 			}
@@ -509,20 +494,21 @@ public class TDTGUI extends JFrame implements DocumentListener {
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 			}
+
 			@Override
-			public void mouseReleased(MouseEvent arg0) {	
+			public void mouseReleased(MouseEvent arg0) {
 			}
 		});
 		trayIcon.setImageAutoSize(true);
 
-		try{
+		try {
 			systemTray.add(trayIcon);
-		}catch(AWTException awtException){
+		} catch (AWTException awtException) {
 			awtException.printStackTrace();
 		}
 	}
 
-	//--------------------------Getters & Setters------------------------------------
+	// --------------------------Getters & Setters------------------------------------
 
 	public ArrayList<String> getCommandHistory() {
 		return commandHistory;
@@ -547,7 +533,6 @@ public class TDTGUI extends JFrame implements DocumentListener {
 	public void setUserCommand(String userCommand) {
 		this.userCommand = userCommand;
 	}
-
 
 	public TDTController getControl() {
 		return control;
@@ -581,6 +566,4 @@ public class TDTGUI extends JFrame implements DocumentListener {
 		this.commandField = commandField;
 	}
 
-
 }
-

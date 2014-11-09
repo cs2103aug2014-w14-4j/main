@@ -36,24 +36,33 @@ public class DeleteCommand extends Command {
 	private String undoLabel;
 	private String undoFeedback = "";
 	
+	/**
+	 * Construct a DeleteCommand object. 
+	 * @param labelName
+	 * @param taskID
+	 */
 	public DeleteCommand(String labelName, int taskID) {
 		super(COMMANDTYPE.DELETE);
 		this.setTaskID(taskID);
 		this.setLabelName(labelName.toUpperCase());
 	}
 	
+	/**
+	 * Delete all the task if labelName is blank and taskID = -1
+	 * Delete all the task under a label if taskID = -1
+	 * Delete label if taskID = -1 and no task under that label
+	 * Delete task from current label if taskID != -1 and label is blank
+	 * Delete task from specific label if taskID != -1 and label is not blank
+	 */
 	@Override
 	public String execute(TDTDataStore data) {
 		prevLabelPointer = data.getCurrLabel();
 		String label = getLabelName();
 		int taskId = getTaskID();
 		
-		
 		//delete
 		if(label.equals("") && taskId == -1) {
 			deleteEverything(data);
-			data.insertToUndoStack(this);
-			setUndoFeedback(MESSAGE_UNDO_CLEAR);
 			return MESSAGE_CLEAR;
 		}
 		
@@ -63,14 +72,10 @@ public class DeleteCommand extends Command {
 				//If label is empty, delete label
 				if(data.getLabelSize(label) == 0) {
 					deleteLabel(data, label);
-					data.insertToUndoStack(this);
-					setUndoFeedback(String.format(MESSAGE_UNDO_DELETE_LABEL_TASK, label));
 					return MESSAGE_DELETE_LABEL;
 				} else {
 					//label not empty, clear task in label
 					deleteLabelTask(data, label);
-					data.insertToUndoStack(this);
-					setUndoFeedback(String.format(MESSAGE_UNDO_DELETE_LABEL_TASK, label));
 					return String.format(MESSAGE_DELETE_LABEL_TASK, label);
 				}
 			} else {
@@ -83,8 +88,6 @@ public class DeleteCommand extends Command {
 			ArrayList<Task> array = data.getTaskMap().get(data.getCurrLabel());
 			if(taskId <= array.size() && getTaskID() > 0) {
 				deleteTask(data.getCurrLabel(),taskId, data);
-				data.insertToUndoStack(this);
-				setUndoFeedback(MESSAGE_UNDO_DELETE_TASK);
 				return MESSAGE_DELETE_TASK;
 			} else {
 				return MESSAGE_INVALID_TASKID;
@@ -97,8 +100,6 @@ public class DeleteCommand extends Command {
 				ArrayList<Task> array = data.getTaskMap().get(label);
 				if(taskId <= array.size() && getTaskID() > 0) {
 					deleteTask(label,taskId, data);
-					data.insertToUndoStack(this);
-					setUndoFeedback(MESSAGE_UNDO_DELETE_TASK);
 					return MESSAGE_DELETE_TASK;
 				} else {
 					return MESSAGE_INVALID_TASKID;
@@ -107,14 +108,14 @@ public class DeleteCommand extends Command {
 				return MESSAGE_INVALID_LABEL;
 			}
 		}
-		//Shouldnt reach here
+		
 		return MESSAGE_INVALID;
 	}
 
 	private void deleteTask(String label, int taskId, TDTDataStore data) {
 		setDeleteState(DELETE_TASK);
 		undoLabel = label;
-		ArrayList<Task> taskList = data.getTaskMap().get(label);
+		ArrayList<Task> taskList = data.getTaskListFromLabel(label);
 		undoTaskList = copyTaskList(taskList);
 		Task task = taskList.get(taskId - 1);
 		if(task.hasReminder()) {
@@ -124,6 +125,8 @@ public class DeleteCommand extends Command {
 		}
 		taskList.remove(taskId - 1);
 		TDTCommons.renumberTaskID(taskList, null);
+		data.insertToUndoStack(this);
+		setUndoFeedback(MESSAGE_UNDO_DELETE_TASK);
 	}
 
 	
@@ -140,6 +143,8 @@ public class DeleteCommand extends Command {
 		data.setTaskMap(new HashMap<String, ArrayList<Task>>());
 		data.getTaskMap().put(TDTCommons.DEFAULT_LABEL, new ArrayList<Task>());
 		data.setCurrLabel(TDTCommons.DEFAULT_LABEL);
+		data.insertToUndoStack(this);
+		setUndoFeedback(MESSAGE_UNDO_CLEAR);
 	}
 	
 
@@ -153,15 +158,19 @@ public class DeleteCommand extends Command {
 			data.getTaskMap().put(TDTCommons.DEFAULT_LABEL, new ArrayList<Task>());
 			data.insertToAutoWords(TDTCommons.DEFAULT_LABEL);
 		}
+		data.insertToUndoStack(this);
+		setUndoFeedback(String.format(MESSAGE_UNDO_DELETE_LABEL_TASK, label));
 	}
 	
 	private void deleteLabelTask(TDTDataStore data, String label) {
 		undoLabel = label;
-		ArrayList<Task> taskList = data.getTaskMap().get(label);
+		ArrayList<Task> taskList = data.getTaskListFromLabel(label);
 		undoTaskList = copyTaskList(taskList);
 		setDeleteState(DELETE_LABELTASK);
 		stopReminderInTaskList(taskList);
 		taskList.clear();
+		data.insertToUndoStack(this);
+		setUndoFeedback(String.format(MESSAGE_UNDO_DELETE_LABEL_TASK, label));
 	}
 	
 	private void stopReminderInTaskList(ArrayList<Task> array) {
@@ -176,7 +185,9 @@ public class DeleteCommand extends Command {
 		}
 	}
 	
-	
+	/**
+	 * Reverses the effect of execute.
+	 */
 	@Override
 	public String undo(TDTDataStore data) {
 		data.setCurrLabel(prevLabelPointer);

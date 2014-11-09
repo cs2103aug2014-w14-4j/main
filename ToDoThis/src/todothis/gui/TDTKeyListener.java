@@ -1,16 +1,14 @@
 package todothis.gui;
 
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
-import javax.swing.JOptionPane;
 
 import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
 import todothis.logic.TDTController;
 
 public class TDTKeyListener implements KeyListener {
+	
 	private static final int _SCROLLFACTOR = 30;
 	private TDTGUI gui;
 
@@ -36,11 +34,6 @@ public class TDTKeyListener implements KeyListener {
 			updateView(scrollVal, feedback);
 		}
 		
-		if (arg0.isControlDown() && keyCode == KeyEvent.VK_R) {
-			Toolkit.getDefaultToolkit().beep();
-			JOptionPane.showMessageDialog(null, "REMINDER!\nTask: Reminder POPUP!.");
-		}
-		
 		if (arg0.isAltDown()  && keyCode == KeyEvent.VK_S) {
 			String feedback = gui.getControl().executeCommand("show");
 			gui.updateGUI(feedback, gui.displayTask(null, null));
@@ -61,20 +54,16 @@ public class TDTKeyListener implements KeyListener {
 			String feedback = gui.getControl().executeCommand("redo");
 			updateView(scrollVal, feedback);
 		}
-
+		
 		switch (keyCode) {
 		case KeyEvent.VK_ENTER:
-			gui.setUserCommand(gui.getCommandField().getText());
-			gui.getCommandHistory().add(gui.getUserCommand());
-			gui.setHistoryPointer(gui.getCommandHistory().size());
-			gui.getCommandField().setText("");
-			
+			renewCommandField();
 			String feedback = gui.getControl().executeCommand(gui.getUserCommand());
 			updateView(scrollVal, feedback);
 			break;
 
 		case KeyEvent.VK_UP:
-			if(gui.getCommandField().hasFocus()) {
+			if(gui.getCommandField().hasFocus() && !arg0.isShiftDown()) {
 				gui.setHistoryPointer(gui.getHistoryPointer() - 1);
 				if (gui.getHistoryPointer() < 0) {
 					gui.getCommandField().setText("");
@@ -86,7 +75,7 @@ public class TDTKeyListener implements KeyListener {
 			}
 			break;
 		case KeyEvent.VK_DOWN:
-			if(gui.getCommandField().hasFocus()) {
+			if(gui.getCommandField().hasFocus() && !arg0.isShiftDown()) {
 				gui.setHistoryPointer(gui.getHistoryPointer() + 1);
 				if (gui.getHistoryPointer() >= gui.getCommandHistory().size()) {
 					gui.getCommandField().setText("");
@@ -101,74 +90,113 @@ public class TDTKeyListener implements KeyListener {
 			gui.setUserCommand(gui.getCommandField().getText());
 			String[] words = gui.getUserCommand().split(" ");
 			if (words.length == 2) {
-				if (words[0].equalsIgnoreCase("edit")) {
-					try {
-						int id = Integer.parseInt(words[1]);
-						int size = gui.getControl().getLabelSize(gui.getControl().getCurrLabel());
-						if (id > 0 && id <= size) {
-							Task task = gui.getControl().getTask(gui.getControl().getCurrLabel(), id);
-							TDTDateAndTime dat = task.getDateAndTime();
-							String datString = gui.getDateTimeStringForEdit(dat);
-							gui.getCommandField().setText(gui.getUserCommand() 
-									+ task.getDetails() + datString);
-							
-							javax.swing.SwingUtilities
-									.invokeLater(new Runnable() {
-										public void run() {
-											gui.getCommandField().select(
-													gui.getUserCommand()
-															.length() + 1,
-													gui.getCommandField().getText()
-															.length() - 1);
-										}
-									});
-						}
-					} catch (NumberFormatException e) {
-						;
-					}
-				}
+				autoCompleteForEditLengthTwo(words);
 			}
 			if (words.length == 3) {
-				if (words[0].equalsIgnoreCase("edit")) {
-					try {
-						int id = Integer.parseInt(words[2]);
-						if (gui.getControl().isInLabelMap(words[1].toUpperCase())) {
-							int size = gui.getControl().getLabelSize(words[1]);
-							if (id > 0 && id <= size) {
-								Task task = gui.getControl().getTask(words[1], id);
-								TDTDateAndTime dat = task.getDateAndTime();
-								String datString = gui
-										.getDateTimeStringForEdit(dat);
-								gui.getCommandField().setText(gui.getUserCommand()
-										+ task.getDetails() + datString);
-								javax.swing.SwingUtilities
-										.invokeLater(new Runnable() {
-											public void run() {
-												gui.getCommandField().select(gui
-														.getUserCommand()
-														.length() + 1,
-														gui.getCommandField()
-																.getText()
-																.length() - 1);
-											}
-										});
-							}
-						}
-					} catch (NumberFormatException e) {
-						;
-					}
-				}
+				autoCompleteForEditLengthThree(words);
 			}
 			break;
 		case KeyEvent.VK_F1:
-			gui.setBounds(300, 0, 500, 125);
+			gui.setBounds(TDTGUI.MINIMODE_SIZE);
 			break;
 		case KeyEvent.VK_F2:
-			gui.setBounds(300, 100, 800, 600);
+			gui.setBounds(TDTGUI.ORIGINAL_SIZE);
 			break;
 		default:
 			break;
 		}
+	}
+
+	private void autoCompleteForEditLengthThree(String[] words) {
+		if (words[0].equalsIgnoreCase("edit")) {
+			try {
+				int id = Integer.parseInt(words[2]);
+				if (gui.getControl().isInLabelMap(words[1].toUpperCase())) {
+					int size = gui.getControl().getLabelSize(words[1]);
+					if (id > 0 && id <= size) {
+						Task task = gui.getControl().getTask(words[1], id);
+						TDTDateAndTime dat = task.getDateAndTime();
+						String datString = getDateTimeStringForEdit(dat);
+						gui.getCommandField().setText(gui.getUserCommand()
+								+ task.getDetails() + datString);
+						
+						highlightText();
+					}
+				}
+			} catch (NumberFormatException e) {
+				;
+			}
+		}
+	}
+
+	private void autoCompleteForEditLengthTwo(String[] words) {
+		if (words[0].equalsIgnoreCase("edit")) {
+			try {
+				int id = Integer.parseInt(words[1]);
+				int size = gui.getControl().getLabelSize(gui.getControl().getCurrLabel());
+				if (id > 0 && id <= size) {
+					Task task = gui.getControl().getTask(gui.getControl().getCurrLabel(), id);
+					TDTDateAndTime dat = task.getDateAndTime();
+					String datString = getDateTimeStringForEdit(dat);
+					gui.getCommandField().setText(gui.getUserCommand() 
+							+ task.getDetails() + datString);
+					
+					highlightText();
+				}
+			} catch (NumberFormatException e) {
+				;
+			}
+		}
+	}
+
+	private void highlightText() {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.getCommandField().select(
+						gui.getUserCommand().length() + 1,
+						gui.getCommandField().getText().length() - 1);
+			}
+		});
+	}
+	
+	private String getDateTimeStringForEdit(TDTDateAndTime dat) {
+		String datString = "";
+		if (dat.isTimedTask()) {
+			datString = " from";
+			if (!dat.getStartDate().equals("null")) {
+				datString = datString + " " + dat.getStartDate();
+			}
+			if (!dat.getStartTime().equals("null")) {
+				datString = datString + " " + dat.getStartTime();
+			}
+			if (!dat.getEndDate().equals("null") || !dat.getEndTime().equals("null")) {
+				datString = datString + " to";
+				if (!dat.getEndDate().equals("null")) {
+					datString = datString + " " + dat.getEndDate();
+				}
+				if (!dat.getEndTime().equals("null")) {
+					datString = datString + " " + dat.getEndTime();
+				}
+			}
+		}
+		if (dat.isDeadlineTask()) {
+			datString = " by";
+			if (!dat.getEndDate().equals("null")) {
+				datString = datString + " " + dat.getEndDate();
+			}
+			if (!dat.getEndTime().equals("null")) {
+				datString = datString + " " + dat.getEndTime();
+			}
+		}
+		return datString;
+	}
+	
+	
+	private void renewCommandField() {
+		gui.setUserCommand(gui.getCommandField().getText());
+		gui.getCommandHistory().add(gui.getUserCommand());
+		gui.setHistoryPointer(gui.getCommandHistory().size());
+		gui.getCommandField().setText("");
 	}
 
 	private void updateView(int scrollVal, String feedback) {

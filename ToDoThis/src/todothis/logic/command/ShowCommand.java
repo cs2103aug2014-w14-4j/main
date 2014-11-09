@@ -12,37 +12,19 @@ public class ShowCommand extends Command {
 	private String labelName;
 	private ArrayList<String> prevHideList;
 	
+	/**
+	 * Construct a ShowCommand object.
+	 * @param labelName
+	 */
 	public ShowCommand(String labelName) {
 		super(COMMANDTYPE.SHOW);
 		this.setLabelName(labelName.toUpperCase());
 	}
-	/*
-	@Override
-	public String execute(TDTDataStore data) {
-		String[] labelNames = getLabelName().split(" ");
-		Iterator<Task> iter;
-
-		if(labelNames[0].equals("")){
-			iter = data.getTaskIterator();
-			while(iter.hasNext()){
-				Task temp = iter.next();
-				temp.setHide(false);
-			}
-		}else {
-			iter = data.getTaskIterator();
-			while(iter.hasNext()){
-				Task temp = iter.next();
-				if(containInArray(temp.getLabelName(), labelNames)){
-					temp.setHide(false);
-				}else{
-					temp.setHide(true);
-				}
-			}
-		}
-		
-		return "";
-	}*/
 	
+	
+	/**
+	 * Show all the given labels and hide the rest.
+	 */
 	public String execute(TDTDataStore data) {
 		prevHideList = copyHideList(data.getHideList());
 		String[] labelNames = getLabelName().split(" ");
@@ -65,6 +47,9 @@ public class ShowCommand extends Command {
 		return MESSAGE_SHOW_FEEDBACK;
 	}
 	
+	/**
+	 * Reverses the effect of execute.
+	 */
 	@Override
 	public String undo(TDTDataStore data) {
 		data.setHideList(prevHideList);
@@ -96,6 +81,32 @@ public class ShowCommand extends Command {
 		this.labelName = labelName;
 	}
 
-	
+	/*
+	Unused code. Previously able to show/hide specific task. Change to show/hide labels only.
+	@Override
+	public String execute(TDTDataStore data) {
+		String[] labelNames = getLabelName().split(" ");
+		Iterator<Task> iter;
+
+		if(labelNames[0].equals("")){
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				temp.setHide(false);
+			}
+		}else {
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				if(containInArray(temp.getLabelName(), labelNames)){
+					temp.setHide(false);
+				}else{
+					temp.setHide(true);
+				}
+			}
+		}
+		
+		return "";
+	}*/
 
 }
