@@ -21,6 +21,9 @@ import todothis.logic.command.UndoCommand;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 
+/**
+ * @author Choong Hui Min
+ */
 public class TDTParser implements ITDTParser {
 
 	private COMMANDTYPE commandType = COMMANDTYPE.INVALID;
@@ -39,21 +42,15 @@ public class TDTParser implements ITDTParser {
 	private int quotationCounter;
 	//private Logger logger = Logger.getLogger("TDTParser");
 
+	/**
+	 * This function parses the user's command according to the type of command it is. 
+	 */
 	public Command parse(String userCommand) {
 		//logger.log(Level.INFO, "start parsing");
-		this.setCommandType(COMMANDTYPE.INVALID);
-		this.setLabelName("");
-		this.setIsHighPriority(false);
-		this.setSkipNextWord(false);
-		this.setCommandDetails("");
-		this.setTaskID(-1);
-		this.setPrepositionWords();
-		this.setQuotationMarks(0);
-		this.setQuotationCounter(0);
-		this.setDateAndTimeParts("");
-
-		this.setCommandType(determineCommandType(getFirstWord(userCommand.trim())));
-		this.setRemainingWords(removeFirstWord(userCommand));
+		setInitalConditions();
+		String firstWord = getFirstWord(userCommand.trim());
+		setCommandType(determineCommandType((firstWord)));
+		setRemainingWords(removeFirstWord(userCommand));
 		
 		switch(getCommandType()) {
 		case ADD :
@@ -64,8 +61,8 @@ public class TDTParser implements ITDTParser {
 			return new DeleteCommand(getLabelName(), getTaskID());
 		case EDIT :
 			edit(userCommand);	
-			return new EditCommand(getLabelName(), getTaskID(),getCommandDetails(), getDateAndTime(), 
-					getIsHighPriority());
+			return new EditCommand(getLabelName(), getTaskID(),getCommandDetails(), 
+					getDateAndTime(), getIsHighPriority());
 		case LABEL :
 			label();
 			return new LabelCommand(getLabelName());
@@ -101,8 +98,9 @@ public class TDTParser implements ITDTParser {
 		//logger.log(Level.INFO, "end of parsing");
 		return null;
 	}
-
+	
 	/**
+	 * This function determines the command type of the command entered by the user.
 	 * Default command is ADD
 	 */
 	private COMMANDTYPE determineCommandType(String commandTypeString) {
@@ -141,11 +139,11 @@ public class TDTParser implements ITDTParser {
 
 	//---------------------------------- Main Command Methods -------------------------------------
 	private void add(String userCommand) {
+		setQuotationMarks(0);
+		setQuotationCounter(0);
 		checkFirstWord(userCommand);
 		parts = getRemainingWords().split(" ");
 		isCommandDetails = new boolean[parts.length];
-		setQuotationMarks(0);
-		setQuotationCounter(0);
 
 		for (int i=0; i<parts.length; i++) {
 			isCommandDetails[i] = true;
@@ -180,21 +178,19 @@ public class TDTParser implements ITDTParser {
 		String details = "";
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) {
-			if (parts.length == 1) { 			// Only taskID or labelName or invalid inputs
+			if (parts.length == 1) { 			// Only <taskID>
 				if (parts[0].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[0]));
-				} else {
-					setCommandDetails(parts[0]);
 				}
 			} else if (parts.length > 1) {
-				if (parts[0].matches("\\d+")) { // taskID followed by date and time
+				if (parts[0].matches("\\d+")) { // <taskID> <date and time>
 					setTaskID(Integer.parseInt(parts[0]));
 					if (parts.length > 1) {
 						for (int i=1; i<parts.length; i++) {
 							details += parts[i] + " ";
 						}
 					}
-				} else if (parts[1].matches("\\d+")) { // labelName, taskID followed by date and time
+				} else if (parts[1].matches("\\d+")) { // <labelName> <taskID> <date and time>
 					setLabelName(parts[0]);
 					setTaskID(Integer.parseInt(parts[1]));
 					if (parts.length > 2) {
@@ -212,13 +208,13 @@ public class TDTParser implements ITDTParser {
 		boolean isValidEdit = false;
 		parts = getRemainingWords().split(" ");
 		if (isValidPartsLength()) { 
-			if (parts[0].matches("\\d+")) { // taskID then details.
+			if (parts[0].matches("\\d+")) { // <taskID> <task details>
 				setTaskID(Integer.parseInt(parts[0]));
 				if (parts.length > 1) {
 					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
 					isValidEdit = true;
 				}
-			} else if (parts.length > 1) { // labelName, taskID, then details.
+			} else if (parts.length > 1) { // <labelName> <taskID> <task details>
 				if (parts[1].matches("\\d+")) {
 					setTaskID(Integer.parseInt(parts[1]));
 					setLabelName(parts[0]);
@@ -267,6 +263,22 @@ public class TDTParser implements ITDTParser {
 	}
 
 	//------------------------------ Other Methods -----------------------------------------------
+	/**
+	 * This function set the variables to the respective initial conditions they should be 
+	 * before a command is parsed.
+	 */
+	private void setInitalConditions() {
+		setCommandType(COMMANDTYPE.INVALID);
+		setLabelName("");
+		setIsHighPriority(false);
+		setSkipNextWord(false);
+		setCommandDetails("");
+		setTaskID(-1);
+		setPrepositionWords();
+		setQuotationMarks(0);
+		setDateAndTimeParts("");
+	}
+
 	/**
 	 * This function removes the first word of the userCommand.
 	 * @param userCommand
@@ -557,8 +569,8 @@ public class TDTParser implements ITDTParser {
 	}
 
 	/**
-	 * This function sets the list of "Preposition" words used in
-	 * day, date, time checking.
+	 * This function sets the list of "Preposition" words used in the checking of
+	 * day, date, time.
 	 */
 	private void setPrepositionWords() {
 		ArrayList<String> prepositionWords = new ArrayList<String>();
