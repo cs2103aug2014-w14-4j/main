@@ -37,7 +37,7 @@ public class TDTParser implements ITDTParser {
 	private boolean[] isCommandDetails;
 	private String remainingWords;
 	private String[] parts;
-	private ArrayList<String> prepositionWordsArr;
+	private ArrayList<String> connectorWordsArr;
 	private int quotationMarks;
 	private int quotationCounter;
 	//private Logger logger = Logger.getLogger("TDTParser");
@@ -274,7 +274,7 @@ public class TDTParser implements ITDTParser {
 		setSkipNextWord(false);
 		setCommandDetails("");
 		setTaskID(-1);
-		setPrepositionWords();
+		setConnectorWords();
 		setQuotationMarks(0);
 		setDateAndTimeParts("");
 	}
@@ -423,7 +423,7 @@ public class TDTParser implements ITDTParser {
 	private void parseMonthDetails(int i) {
 		// checks it the word before the month is a number (date)
 		if ((i>0) && parts[i-1].matches("\\d+")) {
-			if ((i>1) && getPrepositionWords().contains(parts[i-2])) {
+			if ((i>1) && getConnectorWords().contains(parts[i-2])) {
 				isCommandDetails[i-2] = false;
 			}
 			isCommandDetails[i] = false;
@@ -445,7 +445,7 @@ public class TDTParser implements ITDTParser {
 	 */
 	private void parseDateTimeDetails(int i) {
 		if (i>0) {	
-			if (getPrepositionWords().contains(parts[i-1])) {
+			if (getConnectorWords().contains(parts[i-1])) {
 				isCommandDetails[i-1] = false;
 			}
 		} 
@@ -467,14 +467,14 @@ public class TDTParser implements ITDTParser {
 			}
 		}
 		if ((firstOccurance > 0) 
-				&& getPrepositionWords().contains(parts[firstOccurance-1])) {
+				&& getConnectorWords().contains(parts[firstOccurance-1])) {
 			isCommandDetails[firstOccurance-1] = false;
 			if ((firstOccurance>1) 
-					&& getPrepositionWords().contains(parts[firstOccurance-2])) {
+					&& getConnectorWords().contains(parts[firstOccurance-2])) {
 				isCommandDetails[firstOccurance-2] = false;
 			}
 			if ((firstOccurance>2) 
-					&& getPrepositionWords().contains(parts[firstOccurance-3])) {
+					&& getConnectorWords().contains(parts[firstOccurance-3])) {
 				isCommandDetails[firstOccurance-3] = false;
 			}
 		}
@@ -499,10 +499,10 @@ public class TDTParser implements ITDTParser {
 		if (firstOccurance!=i) {
 			isCommandDetails[i] = false;
 			if ((firstOccurance > 0) 
-					&& getPrepositionWords().contains(parts[firstOccurance-1])) {
+					&& getConnectorWords().contains(parts[firstOccurance-1])) {
 				isCommandDetails[firstOccurance-1] = false;
 				if ((firstOccurance > 1) 
-						&& getPrepositionWords().contains(parts[firstOccurance-2])) {
+						&& getConnectorWords().contains(parts[firstOccurance-2])) {
 					isCommandDetails[firstOccurance-2] = false;
 				}
 			} 
@@ -564,32 +564,32 @@ public class TDTParser implements ITDTParser {
 	}
 
 	//--------------------------------- Getters and Setters -----------------------------------------
-	private ArrayList<String> getPrepositionWords() {
-		return prepositionWordsArr;
+	private ArrayList<String> getConnectorWords() {
+		return connectorWordsArr;
 	}
 
 	/**
-	 * This function sets the list of "Preposition" words used in the checking of
+	 * This function sets the list of "connector" words used in the checking of
 	 * day, date, time.
 	 */
-	private void setPrepositionWords() {
-		ArrayList<String> prepositionWords = new ArrayList<String>();
-		prepositionWords.add("on");
-		prepositionWords.add("at");
-		prepositionWords.add("by");
-		prepositionWords.add("from");
-		prepositionWords.add("about");
-		prepositionWords.add("to");
-		prepositionWords.add("-");
-		prepositionWords.add("until");
-		prepositionWords.add("till");
-		prepositionWords.add("next");
-		prepositionWords.add("following");
-		prepositionWords.add("this");
-		prepositionWords.add("the");
-		prepositionWords.add("due");
-		prepositionWords.add("before");
-		this.prepositionWordsArr = prepositionWords;
+	private void setConnectorWords() {
+		ArrayList<String> connectorWords = new ArrayList<String>();
+		connectorWords.add("on");
+		connectorWords.add("at");
+		connectorWords.add("by");
+		connectorWords.add("from");
+		connectorWords.add("about");
+		connectorWords.add("to");
+		connectorWords.add("-");
+		connectorWords.add("until");
+		connectorWords.add("till");
+		connectorWords.add("next");
+		connectorWords.add("following");
+		connectorWords.add("this");
+		connectorWords.add("the");
+		connectorWords.add("due");
+		connectorWords.add("before");
+		this.connectorWordsArr = connectorWords;
 	}
 
 	private String getRemainingWords() {
