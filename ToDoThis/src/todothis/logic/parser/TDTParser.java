@@ -352,7 +352,7 @@ public class TDTParser implements ITDTParser {
 				}
 			}
 		}
-		setCommandDetails(commandDetails);
+		setCommandDetails(commandDetails.trim());
 		TDTDateAndTimeParser dateAndTimeParser = new TDTDateAndTimeParser();
 		setDateAndTime(dateAndTimeParser.decodeDateAndTimeDetails(dateAndTimeParts));
 	}

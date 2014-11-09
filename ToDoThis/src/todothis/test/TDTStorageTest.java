@@ -1,3 +1,6 @@
+//@author A0110398H-unused
+/*
+  unused class. Format of storing data have changed. 
 package todothis.test;
 
 import static org.junit.Assert.*;
@@ -17,7 +20,7 @@ import todothis.storage.TDTFileHandler;
 
 public class TDTStorageTest {
 
-	/*
+	
 	@Test
 	public void testRead() throws Exception {
 		TDTStorage storage = new TDTStorage("TestStorage.txt");
@@ -38,7 +41,7 @@ public class TDTStorageTest {
 			total++;
 		}
 		assertEquals(total, ans.size());
-	}*/
+	}
 	
 	
 	
@@ -82,7 +85,7 @@ public class TDTStorageTest {
 		assertEquals("TODOTHIS", lines.get(1));
 
 	}
-	/*
+	
 	//Normal case of writing tasks to file.
 		@Test
 		public void testWrite3() throws Exception {
@@ -111,5 +114,5 @@ public class TDTStorageTest {
 					assertEquals(task.isHighPriority(), p);
 				}
 
-		}*/
-}
+		}
+}*/

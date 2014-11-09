@@ -11,6 +11,8 @@ import org.junit.Test;
 import todothis.commons.TDTDateAndTime;
 import todothis.commons.Task;
 import todothis.logic.TDTController;
+import todothis.logic.command.AddCommand;
+import todothis.logic.command.DoneCommand;
 
 public class TDTSystemTest {
 	private String fileName = "testing.txt";
@@ -25,6 +27,9 @@ public class TDTSystemTest {
 	public void floatingTaskWithPriorityTest() {
 		TDTController control = new TDTController(fileName);
 		String feedback = control.executeCommand("lets play games!");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK,
+				control.getCurrLabel()), feedback);
 		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
@@ -37,7 +42,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "null");
 			assertEquals(dnt.getEndTime(), "null");
 			
-			assertEquals(details, " lets play games");
+			assertEquals(details, "lets play games");
 			
 			assertTrue(isPriority);
 		}
@@ -48,6 +53,9 @@ public class TDTSystemTest {
 	public void quotationTaskTest() {
 		TDTController control = new TDTController(fileName);
 		String feedback = control.executeCommand("\"the day after tomorrow at 5pm!\" movie showing at 8pm ");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK,
+				control.getCurrLabel()), feedback);
 		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()) {
 			current = i.next();
@@ -60,7 +68,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "null");
 			assertEquals(dnt.getEndTime(), "null");
 			
-			assertEquals(details, " the day after tomorrow at 5pm! movie showing");
+			assertEquals(details, "the day after tomorrow at 5pm! movie showing");
 			
 			assertFalse(isPriority);
 		}
@@ -71,6 +79,9 @@ public class TDTSystemTest {
 	public void deadlineTaskTest() {
 		TDTController control = new TDTController(fileName);
 		String feedback = control.executeCommand("cs2106 homework done by 31-10-14 2359hrs");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK,
+				control.getCurrLabel()), feedback);
 		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
@@ -83,7 +94,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "31/10/2014");
 			assertEquals(dnt.getEndTime(), "23:59");
 			
-			assertEquals(details, " cs2106 homework done");
+			assertEquals(details, "cs2106 homework done");
 			
 			assertFalse(isPriority);
 		}
@@ -93,6 +104,8 @@ public class TDTSystemTest {
 	public void timedTaskTest() {
 		TDTController control = new TDTController(fileName);
 		String feedback = control.executeCommand("incamp training from 29/10/2014 8am to 3/11/2014 9pm");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
 		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
@@ -105,7 +118,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "3/11/2014");
 			assertEquals(dnt.getEndTime(), "21:00");
 			
-			assertEquals(details, " incamp training");
+			assertEquals(details, "incamp training");
 			
 			assertFalse(isPriority);
 		}
@@ -115,8 +128,11 @@ public class TDTSystemTest {
 	@Test
 	public void doneTaskTest() {
 		TDTController control = new TDTController(fileName);
-		String feedback = control.executeCommand("test done");
+		String testDetails = "test done";
+		control.executeCommand(testDetails);
 		String feedback1 = control.executeCommand("done 1");
+		
+		assertEquals(DoneCommand.MESSAGE_DONE_TASK_FEEDBACK, feedback1);
 		Iterator<Task> i = control.getTaskIterator();
 		while(i.hasNext()){
 			current = i.next();
@@ -130,7 +146,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "null");
 			assertEquals(dnt.getEndTime(), "null");
 			
-			assertEquals(details, " test done");
+			assertEquals(details, testDetails);
 			
 			assertFalse(isPriority);
 			assertTrue(isDone);
@@ -144,11 +160,12 @@ public class TDTSystemTest {
 	@Test
 	public void doneTaskTest2() {
 		TDTController control = new TDTController(fileName);
-		String feedback = control.executeCommand("test done");
-		String feedback1 = control.executeCommand("done 1");
-		String feedback2 = control.executeCommand("done 1");
+		String testDetails = "test done";
+		control.executeCommand(testDetails);
+		control.executeCommand("done 1");
+		control.executeCommand("done 1");
 		Iterator<Task> i = control.getTaskIterator();
-
+		
 		while(i.hasNext()){
 			current = i.next();
 			dnt = current.getDateAndTime();
@@ -161,7 +178,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "null");
 			assertEquals(dnt.getEndTime(), "null");
 			
-			assertEquals(details, " test done");
+			assertEquals(details, testDetails);
 			
 			assertFalse(isPriority);
 			assertTrue(isDone);
@@ -219,7 +236,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "null");
 			assertEquals(dnt.getEndTime(), "null");
 			
-			assertEquals(details, " dun wan do homework liao");
+			assertEquals(details, "dun wan do homework liao");
 			
 			assertFalse(isPriority);
 			assertFalse(isDone);
@@ -246,7 +263,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "null");
 			assertEquals(dnt.getEndTime(), "null");
 			
-			assertEquals(details, " testing delete task 2");
+			assertEquals(details, "testing delete task 2");
 			
 			assertFalse(isPriority);
 			assertFalse(isDone);
@@ -272,7 +289,7 @@ public class TDTSystemTest {
 			assertEquals(dnt.getEndDate(), "null");
 			assertEquals(dnt.getEndTime(), "null");
 			
-			assertEquals(details, " testing reminder task");
+			assertEquals(details, "testing reminder task");
 			assertEquals(reminderDateAndTime, "20/12/2014 15:30");
 			assertFalse(isPriority);
 			assertFalse(isDone);
