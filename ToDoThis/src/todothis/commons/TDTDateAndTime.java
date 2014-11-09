@@ -3,10 +3,18 @@ package todothis.commons;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+/**
+ * This TDTDateAndTime class stores the date and time information of a task to
+ * be created.
+ * 
+ * @author
+ *
+ */
 public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	// store converted date format dd/mm/yyyy
 	private String startDate = "null";
 	private String endDate = "null";
+
 	// store converted time format XX:XX 24hrs format
 	private String startTime = "null";
 	private String endTime = "null";
@@ -16,7 +24,14 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 	private static Calendar cal;
 
-	// constructor
+	/**
+	 * Constructor
+	 * 
+	 * @param startDate
+	 * @param endDate
+	 * @param startTime
+	 * @param endTime
+	 */
 	public TDTDateAndTime(String startDate, String endDate, String startTime,
 			String endTime) {
 		this.startDate = startDate;
@@ -24,12 +39,18 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		if (!getStartDate().equals("null") || !getStartTime().equals("null")) {
+			// Timed task will always have start date or start time or both.
 			isTimedTask = true;
 		} else if (!getEndDate().equals("null") || !getEndTime().equals("null")) {
+			// Date and time info will be stored under endDate and endTime for
+			// deadline task
 			isDeadlineTask = true;
 		}
 	}
 
+	/**
+	 * Default Constructor
+	 */
 	public TDTDateAndTime() {
 		this.startDate = "null";
 		this.endDate = "null";
@@ -37,43 +58,68 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		this.endTime = "null";
 	}
 
-	public static void main(String args[]) {
-
-		// TDTDateAndTime test1 = new TDTDateAndTime("11/11/2014");
-		// TDTDateAndTime test2 = new TDTDateAndTime("12/12");
-		// System.out.println(test2.display());
-		// System.out.println(TDTDateAndTime.decodeSearchDetails(""));
-		// System.out.println(TDTDateAndTime.changeTimeFormat("2:59"));
-		// System.out.println(calculateRemainingTime(TDTDateAndTime.decodeReminderDetails("1/1 3.38am")));
-
-	}
-
-	// -----------------------GETTER-------------------------------
+	// -----------------------Getters-------------------------------
+	/**
+	 * This method gets the value of startDate.
+	 * 
+	 * @return String This returns startDate.
+	 */
 	public String getStartDate() {
 		return startDate;
 	}
 
+	/**
+	 * This method gets the value of endDate.
+	 * 
+	 * @return String This returns endDate.
+	 */
 	public String getEndDate() {
 		return endDate;
 	}
 
+	/**
+	 * This method gets the value of startTime.
+	 * 
+	 * @return String This returns startTime.
+	 */
 	public String getStartTime() {
 		return startTime;
 	}
 
+	/**
+	 * This method gets the value of endTime.
+	 * 
+	 * @return String This returns endTime.
+	 */
 	public String getEndTime() {
 		return endTime;
 	}
 
+	/**
+	 * This method gets boolean value of isTimedTask.
+	 * 
+	 * @return boolean This returns true if its a timed task.
+	 */
 	public boolean isTimedTask() {
 		return isTimedTask;
 	}
 
+	/**
+	 * This method gets boolean value of isDeadlineTask.
+	 * 
+	 * @return String This returns true if its a deadline task.
+	 */
 	public boolean isDeadlineTask() {
 		return isDeadlineTask;
 	}
 
-	// --------------------------DISPLAY----------------------
+	/**
+	 * This method displays the date and time information of the task. The
+	 * display string depends on the type of task.
+	 * 
+	 * @return String This return the date and time information of the task.
+	 * 
+	 */
 	public String display() {
 		String dateAndTimeContents = "";
 		if (isDeadlineTask) {
@@ -104,6 +150,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 								.changeTimeFormatDisplay(getStartTime());
 			}
 			dateAndTimeContents = dateAndTimeContents + "<br>";
+			// checks if timed task has a end date or end time
 			if (!getEndDate().equals("null") || !getEndTime().equals("null")) {
 				dateAndTimeContents = dateAndTimeContents + "End: ";
 				if (!getEndDate().equals("null")) {
@@ -125,8 +172,13 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return dateAndTimeContents;
 	}
 
-	// -----------------------------------CHECK IF OVERDUE---------------
+	/**
+	 * This method checks if the task is overdue or has past.
+	 * 
+	 * @return boolean This returns true if the task is overdue.
+	 */
 	public boolean isOverdue() {
+		// Get the current date and time
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
@@ -141,6 +193,9 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 
 		String checkDate = "null";
 		String checkTime = "null";
+
+		// Decides on the date and time info to be checked, depending on the
+		// type of task
 		if (isDeadlineTask) {
 			checkDate = getEndDate();
 			checkTime = getEndTime();
@@ -156,7 +211,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				checkTime = getStartTime();
 			}
 		}
-
+		// Compare with the current date and time to see if it is overdue
 		if (!checkDate.equals("null")) {
 			if (TDTDateMethods.compareToDate(currentDate, checkDate) == -1) {
 				return true;
@@ -171,7 +226,15 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return false;
 	}
 
-	// -----------------------------CHECK FOR CLASHES---------------------
+	/**
+	 * This method checks for clashes with other tasks that consist of
+	 * TDTDateAndTime object. It checks if the task overlaps with other tasks
+	 * that has a start and end timings.
+	 * 
+	 * @param arg0
+	 * @return boolean This returns true if the task clashes with another task
+	 *         being compared.
+	 */
 	public boolean isClash(TDTDateAndTime arg0) {
 		if (arg0.isTimedTask() == true) {
 			if (!this.getStartDate().equals("null")
@@ -421,14 +484,21 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 		return false;
 	}
 
-	// ------------------------------------COMPARABLE----------------------------------
-	@Override
+	/**
+	 * compareTo
+	 * 
+	 * @return int This returns a negative integer, zero, or a positive integer
+	 *         as this object is less than, equal to, or greater than the
+	 *         specified object.
+	 */
 	public int compareTo(TDTDateAndTime arg0) {
 		String thisDate = "null";
 		String thisTime = "null";
 		String comparedDate = "null";
 		String comparedTime = "null";
 
+		// Determines the date and time info to be used to compare as it varies
+		// for each type of task
 		if (this.getStartDate().equals("null")) {
 			thisDate = this.getEndDate();
 		} else {
@@ -453,7 +523,8 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			comparedTime = arg0.getStartTime();
 		}
 
-		if (TDTDateMethods.compareToDate(thisDate, comparedDate) == 1) { // thisdate<compareddate
+		// Compare this.TDTDateAndTime with arg0.TDTDateAndTime
+		if (TDTDateMethods.compareToDate(thisDate, comparedDate) == 1) {
 			return -1;
 		} else if (TDTDateMethods.compareToDate(thisDate, comparedDate) == 0) {
 			if (thisTime.equals("null") && !comparedTime.equals("null")) {
@@ -464,7 +535,7 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 				return -1;
 			}
 
-			if (TDTTimeMethods.compareToTime(thisTime, comparedTime) == 1) { // thistime<comparedtime
+			if (TDTTimeMethods.compareToTime(thisTime, comparedTime) == 1) {
 				return -1;
 			} else if (TDTTimeMethods.compareToTime(thisTime, comparedTime) == 0) {
 				return 0;
@@ -475,6 +546,4 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 			return 1;
 		}
 	}
-	
-	
 }

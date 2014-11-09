@@ -8,24 +8,42 @@ import todothis.commons.TDTDateAndTime;
 import todothis.commons.TDTDateMethods;
 import todothis.commons.TDTTimeMethods;
 
+/**
+ * This TDTDateAndTimeParser class parses the string of date and time details to
+ * be stored as a TDTDateAndTime object. It also provides a method to parse
+ * search by date details and another method to parse set reminder details.
+ * 
+ * @author
+ *
+ */
 public class TDTDateAndTimeParser {
 	// store converted date format dd/mm/yyyy
 	private String startDate = "null";
 	private String endDate = "null";
+
 	// store converted time format XX:XX 24hrs format
 	private String startTime = "null";
 	private String endTime = "null";
-	
+
 	private static Calendar cal;
-	
-	public TDTDateAndTimeParser(){
+
+	/**
+	 * Constructor
+	 * 
+	 */
+	public TDTDateAndTimeParser() {
 		this.startDate = "null";
 		this.endDate = "null";
 		this.startTime = "null";
 		this.endTime = "null";
-	
 	}
-	
+
+	/**
+	 * This method parse the date and time details.
+	 * @param details
+	 * @return TDTDateAndTime This returns the object TDTDateAndTime with the
+	 *         date and time info
+	 */
 	public TDTDateAndTime decodeDateAndTimeDetails(String details) {
 		boolean endTimeDate = false;
 		boolean deadlineEndTimeDate = false;
@@ -36,13 +54,15 @@ public class TDTDateAndTimeParser {
 		int followingCount = 0;
 
 		String[] parts = details.toLowerCase().split(" ");
-
+		
+		//Get current date
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
 		int currentMonth = cal.get(Calendar.MONTH) + 1;
 		int currentYear = cal.get(Calendar.YEAR);
 		int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-
+		
+		//Goes through the string of words in the details
 		for (int a = 0; a < parts.length; a++) {
 			parts[a] = TDTCommons.replaceEndStringPunctuation(parts[a]);
 
@@ -67,8 +87,7 @@ public class TDTDateAndTimeParser {
 			}
 
 			if (TDTDateMethods.checkDate(parts[a])) {
-				decodedDate = decodeDate(parts, a, currentYear,
-						currentMonth);
+				decodedDate = decodeDate(parts, a, currentYear, currentMonth);
 
 				storeDecodedDate(endTimeDate, deadlineEndTimeDate, decodedDate);
 			} else if (TDTTimeMethods.checkTime(parts[a])) {
@@ -100,10 +119,10 @@ public class TDTDateAndTimeParser {
 				&& !startTime.equals("null") && !endTime.equals("null")) {
 			endDate = startDate;
 		}
-		
+
 		return new TDTDateAndTime(startDate, endDate, startTime, endTime);
 	}
-	
+
 	private static String decodeDate(String[] parts, int a, int currentYear,
 			int currentMonth) {
 		String[] dateParts = new String[3];
@@ -155,7 +174,7 @@ public class TDTDateAndTimeParser {
 		}
 		return dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
 	}
-	
+
 	private static String decodeMonthFormat(String[] parts, int a,
 			int currentYear, int currentMonth) {
 		String[] tempParts = parts[a].split("~");
@@ -183,12 +202,15 @@ public class TDTDateAndTimeParser {
 			String[] parts, int a, int currentDayOfWeek, int nextCount,
 			int followingCount) {
 		int numOfDaysToAdd = 0;
-		if (TDTDateMethods.checkDay(parts[a]) <= 7 && TDTDateMethods.checkDay(parts[a]) > 0) {
+		if (TDTDateMethods.checkDay(parts[a]) <= 7
+				&& TDTDateMethods.checkDay(parts[a]) > 0) {
 			if (thisOrNextOrFollowing == 0) { // None of the above
 				if (TDTDateMethods.checkDay(parts[a]) <= currentDayOfWeek) {
-					numOfDaysToAdd = 7 - (currentDayOfWeek - TDTDateMethods.checkDay(parts[a]));
+					numOfDaysToAdd = 7 - (currentDayOfWeek - TDTDateMethods
+							.checkDay(parts[a]));
 				} else {
-					numOfDaysToAdd = TDTDateMethods.checkDay(parts[a]) - currentDayOfWeek;
+					numOfDaysToAdd = TDTDateMethods.checkDay(parts[a])
+							- currentDayOfWeek;
 				}
 			} else {// this
 				if (TDTDateMethods.checkDay(parts[a]) == 1) {// sunday
@@ -196,7 +218,8 @@ public class TDTDateAndTimeParser {
 						numOfDaysToAdd = 8 - currentDayOfWeek;
 					}
 				} else {
-					numOfDaysToAdd = TDTDateMethods.checkDay(parts[a]) - currentDayOfWeek;
+					numOfDaysToAdd = TDTDateMethods.checkDay(parts[a])
+							- currentDayOfWeek;
 				}
 			}
 			if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) { // next
@@ -241,7 +264,7 @@ public class TDTDateAndTimeParser {
 		}
 		return decodedDate;
 	}
-	
+
 	private static String decodeTime(String[] parts, int a) {
 		String[] timeParts = new String[2];
 		int temp;
@@ -372,7 +395,8 @@ public class TDTDateAndTimeParser {
 		int currentDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 
 		for (int i = 0; i < searchParts.length; i++) {
-			searchParts[i] = TDTCommons.replaceEndStringPunctuation(searchParts[i]);
+			searchParts[i] = TDTCommons
+					.replaceEndStringPunctuation(searchParts[i]);
 
 			if (isPrepositionTo(searchParts, i) && !startSearchDate.equals("")) {
 				isSearchDateRange = true;
@@ -404,8 +428,8 @@ public class TDTDateAndTimeParser {
 				int numOfDaysToAdd = determineDaysToBeAdded(
 						thisOrNextOrFollowing, searchParts, i,
 						currentDayOfWeek, nextCount, followingCount);
-				decodedDate = TDTDateMethods.addDaysToCurrentDate(currentDay, currentMonth,
-						currentYear, numOfDaysToAdd);
+				decodedDate = TDTDateMethods.addDaysToCurrentDate(currentDay,
+						currentMonth, currentYear, numOfDaysToAdd);
 				if (TDTDateMethods.isValidDateRange(decodedDate)) {
 					decodedDate = TDTDateMethods.changeDateFormat(decodedDate);
 				}
@@ -438,7 +462,8 @@ public class TDTDateAndTimeParser {
 
 						decodedDate = day + "/" + month + "/" + year;
 						if (TDTDateMethods.isValidDateRange(decodedDate)) {
-							decodedDate = TDTDateMethods.changeDateFormat(decodedDate);
+							decodedDate = TDTDateMethods
+									.changeDateFormat(decodedDate);
 						}
 						if (isSearchDateRange) {
 							endSearchDate = decodedDate;
@@ -473,7 +498,8 @@ public class TDTDateAndTimeParser {
 			if (isSearchDateRange && !endSearchDate.equals("")) {
 				if (TDTDateMethods.isValidDateRange(startSearchDate)
 						&& TDTDateMethods.isValidDateRange(endSearchDate)) {
-					if (TDTDateMethods.compareToDate(startSearchDate, endSearchDate) == 1) {
+					if (TDTDateMethods.compareToDate(startSearchDate,
+							endSearchDate) == 1) {
 						decodedSearchString = searchDateRange(
 								decodedSearchString, startSearchDate,
 								endSearchDate);
@@ -496,7 +522,8 @@ public class TDTDateAndTimeParser {
 			int dayTemp = Integer.parseInt(dateParts[0]);
 			int monthTemp = Integer.parseInt(dateParts[1]);
 			int yearTemp = Integer.parseInt(dateParts[2]);
-			dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
+			dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp,
+					yearTemp, 1);
 			decodedSearchString = decodedSearchString + dateTemp + " ";
 		}
 		return decodedSearchString;
@@ -507,8 +534,9 @@ public class TDTDateAndTimeParser {
 			int currentYear, int currentDayOfWeek, int nextCount,
 			int followingCount) {
 		int dayOfWeek = currentDayOfWeek;
-		String startDayOfWeek = TDTDateMethods.addDaysToCurrentDate(currentDay, currentMonth,
-				currentYear, Integer.parseInt("-" + (dayOfWeek - 1)));
+		String startDayOfWeek = TDTDateMethods.addDaysToCurrentDate(currentDay,
+				currentMonth, currentYear,
+				Integer.parseInt("-" + (dayOfWeek - 1)));
 		String[] dateParts;
 		String dateTemp;
 		dateParts = startDayOfWeek.split("/");
@@ -518,8 +546,9 @@ public class TDTDateAndTimeParser {
 		if (thisOrNextOrFollowing == 0) {
 			return decodedSearchString;
 		} else if (thisOrNextOrFollowing == 2 || thisOrNextOrFollowing == 3) {
-			startDayOfWeek = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp,
-					(7 * nextCount) + (14 * followingCount));
+			startDayOfWeek = TDTDateMethods.addDaysToCurrentDate(dayTemp,
+					monthTemp, yearTemp, (7 * nextCount)
+							+ (14 * followingCount));
 		}
 		decodedSearchString = decodedSearchString + startDayOfWeek + " ";
 		dateTemp = startDayOfWeek;
@@ -529,7 +558,8 @@ public class TDTDateAndTimeParser {
 			monthTemp = Integer.parseInt(dateParts[1]);
 			yearTemp = Integer.parseInt(dateParts[2]);
 
-			dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
+			dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp,
+					yearTemp, 1);
 			decodedSearchString = decodedSearchString + dateTemp + " ";
 		}
 		return decodedSearchString;
@@ -540,8 +570,9 @@ public class TDTDateAndTimeParser {
 			int currentYear, int currentDayOfMonth, int nextCount,
 			int followingCount) {
 		int dayOfMonth = currentDayOfMonth - 1;
-		String startDayOfMonth = TDTDateMethods.addDaysToCurrentDate(currentDay, currentMonth,
-				currentYear, Integer.parseInt("-" + dayOfMonth));
+		String startDayOfMonth = TDTDateMethods.addDaysToCurrentDate(
+				currentDay, currentMonth, currentYear,
+				Integer.parseInt("-" + dayOfMonth));
 		String[] dateParts;
 		String dateTemp = "";
 		dateParts = startDayOfMonth.split("/");
@@ -577,7 +608,8 @@ public class TDTDateAndTimeParser {
 				monthTemp = Integer.parseInt(dateParts[1]);
 				yearTemp = Integer.parseInt(dateParts[2]);
 
-				dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp, monthTemp, yearTemp, 1);
+				dateTemp = TDTDateMethods.addDaysToCurrentDate(dayTemp,
+						monthTemp, yearTemp, 1);
 				decodedSearchString = decodedSearchString + dateTemp + " ";
 			}
 		}
@@ -595,7 +627,8 @@ public class TDTDateAndTimeParser {
 		}
 
 		for (int a = 1; a <= 12; a++) {
-			int numDayOfMonth = TDTDateMethods.getNumOfDaysFromMonth(a, yearTemp);
+			int numDayOfMonth = TDTDateMethods.getNumOfDaysFromMonth(a,
+					yearTemp);
 			for (int b = 1; b <= numDayOfMonth; b++) {
 				String date = b + "/" + a + "/" + yearTemp;
 				decodedSearchString = decodedSearchString + date + " ";
@@ -628,7 +661,8 @@ public class TDTDateAndTimeParser {
 				+ currentYear;
 
 		for (int i = 0; i < reminderParts.length; i++) {
-			reminderParts[i] = TDTCommons.replaceEndStringPunctuation(reminderParts[i]);
+			reminderParts[i] = TDTCommons
+					.replaceEndStringPunctuation(reminderParts[i]);
 
 			if (reminderParts[i].equals("this")) {
 				thisOrNextOrFollowing = 1;
@@ -647,8 +681,8 @@ public class TDTDateAndTimeParser {
 				int numOfDaysToAdd = determineDaysToBeAdded(
 						thisOrNextOrFollowing, reminderParts, i,
 						currentDayOfWeek, nextCount, followingCount);
-				decodedReminderDate = TDTDateMethods.addDaysToCurrentDate(currentDay,
-						currentMonth, currentYear, numOfDaysToAdd);
+				decodedReminderDate = TDTDateMethods.addDaysToCurrentDate(
+						currentDay, currentMonth, currentYear, numOfDaysToAdd);
 			} else if (TDTDateMethods.checkMonth(reminderParts[i]) != 0) {
 				boolean isValidDayYear = true;
 				if (i != 0 && i != reminderParts.length - 1) {
@@ -689,11 +723,14 @@ public class TDTDateAndTimeParser {
 			}
 		} else {
 			if (TDTDateMethods.isValidDateRange(decodedReminderDate)) {
-				if (TDTDateMethods.compareToDate(currentDate, decodedReminderDate) == 0) {
-					if (TDTTimeMethods.compareToTime(currentTime, decodedReminderTime) == 1) {
+				if (TDTDateMethods.compareToDate(currentDate,
+						decodedReminderDate) == 0) {
+					if (TDTTimeMethods.compareToTime(currentTime,
+							decodedReminderTime) == 1) {
 						return decodedReminderDate + " " + decodedReminderTime;
 					}
-				} else if (TDTDateMethods.compareToDate(currentDate, decodedReminderDate) == 1) {
+				} else if (TDTDateMethods.compareToDate(currentDate,
+						decodedReminderDate) == 1) {
 					return decodedReminderDate + " " + decodedReminderTime;
 				}
 			}

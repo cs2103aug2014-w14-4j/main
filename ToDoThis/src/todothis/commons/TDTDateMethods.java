@@ -5,46 +5,95 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * This TDTDateMethods class stores all the static date related methods which
+ * are called by other components of the software.
+ * 
+ * @author
+ *
+ */
 public class TDTDateMethods {
+	/**
+	 * This method checks if the string follows a certain type of date format.
+	 * 
+	 * @param nextWord
+	 * @return boolean This returns true if nextWord is a possible date.
+	 * 
+	 */
 	public static boolean checkDate(String nextWord) {
 		nextWord = TDTCommons.replaceEndStringPunctuation(nextWord);
 		String[] parts;
-		if ((nextWord.split("/").length == 3)
-				|| (nextWord.split("/").length == 2)) {
+
+		if (isDateFormat1(nextWord)) {
+			return true;
+		}
+		if (isDateFormat2(nextWord)) {
 			parts = nextWord.split("/");
-			try {
-				for (int i = 0; i < parts.length; i++) {
-					Integer.parseInt(parts[i]);
-				}
-			} catch (NumberFormatException e) {
+			if (isNumberFormatException(parts)) {
 				return false;
 			}
 			return true;
-		} else if ((nextWord.split("-").length == 3)
-				|| (nextWord.split("-").length == 2)) {
+		} else if (isDateFormat3(nextWord)) {
 			parts = nextWord.split("-");
-			try {
-				for (int i = 0; i < parts.length; i++) {
-					Integer.parseInt(parts[i]);
-				}
-			} catch (NumberFormatException e) {
+			if (isNumberFormatException(parts)) {
 				return false;
 			}
 			return true;
-		} else if ((nextWord.length() == 6) || (nextWord.length() == 8)) {
-			if (nextWord.matches("\\d+")) {
-				return true;
-			}
 		}
 		return false;
 	}
-	
-	public static String addDaysToCurrentDate(int currentDay,
-			int currentMonth, int currentYear, int numOfDaysToAdd) {
+
+	// Checks if nextWord follow date format DDMMYY or DDMMYYYY
+	private static boolean isDateFormat1(String nextWord) {
+		return (nextWord.length() == 6 || nextWord.length() == 8)
+				&& (nextWord.matches("\\d+"));
+	}
+
+	// Check if nextWord follow date format DD/MM/YYYY or DD/MM
+	private static boolean isDateFormat2(String nextWord) {
+		return (nextWord.split("/").length == 3)
+				|| (nextWord.split("/").length == 2);
+	}
+
+	// Check if nextWord follow date format DD-MM-YYYY or DD-MM
+	private static boolean isDateFormat3(String nextWord) {
+		return (nextWord.split("-").length == 3)
+				|| (nextWord.split("-").length == 2);
+	}
+
+	// Checks if the date consists of numbers only
+	private static boolean isNumberFormatException(String[] parts) {
+		try {
+			for (int i = 0; i < parts.length; i++) {
+				Integer.parseInt(parts[i]);
+			}
+		} catch (NumberFormatException e) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * This method adds a number of days to a date.
+	 * 
+	 * @param currentDay
+	 * @param currentMonth
+	 * @param currentYear
+	 * @param numOfDaysToAdd
+	 * @return String This returns the new date following a date format after
+	 *         adding n days.
+	 */
+	public static String addDaysToCurrentDate(int currentDay, int currentMonth,
+			int currentYear, int numOfDaysToAdd) {
+		String currentDate = currentDay + "/" + currentMonth + "/"
+				+ currentYear;
+
+		assert (TDTDateMethods.isValidDateRange(currentDate));
+
 		SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy");
 		Date d = new Date();
 		try {
-			d = sdf.parse(currentDay + "/" + currentMonth + "/" + currentYear);
+			d = sdf.parse(currentDate);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -54,13 +103,20 @@ public class TDTDateMethods {
 		String newDateString = sdf.format(c.getTime());
 		return newDateString;
 	}
-	
-	public static String changeToDayOfWeek(String date){
+
+	/**
+	 * This method converts the old date format dd/MM/yyyy to a new date format
+	 * that reflects of the day of the week for display.
+	 * 
+	 * @param date
+	 * @return String This returns the date that follows the new format.
+	 */
+	public static String changeToDayOfWeek(String date) {
 		final String OLD_FORMAT = "dd/MM/yyyy";
 		final String NEW_FORMAT = "EEE";
 		String oldDateString = date;
 		String dayOfWeek = "";
-		
+
 		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
 		Date d = new Date();
 		try {
@@ -72,33 +128,48 @@ public class TDTDateMethods {
 		dayOfWeek = sdf.format(d);
 		return dayOfWeek;
 	}
-	
+
+	/**
+	 * This method converts the old date format dd/MM/yyyy to a new date format
+	 * d/M/yyyy.
+	 * 
+	 * @param decodedDate
+	 * @return String This returns the date following the new format.
+	 */
 	public static String changeDateFormat(String decodedDate) {
 		final String OLD_FORMAT = "dd/MM/yyyy";
 		final String NEW_FORMAT = "d/M/yyyy";
 
-		String oldDateString = decodedDate;
-		String newDateString = "";
-
-		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-		Date d = new Date();
-		try {
-			d = sdf.parse(oldDateString);
-		} catch (ParseException e) {
-			e.printStackTrace();
+		if (TDTDateMethods.isValidDateRange(decodedDate)) {
+			String oldDateString = decodedDate;
+			String newDateString = "";
+			SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
+			Date d = new Date();
+			try {
+				d = sdf.parse(oldDateString);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			sdf.applyPattern(NEW_FORMAT);
+			newDateString = sdf.format(d);
+			decodedDate = newDateString;
 		}
-		sdf.applyPattern(NEW_FORMAT);
-		newDateString = sdf.format(d);
-		decodedDate = newDateString;
 		return decodedDate;
 	}
-		
+
+	/**
+	 * This method converts the old date format dd/MM/yyyy to a new date format
+	 * d MMM yyyy (10 nov 2014) for display.
+	 * 
+	 * @param date
+	 * @return String This returns the date following the new format.
+	 */
 	public static String changeDateFormatDisplay(String date) {
 		final String OLD_FORMAT = "dd/MM/yyyy";
 		final String NEW_FORMAT = "d MMM yyyy";
 
 		String oldDateString = date;
-		String newDateString;
+		String newDateString = "";
 
 		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
 		Date d = new Date();
@@ -111,14 +182,22 @@ public class TDTDateMethods {
 		newDateString = sdf.format(d);
 		return newDateString;
 	}
-	
+
+	/**
+	 * This method checks if the date falls in the a valid date range.
+	 * 
+	 * @param date
+	 * @return boolean This return true if date is valid and false if otherwise.
+	 */
 	public static boolean isValidDateRange(String date) {
 		String[] dateParts = date.split("/");
-		int day, month, year;
+		int day;
+		int month;
+		int year;
+
 		if (date.equals("null")) {
 			return true;
 		}
-
 		try {
 			day = Integer.parseInt(dateParts[0]);
 			month = Integer.parseInt(dateParts[1]);
@@ -137,40 +216,26 @@ public class TDTDateMethods {
 		return false;
 	}
 
-	public static boolean isValidDateCompare(String startDate, String endDate) {
-		String[] startDateParts = startDate.split("/");
-		String[] endDateParts = endDate.split("/");
-
-		int startDay = Integer.parseInt(startDateParts[0]);
-		int startMonth = Integer.parseInt(startDateParts[1]);
-		int startYear = Integer.parseInt(startDateParts[2]);
-		int endDay = Integer.parseInt(endDateParts[0]);
-		int endMonth = Integer.parseInt(endDateParts[1]);
-		int endYear = Integer.parseInt(endDateParts[2]);
-
-		if (endYear > startYear) {
-			return true;
-		} else if (endYear == startYear) {
-			if (endMonth > startMonth) {
-				return true;
-			} else if (endMonth == startMonth) {
-				if (endDay >= startDay) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
+	/**
+	 * This method compares the two dates and checks if they are of the same
+	 * date or one being later or earlier than another.
+	 * 
+	 * @param date1
+	 * @param date2
+	 * @return int This returns a value -1 if date1>date2, a value 0 if
+	 *         date1=date2 and a value 1 if date2>date1
+	 */
 	public static int compareToDate(String date1, String date2) {
-
-		if (date1.equals("null") && !date2.equals("null")) { // compareddate<thisdate
+		if (date1.equals("null") && !date2.equals("null")) {
 			return -1;
 		} else if (date1.equals("null") && date2.equals("null")) {
 			return 0;
 		} else if (!date1.equals("null") && date2.equals("null")) {
 			return 1;
 		}
+
+		assert (TDTDateMethods.isValidDateRange(date1));
+		assert (TDTDateMethods.isValidDateRange(date2));
 
 		String[] date1Parts = date1.split("/");
 		String[] date2Parts = date2.split("/");
@@ -200,7 +265,17 @@ public class TDTDateMethods {
 		return -1;
 	}
 
+	/**
+	 * This method takes into account leap years and gets the number of days of
+	 * that particular month of the year.
+	 *
+	 * @param month
+	 * @param year
+	 * @return int This returns the number of days of the month in that year.
+	 */
 	public static int getNumOfDaysFromMonth(int month, int year) {
+		assert (month >= 1 && month <= 12);
+
 		int days = 0;
 		boolean isLeapYear = false;
 		switch (month) {
@@ -239,7 +314,16 @@ public class TDTDateMethods {
 		}
 		return days;
 	}
-	
+
+	/**
+	 * This method checks if the string depicts the day of the week or today or
+	 * tomorrow.
+	 * 
+	 * @param day
+	 * @return int This returns a integer value that correspond to each day of
+	 *         the week or today or tomorrow. Example: A value 1 is returned
+	 *         when the string is "sunday".
+	 */
 	public static int checkDay(String day) {
 		day = TDTCommons.replaceEndStringPunctuation(day);
 
@@ -281,6 +365,13 @@ public class TDTDateMethods {
 		}
 	}
 
+	/**
+	 * This method checks if the string depicts one of the month of the year.
+	 * 
+	 * @param month
+	 * @return int This returns a integer value that correspond to the month of
+	 *         the year.
+	 */
 	public static int checkMonth(String month) {
 		if ((month.equalsIgnoreCase("January"))
 				|| (month.equalsIgnoreCase("Jan"))) {
@@ -323,6 +414,13 @@ public class TDTDateMethods {
 		}
 	}
 
+	/**
+	 * This method checks if the string is either week, month or year.
+	 * 
+	 * @param string
+	 * @return This returns a integer value that correspond to either week,
+	 *         month or year.
+	 */
 	public static int checkWeekMonthYear(String string) {
 		if ((string.equalsIgnoreCase("Week"))
 				|| (string.equalsIgnoreCase("Wk"))) {

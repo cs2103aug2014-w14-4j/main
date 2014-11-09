@@ -8,17 +8,23 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This TDTTimeMethods class stores all the static time related methods which
+ * are called by other components of the software.
+ * 
+ * @author
+ *
+ */
 public class TDTTimeMethods {
-	
 	private static Pattern[] pattern;
 	private static Matcher matcher;
 	private static Calendar cal;
 
-	// 2am 11pm --
+	// 2am 11pm
 	private static final String TIME_PATTERN_1 = "(0?[1-9]|1[012])([aA][Mm]|[pP][mM])";
-	// 2:00 12:15 2.00 23:30 ----------
+	// 2:00 12:15 2.00 23:30
 	private static final String TIME_PATTERN_2 = "(0?[0-9]|1[0-9]|2[0-3])(0?[:.])(0?[0-5][0-9])";
-	// 2:00pm 12:15pm 2.00pm 12.15pm --
+	// 2:00pm 12:15pm 2.00pm 12.15pm
 	private static final String TIME_PATTERN_3 = "(0?[0-9]|1[012])(0?[:.])(0?[0-5][0-9])([aA][Mm]|[pP][mM])";
 	// 13:00pm 12:01pm
 	private static final String TIME_PATTERN_4 = "(0?1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
@@ -29,7 +35,13 @@ public class TDTTimeMethods {
 	// 000am 0000am
 	private static final String TIME_PATTERN_7 = "(0?0)(0?[0-5][0-9])([aA][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
 
-	// ----------------------CHECK TIME-------------------------
+	/**
+	 * This method check if the string follows a certain type of time format.
+	 * 
+	 * @param time
+	 * @return boolean This returns true if it follows the time pattern.
+	 * 
+	 */
 	public static boolean checkTime(String time) {
 		time = TDTCommons.replaceEndStringPunctuation(time);
 
@@ -41,6 +53,7 @@ public class TDTTimeMethods {
 		pattern[5] = Pattern.compile(TIME_PATTERN_5);
 		pattern[6] = Pattern.compile(TIME_PATTERN_6);
 		pattern[7] = Pattern.compile(TIME_PATTERN_7);
+		// Checks against all the possible time patterns
 		for (int i = 1; i <= 7; i++) {
 			matcher = pattern[i].matcher(time);
 			if (matcher.matches()) {
@@ -49,14 +62,20 @@ public class TDTTimeMethods {
 		}
 		return false;
 	}
-	
-	//-------------------Change Display Format-----------------
+
+	/**
+	 * The method converts the old time format HH:mm to a new format h:mm a
+	 * (2:30pm) for display.
+	 * 
+	 * @param time
+	 * @return String This returns the time that follows the new time format.
+	 */
 	public static String changeTimeFormatDisplay(String time) {
 		final String OLD_FORMAT = "HH:mm";
 		final String NEW_FORMAT = "h:mm a";
 
 		String oldTimeString = time;
-		String newTimeString;
+		String newTimeString = "";
 
 		SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
 		Date d = new Date();
@@ -69,15 +88,23 @@ public class TDTTimeMethods {
 		newTimeString = sdf.format(d);
 		return newTimeString;
 	}
-	
-	// -----------------Time Related Methods-----------------
+
+	/**
+	 * This method checks if the time falls in the valid time range.
+	 * 
+	 * @param time
+	 * @return boolean This returns true if time is valid and false if
+	 *         otherwise.
+	 */
 	public static boolean isValidTimeRange(String time) {
 		if (time.equals("null")) {
 			return true;
 		}
+
 		String[] timeParts = time.split(":");
 		int hours;
 		int minutes;
+
 		try {
 			hours = Integer.parseInt(timeParts[0]);
 			minutes = Integer.parseInt(timeParts[1]);
@@ -85,38 +112,27 @@ public class TDTTimeMethods {
 			return false;
 		}
 
-		if (hours < 24 && hours >= 0 
-				&& minutes < 60 && minutes >= 0) {
+		if (hours < 24 && hours >= 0 && minutes < 60 && minutes >= 0) {
 			return true;
 		}
 		return false;
 	}
 
-	// use for "from Date1 to Date2" date1 and date2 same.
-	public static boolean isValidTimeCompare(String startTime, String endTime) {
-		String[] startTimeParts = startTime.split(":");
-		String[] endTimeParts = endTime.split(":");
-
-		int startHours = Integer.parseInt(startTimeParts[0]);
-		int startMinutes = Integer.parseInt(startTimeParts[1]);
-		int endHours = Integer.parseInt(endTimeParts[0]);
-		int endMinutes = Integer.parseInt(endTimeParts[1]);
-
-		if (endHours > startHours) {
-			return true;
-		} else if (endHours == startHours) {
-			if (endMinutes > startMinutes) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
-	
+	/**
+	 * This method compares the two timings and checks if they are the same or
+	 * one being later or earlier than another.
+	 * 
+	 * @param time1
+	 * @param time2
+	 * @return int This returns a value -1 if time1>time2, value 0 if
+	 *         time1=time2 and value 1 if time2>time1.
+	 */
 	public static int compareToTime(String time1, String time2) {
 		String[] time1Parts = time1.split(":");
 		String[] time2Parts = time2.split(":");
+
+		assert (TDTTimeMethods.isValidTimeRange(time1));
+		assert (TDTTimeMethods.isValidTimeRange(time2));
 
 		int time1Hours = Integer.parseInt(time1Parts[0]);
 		int time1Minutes = Integer.parseInt(time1Parts[1]);
@@ -136,7 +152,14 @@ public class TDTTimeMethods {
 		}
 		return -1;
 	}
-	
+
+	/**
+	 * This method calculates the remaining amount of time left from the current
+	 * date and time to the targeted date and time.
+	 * 
+	 * @param decodedString
+	 * @return long This returns the remaining time in seconds.
+	 */
 	public static long calculateRemainingTime(String decodedString) {
 		cal = Calendar.getInstance(TimeZone.getDefault());
 		int currentDay = cal.get(Calendar.DATE);
@@ -147,12 +170,14 @@ public class TDTTimeMethods {
 		int currentMinute = cal.get(Calendar.MINUTE);
 		int currentSeconds = cal.get(Calendar.SECOND);
 
+		// Include seconds portion to decodedString so as to match the date
+		// format
 		String reminder = decodedString + ":00";
+
 		String currentDateAndTime = currentDay + "/" + currentMonth + "/"
 				+ currentYear + " " + currentHour + ":" + currentMinute + ":"
 				+ currentSeconds;
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
 		Date d1 = null;
 		Date d2 = null;
 		long remainingTimeInSeconds = 0;
@@ -161,12 +186,12 @@ public class TDTTimeMethods {
 			d1 = format.parse(currentDateAndTime);
 			d2 = format.parse(reminder);
 
-			// in milliseconds
+			// In milliseconds
 			long diff = d2.getTime() - d1.getTime();
 
+			// Convert to seconds
 			remainingTimeInSeconds = diff / 1000;
-
-		} catch (Exception e) {
+		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		return remainingTimeInSeconds;
