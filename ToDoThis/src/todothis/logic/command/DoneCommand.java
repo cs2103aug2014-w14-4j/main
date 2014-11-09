@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -8,12 +9,12 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class DoneCommand extends Command {
-	private static final String MESSAGE_DONE_TASK_FEEDBACK = "Task done";
-	private static final String MESSAGE_UNDO_DONE = "Undo done";
-	private static final String MESSAGE_INVALID_COMMAND = "Invalid command.";
-	private static final String MESAGE_INVALID_LABEL_TASKID = "Invalid Command. Label does not exist or invalid task number.";
-	private static final String MESSAGE_DONE_ALL_FEEDBACK = "All tasks are done!";
-	private static final String MESSAGE_DONE_LABEL_FEEDBACK = "Tasks under %s are done.";
+	public static final String MESSAGE_DONE_TASK_FEEDBACK = "Task done";
+	public static final String MESSAGE_UNDO_DONE = "Undo done";
+	public static final String MESSAGE_INVALID_COMMAND = "Invalid command.";
+	public static final String MESAGE_INVALID_LABEL_TASKID = "Invalid Command. Label does not exist or invalid task number.";
+	public static final String MESSAGE_DONE_ALL_FEEDBACK = "All tasks are done!";
+	public static final String MESSAGE_DONE_LABEL_FEEDBACK = "Tasks under %s are done.";
 
 	private int taskID;
 	private String labelName;

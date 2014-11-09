@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import todothis.logic.parser.ITDTParser.COMMANDTYPE;
@@ -5,7 +6,7 @@ import todothis.storage.TDTDataStore;
 
 public class RedoCommand extends Command{
 	private Command comd;
-	private static final String MESSAGE_INVALID_REDO = "Invalid command. No command to redo.";
+	public static final String MESSAGE_INVALID_REDO = "Invalid command. No command to redo.";
 
 	public RedoCommand() {
 		super(COMMANDTYPE.REDO);

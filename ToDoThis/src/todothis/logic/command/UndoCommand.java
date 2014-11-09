@@ -1,11 +1,13 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class UndoCommand extends Command {
-
-	private static final String MESSAGE_INVALID_UNDO = "Invalid command. No command to undo.";
+	private Command comd;
+	
+	public static final String MESSAGE_INVALID_UNDO = "Invalid command. No command to undo.";
 	
 	/**
 	 * Construct a UndoCommand object.
@@ -24,6 +26,7 @@ public class UndoCommand extends Command {
 		if (!data.getUndoStack().isEmpty()) {
 
 			Command comd = data.getUndoStack().pop();
+			setComd(comd);
 			data.getRedoStack().push(comd);
 
 			return comd.undo(data);
@@ -38,6 +41,16 @@ public class UndoCommand extends Command {
 		return null;
 	}
 
+	public Command getComd() {
+		return comd;
+	}
+
+	public void setComd(Command comd) {
+		this.comd = comd;
+	}
+
+	
+	//@author A0110398H-unused
 	/*
 	 * Unused code. Previously undo copy the whole state of the program.
 	 * Inefficient.

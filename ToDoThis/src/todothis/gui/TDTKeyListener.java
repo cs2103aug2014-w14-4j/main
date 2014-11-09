@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.gui;
 
 import java.awt.event.KeyEvent;
@@ -124,7 +125,7 @@ public class TDTKeyListener implements KeyListener {
 					}
 				}
 			} catch (NumberFormatException e) {
-				;
+				;//Do nothing if it is not number
 			}
 		}
 	}
@@ -144,7 +145,7 @@ public class TDTKeyListener implements KeyListener {
 					highlightText();
 				}
 			} catch (NumberFormatException e) {
-				;
+				;//Do nothing if it is not number
 			}
 		}
 	}

@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -10,14 +11,14 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class EditCommand extends Command {
-	private static final String MESSAGE_UNDO_EDIT = "Undo edit";
-	private static final String MESSAGE_INVALID_COMMAND = "Invalid Command";
-	private static final String MESSAGE_INVALID_LABEL_TASKID = "Invalid Command. Label does not exist or invalid task number.";
-	private static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
-	private static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
-	private static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
-	private static final String MESSAGE_EDIT_FEEDBACK = "Task edited.";
-	private static final String MESSAGE_EDIT_CLASH = "Clashes detected. Task edited.\n%d task(s) found to have same time range on %s";
+	public static final String MESSAGE_UNDO_EDIT = "Undo edit";
+	public static final String MESSAGE_INVALID_COMMAND = "Invalid Command";
+	public static final String MESSAGE_INVALID_LABEL_TASKID = "Invalid Command. Label does not exist or invalid task number.";
+	public static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
+	public static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
+	public static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
+	public static final String MESSAGE_EDIT_FEEDBACK = "Task edited.";
+	public static final String MESSAGE_EDIT_CLASH = "Clashes detected. Task edited.\n%d task(s) found to have same time range on %s";
 
 	private int taskID;
 	private String feedback;

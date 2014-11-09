@@ -4,6 +4,7 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class HelpCommand extends Command{
+	private static final String MESSAGE_UNDO_HELP = "Undo Help";
 	COMMANDTYPE commandTypeForHelp;
 	
 	public HelpCommand(String command) {
@@ -66,7 +67,7 @@ public class HelpCommand extends Command{
 	
 	@Override
 	public String undo(TDTDataStore data) {
-		return "Undo Help";
+		return MESSAGE_UNDO_HELP;
 	}
 	
 	private String helpAdd(){

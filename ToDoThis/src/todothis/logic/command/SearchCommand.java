@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -10,8 +11,8 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class SearchCommand extends Command {
-	private static final String MESSAGE_UNDO_SEARCH = "Undo Search";
-	private static final String SEARCH_FEEDBACK = "%d results found.";
+	public static final String MESSAGE_UNDO_SEARCH = "Undo Search";
+	public static final String SEARCH_FEEDBACK = "%d results found.";
 	
 	private String searchedWords;
 	private ArrayList<Task> searchedResult;

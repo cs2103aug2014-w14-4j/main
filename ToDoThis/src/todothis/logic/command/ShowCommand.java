@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -7,8 +8,9 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class ShowCommand extends Command {
-	private static final String MESSAGE_UNDO_SHOW = "Undo show";
-	private static final String MESSAGE_SHOW_FEEDBACK = "Show selected labels";
+	public static final String MESSAGE_UNDO_SHOW = "Undo show";
+	public static final String MESSAGE_SHOW_FEEDBACK = "Show selected labels";
+	
 	private String labelName;
 	private ArrayList<String> prevHideList;
 	
@@ -80,7 +82,7 @@ public class ShowCommand extends Command {
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
-
+	//@author A0110398H-unused
 	/*
 	Unused code. Previously able to show/hide specific task. Change to show/hide labels only.
 	@Override

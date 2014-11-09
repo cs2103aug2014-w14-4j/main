@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -10,11 +11,12 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class AddCommand extends Command {
-	private static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
-	private static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
-	private static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
-	private static final String MESSAGE_ADD_FEEDBACK = "Task added to %s.";
-	private static final String MESSAGE_ADD_CLASH = "Clashes detected. %s \n%d task(s) found to have same time range on %s";
+	private static final String MESSAGE_UNDO_ADD = "Undo add.";
+	public static final String MESSAGE_INVALID_END_TIME = "Invalid end time! End Time should be after start time!";
+	public static final String MESSAGE_INVALID_END_DATE = "Invalid end date! End date should be after start date!";
+	public static final String MESSAGE_INVALID_DATE_TIME_FORMAT = "Invalid date/time format.";
+	public static final String MESSAGE_ADD_FEEDBACK = "Task added to %s.";
+	public static final String MESSAGE_ADD_CLASH = "Clashes detected. %s \n%d task(s) found to have same time range on %s";
 
 	private int taskID;
 	private String labelName;
@@ -104,7 +106,7 @@ public class AddCommand extends Command {
 		comd.execute(data);
 		assert (data.getUndoStack().size() > 0) : "undostack is empty";
 		data.getUndoStack().pop();
-		return "Undo add!";
+		return MESSAGE_UNDO_ADD;
 	}
 
 	public int getTaskID() {

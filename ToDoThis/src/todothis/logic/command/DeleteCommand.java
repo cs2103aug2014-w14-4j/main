@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -10,16 +11,15 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class DeleteCommand extends Command {
-	private static final String MESSAGE_UNDO_DELETE_TASK = "Undo delete task.";
-	private static final String MESSAGE_DELETE_TASK = "Task deleted";
-	private static final String MESSAGE_INVALID = "Invalid command.";
-	private static final String MESSAGE_INVALID_TASKID = "Invalid command. Invalid task number.";
-	private static final String MESSAGE_INVALID_LABEL = "Invalid command. Label does not exist.";
-	private static final String MESSAGE_DELETE_LABEL = "Label deleted.";
-	private static final String MESSAGE_UNDO_CLEAR = "Undo clear TodoThis.";
-	private static final String MESSAGE_CLEAR = "TodoThis is cleared!";
-	private static final String MESSAGE_DELETE_LABEL_TASK = "Task under %s deleted.";
-	private static final String MESSAGE_UNDO_DELETE_LABEL_TASK = "Undo delete %s.";
+	public static final String MESSAGE_UNDO_DELETE_TASK = "Undo delete task.";
+	public static final String MESSAGE_DELETE_TASK = "Task deleted";
+	public static final String MESSAGE_INVALID = "Invalid command.";
+	public static final String MESSAGE_INVALID_LABEL_TASKID = "Invalid command. Label does not exist or invalid task number.";
+	public static final String MESSAGE_DELETE_LABEL = "Label deleted.";
+	public static final String MESSAGE_UNDO_CLEAR = "Undo clear TodoThis.";
+	public static final String MESSAGE_CLEAR = "TodoThis is cleared!";
+	public static final String MESSAGE_DELETE_LABEL_TASK = "Task under %s deleted.";
+	public static final String MESSAGE_UNDO_DELETE_LABEL_TASK = "Undo delete %s.";
 	private static final int DELETE_ALL = 0;
 	private static final int DELETE_LABELTASK = 1;
 	private static final int DELETE_LABEL = 2;
@@ -79,7 +79,7 @@ public class DeleteCommand extends Command {
 					return String.format(MESSAGE_DELETE_LABEL_TASK, label);
 				}
 			} else {
-				return MESSAGE_INVALID_LABEL;
+				return MESSAGE_INVALID_LABEL_TASKID;
 			}
 		}
 		
@@ -90,7 +90,7 @@ public class DeleteCommand extends Command {
 				deleteTask(data.getCurrLabel(),taskId, data);
 				return MESSAGE_DELETE_TASK;
 			} else {
-				return MESSAGE_INVALID_TASKID;
+				return MESSAGE_INVALID_LABEL_TASKID;
 			}
 		}
 		
@@ -102,10 +102,10 @@ public class DeleteCommand extends Command {
 					deleteTask(label,taskId, data);
 					return MESSAGE_DELETE_TASK;
 				} else {
-					return MESSAGE_INVALID_TASKID;
+					return MESSAGE_INVALID_LABEL_TASKID;
 				}
 			} else {
-				return MESSAGE_INVALID_LABEL;
+				return MESSAGE_INVALID_LABEL_TASKID;
 			}
 		}
 		

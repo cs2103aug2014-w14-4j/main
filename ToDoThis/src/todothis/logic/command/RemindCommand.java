@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -10,14 +11,14 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class RemindCommand extends Command {
-	private static final String MESSAGE_UNDO_REMOVE_REMIND = "Undo remove reminder.";
-	private static final String MESSAGE_UNDO_REMIND = "Undo reminder.";
-	private static final String MESSAGE_INVALID_REMOVE_REMIND = "Invalid command. No reminder to remove.";
-	private static final String MESSAGE_INVALID_LABEL = "Invalid command. Invalid label name.";
-	private static final String MESSAGE_INVALID_TASKID = "Invalid command. Invalid taskId.";
-	private static final String MESSAGE_INVALID_REMIND = "Invalid command. Invalid date/time for reminder.";
-	private static final String MESSAGE_REMIND_FEEDBACK = "Reminder set at %s";
-	private static final String MESSAGE__REMOVE_REMIND_FEEDBACK = "Reminder at %s removed.";
+	public static final String MESSAGE_UNDO_REMOVE_REMIND = "Undo remove reminder.";
+	public static final String MESSAGE_UNDO_REMIND = "Undo reminder.";
+	public static final String MESSAGE_INVALID_REMOVE_REMIND = "Invalid command. No reminder to remove.";
+	public static final String MESSAGE_INVALID_LABEL = "Invalid command. Invalid label name.";
+	public static final String MESSAGE_INVALID_TASKID = "Invalid command. Invalid taskId.";
+	public static final String MESSAGE_INVALID_REMIND = "Invalid command. Invalid date/time for reminder.";
+	public static final String MESSAGE_REMIND_FEEDBACK = "Reminder set at %s";
+	public static final String MESSAGE__REMOVE_REMIND_FEEDBACK = "Reminder at %s removed.";
 
 	private String labelName;
 	private int taskID;

@@ -1,3 +1,4 @@
+//@author A0110398H
 package todothis.logic.command;
 
 import java.util.ArrayList;
@@ -7,11 +8,11 @@ import todothis.logic.parser.ITDTParser.COMMANDTYPE;
 import todothis.storage.TDTDataStore;
 
 public class LabelCommand extends Command {
-	private static final String MESSAGE_INVALID_ADD_LABEL = "Invalid command. Label name cannot be blank or digits only.";
-	private static final String MESSAGE_INVALID_LABEL = "Invalid command. Invalid Label name.";
-	private static final String MESSAGE_LABEL_FEEDBACK = "Current label change to: %s";
-	private static final String MESSAGE_CREATE_LABEL_FEEDBACK = "Label %s created.";
-	private static final String MESSAGE_UNDO_LABEL_FEEDBACK = "Label %s deleted.";
+	public static final String MESSAGE_INVALID_ADD_LABEL = "Invalid command. Label name cannot be blank or digits only.";
+	public static final String MESSAGE_INVALID_LABEL = "Invalid command. Invalid Label name.";
+	public static final String MESSAGE_LABEL_FEEDBACK = "Current label change to: %s";
+	public static final String MESSAGE_CREATE_LABEL_FEEDBACK = "Label %s created.";
+	public static final String MESSAGE_UNDO_LABEL_FEEDBACK = "Label %s deleted.";
 	
 	private String labelName;
 	private String prevLabel;
