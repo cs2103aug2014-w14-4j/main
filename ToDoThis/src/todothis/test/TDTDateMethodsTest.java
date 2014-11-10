@@ -1,3 +1,4 @@
+//@author A0110852R
 package todothis.test;
 
 import static org.junit.Assert.*;
@@ -9,24 +10,34 @@ import todothis.commons.TDTDateMethods;
  * This class tests methods in TDTDateMethods class.
  *
  */
-//@author A0110852R
+
 public class TDTDateMethodsTest {
 	@Test
 	public void testCheckDate(){
 		//Check for date format: DDMMYY
-		assertTrue(TDTDateMethods.checkDate("120814")); //This is boundary case for date of length 6
-		assertFalse(TDTDateMethods.checkDate("1208143")); //This is boundary case for date of length more than 6
-		assertFalse(TDTDateMethods.checkDate("12814")); //This is boundary case for date of length less than 6
-		assertFalse(TDTDateMethods.checkDate("2a0814")); //This is case when date consist of not all digits
+		
+		//This is boundary case for date of length 6
+		assertTrue(TDTDateMethods.checkDate("120814")); 
+		//This is boundary case for date of length more than 6
+		assertFalse(TDTDateMethods.checkDate("1208143")); 
+		 //This is boundary case for date of length less than 6
+		assertFalse(TDTDateMethods.checkDate("12814"));
+		//This is case when date consist of not all digits
+		assertFalse(TDTDateMethods.checkDate("2a0814")); 
 		
 		//Check for date format: DDMMYYYY 
 		//Similar to DDMMYY testing OMITTED
 		
 		//Check for date format: DD-MM-YYYY, DD-MM
-		assertTrue(TDTDateMethods.checkDate("12-2-14")); //This is a case that follows the date format
-		assertTrue(TDTDateMethods.checkDate("12-1")); //This is a case that follows the date format
-		assertFalse(TDTDateMethods.checkDate("12-1-14-1")); //This is a boundary case for having more than 2 dashes
-		assertFalse(TDTDateMethods.checkDate("1a-12-14")); //this is a case when date consist of not all digits
+		
+		 //This is a case that follows the date format
+		assertTrue(TDTDateMethods.checkDate("12-2-14"));
+		//This is a case that follows the date format
+		assertTrue(TDTDateMethods.checkDate("12-1")); 
+		//This is a boundary case for having more than 2 dashes
+		assertFalse(TDTDateMethods.checkDate("12-1-14-1")); 
+		//this is a case when date consist of not all digits
+		assertFalse(TDTDateMethods.checkDate("1a-12-14")); 
 		
 		//Check for date format: DD/MM/YYYY, DD/MM
 		//Similar to DD-MM-YYYY OMITTED
@@ -61,21 +72,31 @@ public class TDTDateMethodsTest {
 	}
 	@Test
 	public void testValidDateRange(){
-		assertFalse(TDTDateMethods.isValidDateRange("12/12/2013"));//This is boundary case for year lesser than 2014 partition
-		assertTrue(TDTDateMethods.isValidDateRange("12/12/2050"));//This is boundary case for year within range partition
-		assertFalse(TDTDateMethods.isValidDateRange("12/12/2100"));//This is boundary case for year more than 2099 partition
+		//This is boundary case for year lesser than 2014 partition
+		assertFalse(TDTDateMethods.isValidDateRange("12/12/2013"));
+		//This is boundary case for year within range partition
+		assertTrue(TDTDateMethods.isValidDateRange("12/12/2050"));
+		//This is boundary case for year more than 2099 partition
+		assertFalse(TDTDateMethods.isValidDateRange("12/12/2100"));
 		
-		assertFalse(TDTDateMethods.isValidDateRange("12/0/2014"));//This is boundary case for month lesser than 1 partition
-		assertTrue(TDTDateMethods.isValidDateRange("12/8/2014"));//This is boundary case for month within range partition
-		assertFalse(TDTDateMethods.isValidDateRange("12/13/2014"));//This is boundary case for month more than 12 partition
+		//This is boundary case for month lesser than 1 partition
+		assertFalse(TDTDateMethods.isValidDateRange("12/0/2014"));
+		//This is boundary case for month within range partition
+		assertTrue(TDTDateMethods.isValidDateRange("12/8/2014"));
+		//This is boundary case for month more than 12 partition
+		assertFalse(TDTDateMethods.isValidDateRange("12/13/2014"));
 		
-		assertFalse(TDTDateMethods.isValidDateRange("0/8/2014"));//This is boundary case for day lesser than 1 partition
-		assertTrue(TDTDateMethods.isValidDateRange("12/8/2014"));//This is boundary case for day within range partition
-		assertFalse(TDTDateMethods.isValidDateRange("32/8/2014"));//This is boundary case for day more than 31 partition
+		//This is boundary case for day lesser than 1 partition
+		assertFalse(TDTDateMethods.isValidDateRange("0/8/2014"));
+		//This is boundary case for day within range partition
+		assertTrue(TDTDateMethods.isValidDateRange("12/8/2014"));
+		//This is boundary case for day more than 31 partition
+		assertFalse(TDTDateMethods.isValidDateRange("32/8/2014"));
 		
-		assertTrue(TDTDateMethods.isValidDateRange("null"));//This is case when date is not initialized
-		
-		assertFalse(TDTDateMethods.isValidDateRange("a31/8/2014")); //This is case when date has unwanted non digits
+		//This is case when date is not initialized
+		assertTrue(TDTDateMethods.isValidDateRange("null"));
+		//This is case when date has unwanted non digits
+		assertFalse(TDTDateMethods.isValidDateRange("a31/8/2014")); 
 		
 	}
 	@Test

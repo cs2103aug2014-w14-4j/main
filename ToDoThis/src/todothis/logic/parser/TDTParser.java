@@ -1,4 +1,4 @@
-//@author @A0115933H
+//@author A0115933H
 package todothis.logic.parser;
 
 import java.util.ArrayList;
@@ -19,8 +19,8 @@ import todothis.logic.command.RemindCommand;
 import todothis.logic.command.SearchCommand;
 import todothis.logic.command.ShowCommand;
 import todothis.logic.command.UndoCommand;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TDTParser implements ITDTParser {
 
@@ -38,14 +38,14 @@ public class TDTParser implements ITDTParser {
 	private ArrayList<String> connectorWordsArr;
 	private int quotationMarks;
 	private int quotationCounter;
-	//private Logger logger = Logger.getLogger("TDTParser");
+	private Logger logger = Logger.getLogger("TDTParser");
 
 	/**
 	 * This function parses the user's command according to the type of command it is. 
 	 */
 	public Command parse(String userCommand) {
 		assert(userCommand!= null);
-		//logger.log(Level.INFO, "start parsing");
+		logger.log(Level.INFO, "start parsing");
 		setInitalConditions();
 		int length = userCommand.split(" ").length;
 		String firstWord = getFirstWord(userCommand.trim());
@@ -95,7 +95,7 @@ public class TDTParser implements ITDTParser {
 		default:
 			break;
 		}
-		//logger.log(Level.INFO, "end of parsing");
+		logger.log(Level.INFO, "end of parsing");
 		return null;
 	}
 	
@@ -170,9 +170,7 @@ public class TDTParser implements ITDTParser {
 				completeTaskIdOrLabelName();
 			} else if (parts.length == 2) { // Both taskID and labelName 
 				completeTaskIdAndLabelName();
-			} else { 						// Invalid
-				setLabelName(" ");
-			}
+			} 
 		}
 	}
 
@@ -238,9 +236,7 @@ public class TDTParser implements ITDTParser {
 				completeTaskIdOrLabelName();
 			} else if (parts.length == 2) { // Both taskID and labelName 
 				completeTaskIdAndLabelName();
-			} else { 						// Invalid
-				setLabelName(" ");
-			}
+			} 
 		}
 	}
 

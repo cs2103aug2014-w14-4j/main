@@ -1,4 +1,4 @@
-//@author @A0115933H
+//@author A0115933H
 package todothis.test;
 
 import static org.junit.Assert.*;
@@ -134,9 +134,9 @@ public class TDTParserTest {
 		TDTParser parser = new TDTParser();
 		String testInput9 = "delete 1 todothis todothisss";
 		parser.parse(testInput9);
-		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
 		assertEquals(parser.getTaskID(), -1);
-		assertEquals(parser.getLabelName(), " ");
+		assertEquals(parser.getLabelName(), "");
 	}
 	
 	/**
@@ -206,8 +206,8 @@ public class TDTParserTest {
 		TDTParser parser = new TDTParser();
 		String testInput2 = "done todothis today 1";
 		parser.parse(testInput2);
-		assertEquals(parser.getCommandType(), COMMANDTYPE.DONE);
-		assertEquals(parser.getLabelName(), " ");
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getLabelName(), "");
 		assertEquals(parser.getTaskID(), -1);
 	}
 	//----------------------------------------EDIT----------------------------------------------
@@ -222,7 +222,7 @@ public class TDTParserTest {
 		assertEquals(parser.getCommandType(), COMMANDTYPE.EDIT);
 		assertEquals(parser.getLabelName(), "");
 		assertEquals(parser.getTaskID(), 1);
-		assertEquals(parser.getCommandDetails(), " lets test edit command");
+		assertEquals(parser.getCommandDetails(), "lets test edit command");
 	}
 	
 	//----------------------------------------HIDE----------------------------------------------

@@ -118,7 +118,7 @@ public class TDTKeyListener implements KeyListener {
 						Task task = gui.getControl().getTask(words[1], id);
 						TDTDateAndTime dat = task.getDateAndTime();
 						String datString = getDateTimeStringForEdit(dat);
-						gui.getCommandField().setText(gui.getUserCommand()
+						gui.getCommandField().setText(gui.getUserCommand() + " "
 								+ task.getDetails() + datString);
 						
 						highlightText();
@@ -139,7 +139,7 @@ public class TDTKeyListener implements KeyListener {
 					Task task = gui.getControl().getTask(gui.getControl().getCurrLabel(), id);
 					TDTDateAndTime dat = task.getDateAndTime();
 					String datString = getDateTimeStringForEdit(dat);
-					gui.getCommandField().setText(gui.getUserCommand() 
+					gui.getCommandField().setText(gui.getUserCommand() + " " 
 							+ task.getDetails() + datString);
 					
 					highlightText();

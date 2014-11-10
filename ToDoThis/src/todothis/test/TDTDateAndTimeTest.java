@@ -14,7 +14,8 @@ import todothis.commons.TDTDateAndTime;
  *
  */
 public class TDTDateAndTimeTest {
-	
+	// As this method makes use of the current date and time, this test will
+	// only pass at the specific time of testing
 	//@Test
 	public void testOverDue(){
 		ArrayList<TDTDateAndTime> taskList = new ArrayList<TDTDateAndTime>();

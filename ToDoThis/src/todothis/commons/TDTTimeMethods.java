@@ -1,4 +1,4 @@
-//@author @A0115933H
+//@author A0115933H
 package todothis.commons;
 
 import java.text.ParseException;
@@ -18,19 +18,19 @@ public class TDTTimeMethods {
 	private static Matcher matcher;
 	private static Calendar cal;
 
-	// 2am 11pm
+	
 	private static final String TIME_PATTERN_1 = "(0?[1-9]|1[012])([aA][Mm]|[pP][mM])";
-	// 2:00 12:15 2.00 23:30
+	
 	private static final String TIME_PATTERN_2 = "(0?[0-9]|1[0-9]|2[0-3])(0?[:.])(0?[0-5][0-9])";
-	// 2:00pm 12:15pm 2.00pm 12.15pm
+	
 	private static final String TIME_PATTERN_3 = "(0?[0-9]|1[012])(0?[:.])(0?[0-5][0-9])([aA][Mm]|[pP][mM])";
-	// 13:00pm 12:01pm
+	
 	private static final String TIME_PATTERN_4 = "(0?1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
-	// 1200am to 1259pm
+
 	private static final String TIME_PATTERN_5 = "(0?[1-9]|1[012])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
-	// 1300pm onwards
+	
 	private static final String TIME_PATTERN_6 = "(0?1[3-9]|2[0-3])(0?[0-5][0-9])([pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
-	// 000am 0000am
+	
 	private static final String TIME_PATTERN_7 = "(0?0)(0?[0-5][0-9])([aA][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
 
 	/**
