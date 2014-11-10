@@ -315,7 +315,7 @@ public class TDTDateMethods {
 		}
 		return days;
 	}
-	//@author @A0115933H
+	//@author A0115933H
 	/**
 	 * This method checks if the string depicts the day of the week or today or
 	 * tomorrow.
