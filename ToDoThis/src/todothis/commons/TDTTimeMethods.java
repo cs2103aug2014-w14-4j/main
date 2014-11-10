@@ -63,7 +63,7 @@ public class TDTTimeMethods {
 		}
 		return false;
 	}
-	//@author victor
+	//@author A0110852R
 	/**
 	 * The method converts the old time format HH:mm to a new format h:mm a
 	 * (2:30pm) for display.

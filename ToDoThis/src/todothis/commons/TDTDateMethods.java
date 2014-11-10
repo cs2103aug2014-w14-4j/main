@@ -1,3 +1,4 @@
+//@author A0110852R
 package todothis.commons;
 
 import java.text.ParseException;
@@ -314,7 +315,7 @@ public class TDTDateMethods {
 		}
 		return days;
 	}
-
+	//@author @A0115933H
 	/**
 	 * This method checks if the string depicts the day of the week or today or
 	 * tomorrow.
