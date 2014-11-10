@@ -1,3 +1,4 @@
+//@author @A0115933H
 package todothis.logic.parser;
 
 import java.util.ArrayList;
@@ -21,9 +22,6 @@ import todothis.logic.command.UndoCommand;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 
-/**
- * @author Choong Hui Min
- */
 public class TDTParser implements ITDTParser {
 
 	private COMMANDTYPE commandType = COMMANDTYPE.INVALID;
@@ -48,8 +46,9 @@ public class TDTParser implements ITDTParser {
 	public Command parse(String userCommand) {
 		//logger.log(Level.INFO, "start parsing");
 		setInitalConditions();
+		int length = userCommand.split(" ").length;
 		String firstWord = getFirstWord(userCommand.trim());
-		setCommandType(determineCommandType((firstWord)));
+		setCommandType(determineCommandType(firstWord, length));
 		setRemainingWords(removeFirstWord(userCommand));
 		
 		switch(getCommandType()) {
@@ -103,16 +102,18 @@ public class TDTParser implements ITDTParser {
 	 * This function determines the command type of the command entered by the user.
 	 * Default command is ADD
 	 */
-	private COMMANDTYPE determineCommandType(String commandTypeString) {
+	private COMMANDTYPE determineCommandType(String commandTypeString, int length) {
 		if (commandTypeString == null) {
 			return COMMANDTYPE.INVALID;
 		} else if (commandTypeString.equalsIgnoreCase("hide")) {
 			return COMMANDTYPE.HIDE;
 		} else if (commandTypeString.equalsIgnoreCase("show")) {
 			return COMMANDTYPE.SHOW;
-		} else if (commandTypeString.equalsIgnoreCase("delete") || commandTypeString.equalsIgnoreCase("de")) {
+		} else if ((commandTypeString.equalsIgnoreCase("delete") 
+				|| commandTypeString.equalsIgnoreCase("de")) && length < 4) {
 			return COMMANDTYPE.DELETE;
-		} else if (commandTypeString.equalsIgnoreCase("label") || commandTypeString.equalsIgnoreCase("la")) {
+		} else if (commandTypeString.equalsIgnoreCase("label") 
+				|| commandTypeString.equalsIgnoreCase("la") && length == 2) {
 			return COMMANDTYPE.LABEL;
 		} else if (commandTypeString.equalsIgnoreCase("edit")) {
 			return COMMANDTYPE.EDIT;
@@ -120,17 +121,17 @@ public class TDTParser implements ITDTParser {
 			return COMMANDTYPE.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("search") || commandTypeString.equalsIgnoreCase("se")) {
 			return COMMANDTYPE.SEARCH;
-		} else if (commandTypeString.equalsIgnoreCase("undo")) {
+		} else if (commandTypeString.equalsIgnoreCase("undo") && length == 1) {
 			return COMMANDTYPE.UNDO;
-		} else if (commandTypeString.equalsIgnoreCase("done")) {
+		} else if (commandTypeString.equalsIgnoreCase("done") && length < 4) {
 			return COMMANDTYPE.DONE;
-		} else if (commandTypeString.equalsIgnoreCase("redo")) {
+		} else if (commandTypeString.equalsIgnoreCase("redo") && length == 1) {
 			return COMMANDTYPE.REDO;
 		} else if (commandTypeString.equalsIgnoreCase("remind") || commandTypeString.equalsIgnoreCase("rem")) {
 			return COMMANDTYPE.REMIND;
-		} else if (commandTypeString.equalsIgnoreCase("exit")) {
+		} else if (commandTypeString.equalsIgnoreCase("exit") && length == 1) {
 			return COMMANDTYPE.EXIT;
-		} else if (commandTypeString.equalsIgnoreCase("help")) {
+		} else if (commandTypeString.equalsIgnoreCase("help") && length < 3) {
 			return COMMANDTYPE.HELP;
 		} else {
 			return COMMANDTYPE.ADD;

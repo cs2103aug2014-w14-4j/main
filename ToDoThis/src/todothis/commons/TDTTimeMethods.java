@@ -1,3 +1,4 @@
+//@author @A0115933H
 package todothis.commons;
 
 import java.text.ParseException;
@@ -62,7 +63,7 @@ public class TDTTimeMethods {
 		}
 		return false;
 	}
-
+	//@author victor
 	/**
 	 * The method converts the old time format HH:mm to a new format h:mm a
 	 * (2:30pm) for display.
