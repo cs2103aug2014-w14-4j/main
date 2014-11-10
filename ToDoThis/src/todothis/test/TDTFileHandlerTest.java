@@ -49,8 +49,8 @@ public class TDTFileHandlerTest {
 		al2.add(task7);
 		storage.getTaskMap().put("TODAY", al2);
 		
-		assertEquals(al2.size(), testArray[0]);
-		assertEquals(0, testArray[1]);
+		assertEquals(al2.size(), testArray[1]);
+		assertEquals(0, testArray[0]);
 		assertEquals(al1.size(), testArray[2]);
 		
 	}
@@ -68,11 +68,11 @@ public class TDTFileHandlerTest {
 			i++;
 		}
 		
-		assertEquals("PLAY", labelArray[0]);
+		assertEquals("PLAY", labelArray[3]);
 		assertEquals("TODAY", labelArray[1]);
-		assertEquals("TOMORROW", labelArray[2]);
-		assertEquals("WORK", labelArray[3]);
-		assertEquals("TODOTHIS", labelArray[4]);
+		assertEquals("TOMORROW", labelArray[4]);
+		assertEquals("WORK", labelArray[2]);
+		assertEquals("TODOTHIS", labelArray[0]);
 	}
 	
 	@Test // Boundary case of writing no labels to file.
@@ -145,8 +145,8 @@ public class TDTFileHandlerTest {
 		br.close();
 		
 		assertEquals("3", lines.get(0));
-		assertEquals("TODAY", lines.get(1));
-		assertEquals("TODOTHIS", lines.get(2));
+		assertEquals("TODAY", lines.get(2));
+		assertEquals("TODOTHIS", lines.get(1));
 		assertEquals("SOON", lines.get(3));
 		
 	}
