@@ -1,0 +1,11 @@
+3
+TODAY
+TODOTHIS
+SOON
+TODAY	 cook chicken feet	true	false	null	10/11/2014	null	null	null
+TODAY	 eat magi mee	false	false	null	null	12:00	null	null
+TODAY	 revise CS2101	false	false	null	null	null	null	null
+TODAY	 prepare for written test	false	false	null	null	null	null	null
+SOON	 sell rubik cube	false	false	11/11/2014	null	13:30	null	null
+SOON	 razer ouroboros	false	false	null	null	null	null	null
+SOON	 razer taipan	false	false	null	null	null	null	null
