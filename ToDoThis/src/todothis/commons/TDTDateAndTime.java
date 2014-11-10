@@ -235,246 +235,266 @@ public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
 	 *         being compared.
 	 */
 	public boolean isClash(TDTDateAndTime arg0) {
+		boolean isClashTDT = false;
 		if (arg0.isTimedTask() == true) {
 			if (!this.getStartDate().equals("null")
 					&& !this.getStartTime().equals("null")) {
+				// Handle cases when "this" task only have start date and time
 				if (this.getEndDate().equals("null")
 						&& this.getEndTime().equals("null")) {
-					if (arg0.getStartDate().equals(this.getStartDate())
-							&& arg0.getStartTime().equals(this.getStartTime())) {
-						return true;
-					} else {
-						if (!arg0.getEndDate().equals("null")) {
-							if (TDTDateMethods.compareToDate(
-									this.getStartDate(), arg0.getStartDate()) == -1
-									&& TDTDateMethods.compareToDate(
-											this.getStartDate(),
-											arg0.getEndDate()) == 1) {
-								return true;
-							} else if (TDTDateMethods.compareToDate(
-									this.getStartDate(), arg0.getStartDate()) == 0
-									&& TDTDateMethods.compareToDate(
-											this.getStartDate(),
-											arg0.getEndDate()) == 0) {
-								if (TDTTimeMethods.compareToTime(
-										this.getStartTime(),
-										arg0.getStartTime()) == -1
-										&& TDTTimeMethods.compareToTime(
-												this.getStartTime(),
-												arg0.getEndTime()) == 1) {
-									return true;
-								}
-							} else {
-								if (TDTDateMethods.compareToDate(
-										this.getStartDate(),
-										arg0.getStartDate()) == 0) {
-									if (TDTTimeMethods.compareToTime(
-											this.getStartTime(),
-											arg0.getStartTime()) == -1) {
-										return true;
-									}
-								}
-								if (TDTDateMethods.compareToDate(
-										this.getStartDate(), arg0.getEndDate()) == 0) {
-									if (TDTTimeMethods.compareToTime(
-											this.getStartTime(),
-											arg0.getEndTime()) == 1) {
-										return true;
-									}
-								}
-							}
-						}
-					}
+					isClashTDT = isClashForTHISTaskWithStartDateTimeOnly(arg0);
 				}
+				// Handle cases when "this" task has end date and end time as
+				// well
 				if ((!this.getEndDate().equals("null") && !this.getEndTime()
 						.equals("null")) && !arg0.getStartDate().equals("null")) {
+					// SD=startDate ED=endDate ST=startTime ET=endTime
 					// condition where this->has SD ED ST ET and arg0->has SD
 					// may have ED may have ST ET
-					if (TDTDateMethods.compareToDate(this.getStartDate(),
-							arg0.getStartDate()) == 1
-							&& TDTDateMethods.compareToDate(this.getEndDate(),
-									arg0.getStartDate()) == -1) {
-						// SDate = 8/10/2014 EDate = 11/10/2014 startArgdate =
-						// 10/10/2014
+					isClashTDT = isClashForTHISTaskWithEndDateTimeAlso(arg0);
+				}
+			}
+		}
+		return isClashTDT;
+	}
+
+	private boolean isClashForTHISTaskWithEndDateTimeAlso(TDTDateAndTime arg0) {
+		// SDate = 8/10/2014 EDate = 11/10/2014 startArgdate =
+		// 10/10/2014
+		if (TDTDateMethods.compareToDate(this.getStartDate(),
+				arg0.getStartDate()) == 1
+				&& TDTDateMethods.compareToDate(this.getEndDate(),
+						arg0.getStartDate()) == -1) {
+			
+			return true;
+		}
+		
+		// SDate = 8/10/2014 EDate = 11/10/2014 Argdate =
+		// 8/10/2014 NEED CHECK TIMING
+		if (TDTDateMethods.compareToDate(this.getStartDate(),
+				arg0.getStartDate()) == 0
+				&& TDTDateMethods.compareToDate(this.getEndDate(),
+						arg0.getStartDate()) == -1
+				&& !arg0.getStartTime().equals("null")) {
+			// Timing SDate 8/10/2014 0800 argdate 8/10/2014
+			// 0900/0800
+			if (TDTTimeMethods.compareToTime(this.getStartTime(),
+					arg0.getStartTime()) == 1
+					|| TDTTimeMethods.compareToTime(this.getStartTime(),
+							arg0.getStartTime()) == 0) {
+				
+				return true;
+			}
+		}
+		// SDate = 8/10/2014 EDate = 11/10/2014 Argdate =
+		// 11/10/2014 NEED CHECK TIMING
+		if (TDTDateMethods.compareToDate(this.getStartDate(),
+				arg0.getStartDate()) == 1
+				&& TDTDateMethods.compareToDate(this.getEndDate(),
+						arg0.getStartDate()) == 0
+				&& !arg0.getStartTime().equals("null")) {
+			// Timing EDate 11/10/2014 0800 argdate 11/10/2014
+			// 0700
+			if (TDTTimeMethods.compareToTime(this.getEndTime(),
+					arg0.getStartTime()) == -1) {
+				
+				return true;
+			}
+		}
+		// SDate = 8/10/2014 EDate = 8/10/2014 Argdate =
+		// 8/10/2014 NEED CHECK TIMING
+		if (TDTDateMethods.compareToDate(this.getStartDate(),
+				arg0.getStartDate()) == 0
+				&& TDTDateMethods.compareToDate(this.getEndDate(),
+						arg0.getStartDate()) == 0
+				&& !arg0.getStartTime().equals("null")) {
+			// Timing date same sTime = 0900 eTime = 1200
+			// argtime = 1000/0900
+			if ((TDTTimeMethods.compareToTime(this.getStartTime(),
+					arg0.getStartTime()) == 1 || TDTTimeMethods.compareToTime(
+					this.getStartTime(), arg0.getStartTime()) == 0)
+					&& TDTTimeMethods.compareToTime(this.getEndTime(),
+							arg0.getStartTime()) == -1) {
+				
+				return true;
+			}
+			if (!arg0.getEndTime().equals("null")) {
+				if (TDTTimeMethods.compareToTime(this.getStartTime(),
+						arg0.getStartTime()) == -1
+						&& TDTTimeMethods.compareToTime(this.getEndTime(),
+								arg0.getEndTime()) == 1) {
+					return true;
+				}
+			}
+		}
+		// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
+		// 10/10/2014
+		if (!arg0.getEndDate().equals("null")) {
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getEndDate()) == 1
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == -1) {
+				
+				return true;
+			}
+			// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
+			// 8/10/2014
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getEndDate()) == 0
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == -1
+					&& !arg0.getEndTime().equals("null")) {
+				// Timing SDate 8/10/2014 0800 argdate 8/10/2014
+				// 0900
+				if (TDTTimeMethods.compareToTime(this.getStartTime(),
+						arg0.getEndTime()) == 1) {
+					
+					return true;
+				}
+			}
+			// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
+			// 11/10/2014
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getEndDate()) == 1
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == 0
+					&& !arg0.getEndTime().equals("null")) {
+				// Timing EDate 11/10/2014 0800 endargdate
+				// 11/10/2014 0700/0800
+				if (TDTTimeMethods.compareToTime(this.getEndTime(),
+						arg0.getEndTime()) == -1
+						|| TDTTimeMethods.compareToTime(this.getEndTime(),
+								arg0.getEndTime()) == 0) {
+					return true;
+				}
+			}
+			// SDate = 8/10/2014 EDate = 8/10/2014 endArgdate =
+			// 8/10/2014
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getEndDate()) == 0
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == 0
+					&& !arg0.getEndTime().equals("null")) {
+				
+				if (TDTTimeMethods.compareToTime(this.getStartTime(),
+						arg0.getEndTime()) == 1
+						&& (TDTTimeMethods.compareToTime(this.getEndTime(),
+								arg0.getEndTime()) == -1 || TDTTimeMethods
+								.compareToTime(this.getEndTime(),
+										arg0.getEndTime()) == 0)) {
+					return true;
+				}
+				if (!arg0.getStartTime().equals("null")) {
+					if (TDTTimeMethods.compareToTime(this.getStartTime(),
+							arg0.getStartTime()) == -1
+							&& TDTTimeMethods.compareToTime(this.getEndTime(),
+									arg0.getEndTime()) == 1) {
 						return true;
 					}
-					if (TDTDateMethods.compareToDate(this.getStartDate(),
-							arg0.getStartDate()) == 0
-							&& TDTDateMethods.compareToDate(this.getEndDate(),
-									arg0.getStartDate()) == -1
-							&& !arg0.getStartTime().equals("null")) {
-						// SDate = 8/10/2014 EDate = 11/10/2014 Argdate =
-						// 8/10/2014 NEED CHECK TIMING
-						if (TDTTimeMethods.compareToTime(this.getStartTime(),
-								arg0.getStartTime()) == 1
-								|| TDTTimeMethods.compareToTime(
-										this.getStartTime(),
-										arg0.getStartTime()) == 0) {
-							// Timing SDate 8/10/2014 0800 argdate 8/10/2014
-							// 0900/0800
-							return true;
-						}
+				}
+			}
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getStartDate()) == -1
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == 1) {
+				return true;
+			}
+			// when startdate = arg0startdate & enddate<arg0enddate
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getStartDate()) == 0
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == 1) {
+				if (!arg0.getStartTime().equals("null")) {
+					if (TDTTimeMethods.compareToTime(this.getStartTime(),
+							arg0.getStartTime()) == -1) {
+						return true;
 					}
-					if (TDTDateMethods.compareToDate(this.getStartDate(),
-							arg0.getStartDate()) == 1
-							&& TDTDateMethods.compareToDate(this.getEndDate(),
-									arg0.getStartDate()) == 0
-							&& !arg0.getStartTime().equals("null")) {
-						// SDate = 8/10/2014 EDate = 11/10/2014 Argdate =
-						// 11/10/2014 NEED CHECK TIMING
-						if (TDTTimeMethods.compareToTime(this.getEndTime(),
-								arg0.getStartTime()) == -1) {
-							// Timing EDate 11/10/2014 0800 argdate 11/10/2014
-							// 0700
-							return true;
-						}
+				}
+			}
+			// when startdate > arg0startdate & enddate =
+			// arg0enddate
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getStartDate()) == -1
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == 0) {
+				if (!arg0.getEndTime().equals("null")) {
+					if (TDTTimeMethods.compareToTime(this.getEndTime(),
+							arg0.getEndTime()) == 1) {
+						return true;
 					}
-					if (TDTDateMethods.compareToDate(this.getStartDate(),
-							arg0.getStartDate()) == 0
-							&& TDTDateMethods.compareToDate(this.getEndDate(),
-									arg0.getStartDate()) == 0
-							&& !arg0.getStartTime().equals("null")) {
-						// SDate = 8/10/2014 EDate = 8/10/2014 Argdate =
-						// 8/10/2014 NEED CHECK TIMING
-						if ((TDTTimeMethods.compareToTime(this.getStartTime(),
-								arg0.getStartTime()) == 1 || TDTTimeMethods
-								.compareToTime(this.getStartTime(),
-										arg0.getStartTime()) == 0)
-								&& TDTTimeMethods.compareToTime(
-										this.getEndTime(), arg0.getStartTime()) == -1) {
-							// Timing date same sTime = 0900 eTime = 1200
-							// argtime = 1000/0900
-							return true;
-						}
-						if (!arg0.getEndTime().equals("null")) {
-							if (TDTTimeMethods.compareToTime(
-									this.getStartTime(), arg0.getStartTime()) == -1
-									&& TDTTimeMethods.compareToTime(
-											this.getEndTime(),
-											arg0.getEndTime()) == 1) {
-								return true;
-							}
-						}
+				}
+			}
+			// when startdate = arg0startdate & enddate =
+			// arg0enddate
+			if (TDTDateMethods.compareToDate(this.getStartDate(),
+					arg0.getStartDate()) == 0
+					&& TDTDateMethods.compareToDate(this.getEndDate(),
+							arg0.getEndDate()) == 0) {
+				if (!arg0.getStartTime().equals("null")
+						&& !arg0.getEndTime().equals("null")) {
+					if (TDTTimeMethods.compareToTime(this.getStartTime(),
+							arg0.getStartTime()) == -1
+							&& TDTTimeMethods.compareToTime(this.getEndTime(),
+									arg0.getEndTime()) == 1) {
+						return true;
 					}
-					if (!arg0.getEndDate().equals("null")) {
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getEndDate()) == 1
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == -1) {
-							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
-							// 10/10/2014
-							return true;
-						}
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getEndDate()) == 0
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == -1
-								&& !arg0.getEndTime().equals("null")) {
-							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
-							// 8/10/2014
-							if (TDTTimeMethods.compareToTime(
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isClashForTHISTaskWithStartDateTimeOnly(TDTDateAndTime arg0) {
+		if (arg0.getStartDate().equals(this.getStartDate())
+				&& arg0.getStartTime().equals(this.getStartTime())) {
+			// checks case when startDate and startTime clashes
+			// exactly with compared arg0 startDate and startTime
+			return true;
+		} else {
+			// checks for other cases when "this" task startDate and
+			// startTime
+			// lands between the "arg0" task start and end duration
+			if (!arg0.getEndDate().equals("null")) {
+				if (TDTDateMethods.compareToDate(this.getStartDate(),
+						arg0.getStartDate()) == -1
+						&& TDTDateMethods.compareToDate(this.getStartDate(),
+								arg0.getEndDate()) == 1) {
+					// checks for case when "this" task start date
+					// lands between
+					// "arg0" task start date and end date
+					return true;
+				} else if (TDTDateMethods.compareToDate(this.getStartDate(),
+						arg0.getStartDate()) == 0
+						&& TDTDateMethods.compareToDate(this.getStartDate(),
+								arg0.getEndDate()) == 0) {
+					if (TDTTimeMethods.compareToTime(this.getStartTime(),
+							arg0.getStartTime()) == -1
+							&& TDTTimeMethods.compareToTime(
 									this.getStartTime(), arg0.getEndTime()) == 1) {
-								// Timing SDate 8/10/2014 0800 argdate 8/10/2014
-								// 0900
-								return true;
-							}
-						}
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getEndDate()) == 1
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == 0
-								&& !arg0.getEndTime().equals("null")) {
-							// SDate = 8/10/2014 EDate = 11/10/2014 endArgdate =
-							// 11/10/2014
-							if (TDTTimeMethods.compareToTime(this.getEndTime(),
-									arg0.getEndTime()) == -1
-									|| TDTTimeMethods.compareToTime(
-											this.getEndTime(),
-											arg0.getEndTime()) == 0) {
-								// Timing EDate 11/10/2014 0800 endargdate
-								// 11/10/2014 0700/0800
-								return true;
-							}
-						}
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getEndDate()) == 0
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == 0
-								&& !arg0.getEndTime().equals("null")) {
-							// SDate = 8/10/2014 EDate = 8/10/2014 endArgdate =
-							// 8/10/2014
-							if (TDTTimeMethods.compareToTime(
-									this.getStartTime(), arg0.getEndTime()) == 1
-									&& (TDTTimeMethods.compareToTime(
-											this.getEndTime(),
-											arg0.getEndTime()) == -1 || TDTTimeMethods
-											.compareToTime(this.getEndTime(),
-													arg0.getEndTime()) == 0)) {
-								return true;
-							}
-							if (!arg0.getStartTime().equals("null")) {
-								if (TDTTimeMethods.compareToTime(
-										this.getStartTime(),
-										arg0.getStartTime()) == -1
-										&& TDTTimeMethods.compareToTime(
-												this.getEndTime(),
-												arg0.getEndTime()) == 1) {
-									return true;
-								}
-							}
-						}
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getStartDate()) == -1
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == 1) {
+						// checks for the case when "this" task start date =
+						// "arg0" task start and end date. hence check for time,
+						// if start time lands between the time duration
+						return true;
+					}
+				} else {
+					// handles the case when "this" task start date =
+					// "arg0" task start date only
+					// checks for timing as a result
+					if (TDTDateMethods.compareToDate(this.getStartDate(),
+							arg0.getStartDate()) == 0) {
+						if (TDTTimeMethods.compareToTime(this.getStartTime(),
+								arg0.getStartTime()) == -1) {
 							return true;
 						}
-						// when startdate = arg0startdate & enddate<arg0enddate
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getStartDate()) == 0
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == 1) {
-							if (!arg0.getStartTime().equals("null")) {
-								if (TDTTimeMethods.compareToTime(
-										this.getStartTime(),
-										arg0.getStartTime()) == -1) {
-									return true;
-								}
-							}
-						}
-
-						// when startdate > arg0startdate & enddate =
-						// arg0enddate
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getStartDate()) == -1
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == 0) {
-							if (!arg0.getEndTime().equals("null")) {
-								if (TDTTimeMethods.compareToTime(
-										this.getEndTime(), arg0.getEndTime()) == 1) {
-									return true;
-								}
-							}
-						}
-
-						// when startdate = arg0startdate & enddate =
-						// arg0enddate
-						// arg0 start ----- end arg0
-						if (TDTDateMethods.compareToDate(this.getStartDate(),
-								arg0.getStartDate()) == 0
-								&& TDTDateMethods.compareToDate(
-										this.getEndDate(), arg0.getEndDate()) == 0) {
-							if (!arg0.getStartTime().equals("null")
-									&& !arg0.getEndTime().equals("null")) {
-								if (TDTTimeMethods.compareToTime(
-										this.getStartTime(),
-										arg0.getStartTime()) == -1
-										&& TDTTimeMethods.compareToTime(
-												this.getEndTime(),
-												arg0.getEndTime()) == 1) {
-									return true;
-								}
-							}
+					}
+					// handles the case when "this" task start date =
+					// "arg0" task end date only
+					// checks for timing as a result
+					if (TDTDateMethods.compareToDate(this.getStartDate(),
+							arg0.getEndDate()) == 0) {
+						if (TDTTimeMethods.compareToTime(this.getStartTime(),
+								arg0.getEndTime()) == 1) {
+							return true;
 						}
 					}
 				}
