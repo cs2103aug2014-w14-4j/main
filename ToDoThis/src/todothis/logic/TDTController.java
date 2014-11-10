@@ -33,6 +33,7 @@ public class TDTController  {
 	private ArrayList<Task> highlightTask;
 	private Task addedTask;
 	private ArrayList<Task> searchedTask;
+	private Command cmd;
 	
 	public TDTController(String fileName) {
 		this.parser = new TDTParser();
@@ -48,6 +49,7 @@ public class TDTController  {
 	 */
 	public String executeCommand(String userCommand) {
 		Command command = parser.parse(userCommand);
+		this.setCmd(command);
 		String feedback = command.execute(dataStore);
 		
 		//Clear Redo stack if comd != undo/redo
@@ -247,6 +249,14 @@ public class TDTController  {
 
 	public void setData(TDTDataStore data) {
 		this.dataStore = data;
+	}
+
+	public Command getCmd() {
+		return cmd;
+	}
+
+	public void setCmd(Command cmd) {
+		this.cmd = cmd;
 	}
 
 
