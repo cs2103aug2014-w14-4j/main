@@ -13,8 +13,6 @@ import todothis.commons.TDTTimeMethods;
  * This TDTDateAndTimeParser class parses the string of date and time details to
  * be stored as a TDTDateAndTime object. It also provides a method to parse
  * search by date details and another method to parse set reminder details.
- * 
- * @author
  *
  */
 public class TDTDateAndTimeParser {
@@ -37,6 +35,11 @@ public class TDTDateAndTimeParser {
 		this.endDate = "null";
 		this.startTime = "null";
 		this.endTime = "null";
+	}
+
+	public static void main(String[] args) {
+		System.out.println(TDTDateAndTimeParser
+				.decodeSearchDetails("next month"));
 	}
 
 	/**
@@ -781,7 +784,8 @@ public class TDTDateAndTimeParser {
 		} else if (decodedReminderDate.equals("null")) {
 			// date is taken as the current date
 			if (TDTTimeMethods.compareToTime(currentTime, decodedReminderTime) == 1) {
-				//ReminderTime has to be after currentTime if date is current date
+				// ReminderTime has to be after currentTime if date is current
+				// date
 				return currentDate + " " + decodedReminderTime;
 			}
 		} else {

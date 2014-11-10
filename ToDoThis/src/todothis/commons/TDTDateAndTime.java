@@ -7,8 +7,6 @@ import java.util.TimeZone;
 /**
  * This TDTDateAndTime class stores the date and time information of a task to
  * be created.
- * 
- * @author
  *
  */
 public class TDTDateAndTime implements Comparable<TDTDateAndTime> {
