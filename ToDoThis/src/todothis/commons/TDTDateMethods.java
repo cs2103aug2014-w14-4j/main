@@ -9,8 +9,6 @@ import java.util.Date;
 /**
  * This TDTDateMethods class stores all the static date related methods which
  * are called by other components of the software.
- * 
- * @author
  *
  */
 public class TDTDateMethods {
