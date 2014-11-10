@@ -1,0 +1,239 @@
+//@author: a0110398h-unused
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\HideCommand.java
+	 */
+
+	/*
+	Unused code. Previously able to hide specific task. Changed to able to hide labels only.
+	@Override
+	public String execute(TDTDataStore data) {
+		String[] labelNames = getLabelName().split(" ");
+		Iterator<Task> iter;
+
+		if(labelNames[0].equals("")){
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				temp.setHide(true);
+			}
+		}else {
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				if(containInArray(temp.getLabelName(), labelNames)){
+					temp.setHide(true);
+				}
+			}
+		}
+		
+		return "";
+	}*/
+	
+
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\HideCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\ShowCommand.java
+	 */
+
+	/*
+	Unused code. Previously able to show/hide specific task. Change to show/hide labels only.
+	@Override
+	public String execute(TDTDataStore data) {
+		String[] labelNames = getLabelName().split(" ");
+		Iterator<Task> iter;
+
+		if(labelNames[0].equals("")){
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				temp.setHide(false);
+			}
+		}else {
+			iter = data.getTaskIterator();
+			while(iter.hasNext()){
+				Task temp = iter.next();
+				if(containInArray(temp.getLabelName(), labelNames)){
+					temp.setHide(false);
+				}else{
+					temp.setHide(true);
+				}
+			}
+		}
+		
+		return "";
+	}*/
+
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\ShowCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\UndoCommand.java
+	 */
+
+	/*
+	 * Unused code. Previously undo copy the whole state of the program.
+	 * Inefficient.
+	 * 
+	 * @Override public String execute(TDTDataStore data) { assert
+	 * (data.getUndoStack().size() > 0) : "undostack is empty";
+	 * data.getRedoStack().push(data.getUndoStack().pop());
+	 * data.getRedoLabelPointerStack().push(data.getLabelPointerStack().pop());
+	 * if(!data.getUndoStack().isEmpty()) {
+	 * data.setLabelMap(data.getUndoStack().pop());
+	 * data.setCurrLabel(data.getLabelPointerStack().pop());
+	 * 
+	 * return "Undo success!"; } else { data.getRedoStack().pop();
+	 * data.getRedoLabelPointerStack().pop(); return "No command to undo."; } }
+	 */
+
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\UndoCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTStorageTest.java
+	 */
+
+/*
+  unused class. Format of storing data have changed. 
+package todothis.test;
+
+import static org.junit.Assert.*;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+
+
+import org.junit.Test;
+
+import todothis.commons.Task;
+
+import todothis.storage.TDTDataStore;
+import todothis.storage.TDTFileHandler;
+
+
+public class TDTStorageTest {
+
+	
+	@Test
+	public void testRead() throws Exception {
+		TDTStorage storage = new TDTStorage("TestStorage.txt");
+		storage.readInitialise();
+		Iterator<Task> iter = storage.getTaskIterator();
+		ArrayList<Task> ans = new ArrayList<Task>();
+		ans.add(new Task(1, "Today", "Buy egg", new TDTDateAndTime("","","",""), true));
+		ans.add(new Task(2, "Today", "Buy rice", new TDTDateAndTime("","","",""), false));
+		ans.add(new Task(3, "Today", "Buy rice", new TDTDateAndTime("","","",""), false));
+		ans.add(new Task(1, "Ytd", "Buy nothing", new TDTDateAndTime("","","",""), true));
+		int total = 0;
+		
+		while(iter.hasNext()) {
+			Task task = iter.next();
+			assertEquals(task.getTaskID(), ans.get(total).getTaskID());
+			assertEquals(task.getDetails(), ans.get(total).getDetails());
+			assertEquals(task.isHighPriority(), ans.get(total).isHighPriority());
+			total++;
+		}
+		assertEquals(total, ans.size());
+	}
+	
+	
+	
+	//Normal case of writing 2 labels to file.
+	@Test
+	public void testWrite1() throws Exception {
+		TDTDataStore storage = new TDTDataStore();
+		storage.getTaskMap().put("TODAY", new ArrayList<Task>());
+		storage.getTaskMap().put("YTD", new ArrayList<Task>());
+		TDTFileHandler fh = new TDTFileHandler("TestStorage.txt");
+		fh.write(storage);
+		
+		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
+		ArrayList<String> lines = new ArrayList<String>();
+		while(br.ready()) {
+			lines.add(br.readLine());
+		}
+		br.close();
+		
+		assertEquals("3", lines.get(0));
+		assertEquals("TODOTHIS", lines.get(1));
+		assertEquals("TODAY", lines.get(2));
+		assertEquals("YTD", lines.get(3));
+	}
+	
+	//Boundary case of writing no labels to file.
+	@Test
+	public void testWrite2() throws Exception {
+		TDTDataStore storage = new TDTDataStore();
+		TDTFileHandler fh = new TDTFileHandler("TestStorage.txt");
+		fh.write(storage);
+
+		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
+		ArrayList<String> lines = new ArrayList<String>();
+		while(br.ready()) {
+			lines.add(br.readLine());
+		}
+		br.close();
+
+		assertEquals("1", lines.get(0));
+		assertEquals("TODOTHIS", lines.get(1));
+
+	}
+	
+	//Normal case of writing tasks to file.
+		@Test
+		public void testWrite3() throws Exception {
+			TDTStorage storage = new TDTStorage("TestStorage.txt");
+			storage.write();
+
+			BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
+			ArrayList<String> lines = new ArrayList<String>();
+			while(br.ready()) {
+				lines.add(br.readLine());
+			}
+			br.close();
+
+			assertEquals("1", lines.get(0));
+			assertEquals("TODOTHIS", lines.get(1));
+			
+				for(int i = 0; i < lines.size(); i++) {
+					String[] params = lines.get(i);
+					boolean p = false;
+					Task task = storage.getLabelMap().get(params[0]).get(i%3);
+					assertEquals(task.getLabelName(), params[0]);
+					assertEquals(task.getDetails(), params[1]);
+					if(params[4].equals("true")) {
+						p = true;
+					}
+					assertEquals(task.isHighPriority(), p);
+				}
+
+		}
+}*/
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTStorageTest.java
+
+
+
+
+

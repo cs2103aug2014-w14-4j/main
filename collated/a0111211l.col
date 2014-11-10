@@ -1,0 +1,1187 @@
+//@author: a0111211l
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\commons\TDTCommons.java
+	 */
+
+package todothis.commons;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class TDTCommons {
+	public static final String FILENAME = "todothis.txt";
+	public static final String DEFAULT_LABEL = "TODOTHIS";
+	
+	
+	public static String replaceEndStringPunctuation(String word) {
+		int length = word.length();
+		String replacedWord = word;
+		for (int i = length - 1; i >= 0; i--) {
+			if (word.charAt(i) == '.' || word.charAt(i) == '!'
+					|| word.charAt(i) == ',') {
+				replacedWord = word.substring(0, i);
+			} else {
+				return replacedWord;
+			}
+		}
+		return replacedWord;
+	}
+	
+	public static int renumberTaskID(ArrayList<Task> array, Task t) {
+		int newNum = 0;
+		for(int i = 0; i < array.size(); i++) {
+			Task task = array.get(i);
+			task.setTaskID(i + 1);
+			if(task == t) {
+				newNum = i + 1;
+			}
+		}
+		return newNum;
+	}
+	
+	public static int sort(ArrayList<Task> array, Task task) {
+		Collections.sort(array);
+		return renumberTaskID(array, task);
+	}
+	
+	public static boolean isValidStartEndDate(TDTDateAndTime dnt) {
+		if(!dnt.getStartDate().equals("null") && !dnt.getEndDate().equals("null")) {
+			if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static boolean isValidStartEndTime(TDTDateAndTime dnt) {
+		if(TDTDateMethods.compareToDate(dnt.getStartDate(), dnt.getEndDate()) == 0) {
+			if(!dnt.getStartTime().equals("null") && !dnt.getEndTime().equals("null")){
+				if(TDTTimeMethods.compareToTime(dnt.getStartTime(), dnt.getEndTime()) == -1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	public static boolean isValidDateTimeRange(TDTDateAndTime dnt) {
+		return TDTDateMethods.isValidDateRange(dnt.getStartDate())
+				&& TDTDateMethods.isValidDateRange(dnt.getEndDate())
+				&& TDTTimeMethods.isValidTimeRange(dnt.getStartTime())
+				&& TDTTimeMethods.isValidTimeRange(dnt.getEndTime());
+	}
+	
+}
+
+/*
+ * private static String addDaysToCurrentDate(int currentDay, int
+ * currentMonth, int currentYear, int numOfDaysCurrentMonth, int
+ * numOfDaysToAdd) { int dayTemp = currentDay; int monthTemp = currentMonth;
+ * int yearTemp = currentYear;
+ * 
+ * if ((dayTemp + numOfDaysToAdd) > numOfDaysCurrentMonth) { monthTemp++; if
+ * (monthTemp > 12) { monthTemp = 1; // set to Jan yearTemp++; } dayTemp =
+ * (dayTemp + numOfDaysToAdd) - numOfDaysCurrentMonth; } else if ((dayTemp +
+ * numOfDaysToAdd) <= 0) { monthTemp--; if (monthTemp <= 0) { monthTemp =
+ * 12; // set to Dec yearTemp--; } dayTemp =
+ * getNumOfDaysFromMonth(monthTemp, yearTemp) + (dayTemp + numOfDaysToAdd);
+ * } else { dayTemp = dayTemp + numOfDaysToAdd; } return dayTemp + "/" +
+ * monthTemp + "/" + yearTemp; }
+ */
+
+/*
+ * previous one. // check time possible cases // 2am 11pm -- // 2:00 12:15
+ * 2.00 -- // 2:00pm 12:15pm 2.00pm 12.15pm -- // 2359 230 // 2359pm 230pm
+ * -- // shortest 2am || longest 12:15pm nextWord =
+ * nextWord.replaceAll("[.!,]", ""); nextWord = nextWord.toLowerCase(); if
+ * (isValidTimeLengthRange(nextWord)) { if (isAMorPM(nextWord)) { // eg
+ * 2:00pm 12:15pm 2.00pm 12.15pm if(nextWord.length()>4) { if
+ * (isValidTimeTypeAMPM(nextWord)) { return true; } } // eg 2359pm 230pm 2am
+ * 11pm - only digits. 2:345pm , 12344pm are invalid. if
+ * (isDigits(nextWord.substring(0, nextWord.length()-2))) { return true; }
+ * // eg 2:00 12:15 2.00 } else if (isValidTimeType(nextWord)) { return
+ * true; // eg 2359 230 } else if (((nextWord.length() == 3) ||
+ * (nextWord.length() == 4)) && (isDigits(nextWord))) { return true; } }
+ * return false;
+ * 
+ * 
+ * }
+ * 
+ * public static boolean isValidTimeLengthRange(String nextWord) {
+ * if(nextWord.length() > 2 && nextWord.length() <= 7) { return true; }
+ * return false; }
+ * 
+ * public static boolean isAMorPM(String nextWord) { if
+ * ((nextWord.substring(nextWord.length()-2,
+ * nextWord.length()).equals("am")) ||
+ * (nextWord.substring(nextWord.length()-2,
+ * nextWord.length()).equals("pm"))) { return true; } return false; }
+ * 
+ * public static boolean isValidTimeTypeAMPM(String nextWord) { if
+ * ((nextWord.charAt(nextWord.length()-5) == ':') ||
+ * (nextWord.charAt(nextWord.length()-5) == '.')) { String temp =
+ * nextWord.replace(nextWord.charAt(nextWord.length()-5) + "", ""); temp =
+ * temp.substring(0, temp.length()-2); if (isDigits(temp)) { return true; }
+ * } return false; }
+ * 
+ * public static boolean isValidTimeType(String nextWord) { if
+ * (((nextWord.charAt(nextWord.length()-3)) == ':')
+ * ||((nextWord.charAt(nextWord.length()-3)) == '.')) { return true; }
+ * return false; }
+ * 
+ * public static boolean isDigits(String temp) { if(temp.matches("\\d+")) {
+ * return true; } return false; }
+ */
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\commons\TDTCommons.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\HelpCommand.java
+	 */
+
+package todothis.logic.command;
+
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
+import todothis.storage.TDTDataStore;
+
+public class HelpCommand extends Command{
+	private static final String MESSAGE_UNDO_HELP = "Undo Help";
+	COMMANDTYPE commandTypeForHelp;
+	
+	public HelpCommand(String command) {
+		super(COMMANDTYPE.HELP);
+		commandTypeForHelp = determineHelpCommandType(command);
+	}
+	
+	/*
+	 * NO need create new frame
+	public static class HtmlContent extends JFrame {
+	
+		private static final long serialVersionUID = 1L;
+		
+		void start() {
+			String html;
+			html="<html><head><title>Simple Page</title></head>"; 
+			html+="<body bgcolor='#777779'><hr/><font size=50>Help Command</font><hr/>"; 
+			html+="</body></html>";
+			JEditorPane ed1=new JEditorPane("text/html",html);
+			add(ed1);
+			setVisible(true);
+			setSize(600,600);
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+		}
+	}
+	*/
+
+	@Override
+	public String execute(TDTDataStore data) {
+		data.insertToUndoStack(this);
+		switch(getCommandForHelp()){
+		case ADD:
+			return helpAdd();
+		case DELETE:
+			return helpDelete();
+		case EDIT:
+			return helpEdit();
+		case LABEL:
+			return helpLabel();
+		case UNDO:
+			return helpUndo();
+		case REDO:
+			return helpRedo();
+		case SEARCH:
+			return helpSearch();
+		case SHOW:
+			return helpShow();
+		case HIDE:
+			return helpHide();
+		case DONE:
+			return helpDone();
+		case REMIND:
+			return helpRemind();
+		default:
+			break;
+		}
+		return helpAll();
+	}
+	
+	@Override
+	public String undo(TDTDataStore data) {
+		return MESSAGE_UNDO_HELP;
+	}
+	
+	private String helpAdd(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>ADD - input task</b></span>");
+		sb.append("<br>");
+		sb.append("<b>To add a task under current label</b>: add <span color = blue>taskDetails</span>");
+		sb.append("<br>");
+		sb.append("Note that the word 'add' can be omitted and the only required field is taskDetails");
+		sb.append("<br>");
+		sb.append("Note that the start date and/or time has to be typed in before the end date and/or time");
+		sb.append("<br>");
+		sb.append("List of preposition words available: ON, AT, BY, TO, FROM, TILL, UNTIL, ABOUT, THE, NEXT, FOLLOWING, THIS, '-'");
+		sb.append("<br>");
+		sb.append("Examples:");
+		sb.append("<br>");
+		sb.append("complete assignment by monday at 2pm");
+		sb.append("<br>");
+		sb.append("study in school from 6am - 8am on the following tuesday");
+		sb.append("<br>");
+		sb.append("<table class = helptable>");
+		sb.append("<caption><b>Date and Time formats</b></caption>");
+		sb.append("<tr>");
+	    sb.append("<th><b>Time</b></th>");
+	    sb.append("<th><b>Date</b></th>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>12 Hours Format</td>");
+	    sb.append("<td>27 October 2014 / 27 October 14</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>3pm</td>");
+	    sb.append("<td>27 Oct 2014 / 27 Oct 14</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>3:00 / 3:00pm</td>");
+	    sb.append("<td>27 Oct</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>300pm</td>");
+	    sb.append("<td>DD/MM/YYYY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>3.00 / 3.00pm</td>");
+	    sb.append("<td>DD/MM/YY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>24 Hours Format</td>");
+	    sb.append("<td>DD-MM-YYYY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>15:00pm</td>");
+	    sb.append("<td>DD-MM-YY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>1500pm</td>");
+	    sb.append("<td>DDMMYYYY</td>");
+	    sb.append("</tr>");
+	    sb.append("<tr>");
+	    sb.append("<td>1500h/hr/hrs</td>");
+	    sb.append("<td>DDMMYY</td>");
+	    sb.append("</tr>");
+	    sb.append("</table>");
+	    sb.append("<br>");
+	    sb.append("The following words are accepted as keywords for input as well");
+	    sb.append("<br>");
+	    sb.append("TODAY, TOMORROW, NEXT DAY, FOLLOWING DAY, MONDAY, FRIDAY");
+	    sb.append("<br>");
+	    sb.append("<br>");
+	    sb.append("<b>Types of tasks supported</b>");
+	    sb.append("<br>");
+	    sb.append("Timed tasks - tasks with a specific range of time");
+	    sb.append("<br>");
+	    sb.append("Deadline tasks - tasks with a specific date of completion");
+	    sb.append("<br>");
+	    sb.append("Floating tasks - tasks without deadlines");
+	    sb.append("<br>");
+		sb.append("Note that the use of \" \" allows you to input key words such as edit or tomorrow in your task details");
+		sb.append("<br>");
+		sb.append("For priority tasks, simply include a ! within the task details");
+		sb.append("<br>");
+		sb.append("Note that the presence of a ! within \" \" would not be recognised as a priority task");
+		sb.append("<br>");
+	    
+	    sb.append("<br>");
+	    sb.append("<br>");	
+		
+		return sb.toString();
+	}
+	private String helpDelete(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>DELETE - remove task completely</b></span>");
+		sb.append("<br>");
+		sb.append("<b>To delete task from the current label</b>: delete <span color = blue>taskID</span>");
+		sb.append("<br>");
+		sb.append("<b>To delete task from a different label</b>: delete <span color = blue>labelName</span> <span color = green>taskID</span>");
+		sb.append("<br>");
+		sb.append("<b>To delete an entire label and its contents</b>: delete <span color = blue>labelName</span>");
+		sb.append("<br>");
+		sb.append("<b>To delete all labels and tasks</b>: delete");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpEdit(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>EDIT - change task details</b></span>");
+		sb.append("<br>");
+		sb.append("Task details of the corresponding task ID will be auto completed for convenience");
+		sb.append("<br>");
+		sb.append("<b>To edit task under current label</b>: edit taskID detailsToBeChanged");
+		sb.append("<br>");
+		sb.append("<b>To edit a task under a different label</b>: edit <span color = blue>labelName</span> <span color = green>taskID</span> <span color = orange>detailsToBeChanged</span>");
+		sb.append("<br>");	
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpLabel(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>LABEL - categorize tasks</b></span>");
+		sb.append("<br>");
+		sb.append("A valid label has to comprise of only one word");
+		sb.append("<br>");
+		sb.append("<b>To create a new label</b>: label <span color = blue>labelName</span>");
+		sb.append("<br>");
+		sb.append("<b>To change current directory to a different label</b>: label <span color = blue>labelName</span>");
+		sb.append("<br>");	
+		sb.append("Note that this is similar to creating a new label");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpUndo(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>UNDO - reverse the effect of previous command</b></span>");
+		sb.append("<br>");
+		sb.append("<b>Keyboard shortcut available</b>: Ctrl + Z");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpRedo(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>REDO - reverse the effect of undo</b></span>");
+		sb.append("<br>");
+		sb.append("<b>Keyboard shortcut available</b>: Ctrl + Y");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpSearch(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>SEARCH - locate tasks with given keyword or date</b></span>");
+		sb.append("<br>");
+		sb.append("<b>To search for a keyword</b>: search <span color = blue>keyword</span>");
+		sb.append("<br>");
+		sb.append("<b>To search for a day/date</b>: search <span color = blue>@tmr</span> OR Search <span color = blue>@24/12/14</span>");
+		sb.append("<br>");
+		sb.append("<b>To search for a range of dates/days</b>: search <span color = blue>@day1/date1 till day2/date2</span>");
+		sb.append("<br>");
+		sb.append("<b>To search with both keyword and date</b>: search <span color = blue>keyword</span> <span color = green>@date</span>");
+		sb.append("<br>");
+		sb.append("<b>To search for done or overdue tasks</b>: search <span color = blue>done/overdue</span>");
+		sb.append("<br>");
+		sb.append("Note that for keywords such as done, \" \" have to be applied: search \"done\"");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpShow(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>SHOW - display labels desired</b></span>");
+		sb.append("<br>");
+		sb.append("<b>To show one or more labels from view</b>: show <span color = blue>labelName1</span> <span color = green>labelName2</span> ...");
+		sb.append("<br>");
+		sb.append("<b>To show all labels available</b>: show");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpHide(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>HIDE - hide labels from view</b></span>");
+		sb.append("<br>");
+		sb.append("<b>To hide one or more labels from view</b>: hide <span color = blue>labelName1</span> <span color = green>labelName2</span> ...");
+		sb.append("<br>");
+		sb.append("<b>To hide all labels from view</b>: hide");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpDone(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>DONE - mark task as completed</b></span>");
+		sb.append("<br>");
+		sb.append("Marking a task which has already been marked done will switch it back to undone");
+		sb.append("<br>");
+		sb.append("<b>To mark a task from the current label as done</b>: done <span color = blue>taskID</span>");
+		sb.append("<br>");
+		sb.append("<b>To mark a task from a different label as done</b>: done <span color = blue>labelName</span> <span color = green>taskID</span>");
+		sb.append("<br>");
+		sb.append("<b>To mark all tasks under a label as complete</b>: done <span color = blue>labelName</span>");
+		sb.append("<br>");
+		sb.append("<b>To mark everything as done</b>: done");
+		sb.append("<br>");
+		sb.append("<br>");
+		 
+		 return sb.toString();	
+	}
+	private String helpRemind(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = purple><b>REMIND - set a reminder for task</b></span>");
+		sb.append("<br>");
+		sb.append("<b>To set a reminder for task from the current label</b>: remind <span color = blue>taskID</span> <span color = green>time date</span>");
+		sb.append("<br>");
+		sb.append("<b>To set a reminder for task from a different label</b>: remind <span color = blue>labelName</span> <span color = green>taskID</span> <span color = orange>time date</span>");
+		sb.append("<br>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	private String helpAll(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<span color = red><b>HELP - List of available commands</b></span>");
+		sb.append("<br>");
+		sb.append("<b>For specific command help: help <span color = blue>commandName</span></b>");
+		sb.append("<br>");
+		sb.append("If the date and/or time of a newly added task clashes with existing tasks in TDT,");
+		sb.append("<br>");
+		sb.append("all these tasks will be highlighted in yellow");
+		sb.append("<br>");
+		sb.append("Overdue tasks (past deadlines) are highlighted in pink");
+		sb.append("<br>");
+		sb.append("<b>Some available shortcuts</b>");
+		sb.append("<br>");
+		sb.append("Ctrl + Z  -  Undo");
+		sb.append("<br>");
+		sb.append("Ctrl + Y  -  Redo");
+		sb.append("<br>");
+		sb.append("Alt + S  -  Show");
+		sb.append("<br>");
+		sb.append("Alt + H  -  Hide");
+		sb.append("<br>");
+		sb.append("Alt + E  -  Exit");
+		sb.append("<br>");
+		sb.append("F1  -  Stealth Mode");
+		sb.append("<br>");
+		sb.append("F2  -  Original Size");
+		sb.append("<br>");
+		sb.append("Up/Down  -  Look through previous commands at the command input field");
+		sb.append("<br>");
+		sb.append("Shift + Up/Down  -  Scroll through list of tasks");
+		sb.append("<br>");
+		sb.append("<br>");
+		sb.append(helpAdd());
+		sb.append(helpLabel());
+		sb.append(helpDelete());
+		sb.append(helpEdit());
+		sb.append(helpSearch());
+		sb.append(helpDone());
+		sb.append(helpHide());
+		sb.append(helpShow());
+		sb.append(helpUndo());
+		sb.append(helpRedo());
+		sb.append(helpRemind());
+				
+		return sb.toString();
+	}
+	
+	public COMMANDTYPE getCommandForHelp(){
+		return commandTypeForHelp;
+	}
+	
+	private static COMMANDTYPE determineHelpCommandType(String commandTypeString) {
+		if (commandTypeString.equalsIgnoreCase("add")) {
+			return COMMANDTYPE.ADD;
+		} else if (commandTypeString.equalsIgnoreCase("hide")) {
+			return COMMANDTYPE.HIDE;
+		} else if (commandTypeString.equalsIgnoreCase("show")) {
+			return COMMANDTYPE.SHOW;
+		} else if (commandTypeString.equalsIgnoreCase("delete")) {
+			return COMMANDTYPE.DELETE;
+		} else if (commandTypeString.equalsIgnoreCase("label")) {
+			return COMMANDTYPE.LABEL;
+		} else if (commandTypeString.equalsIgnoreCase("edit")) {
+			return COMMANDTYPE.EDIT;
+		} else if (commandTypeString.equalsIgnoreCase("add")) {
+			return COMMANDTYPE.ADD;
+		} else if (commandTypeString.equalsIgnoreCase("search")) {
+			return COMMANDTYPE.SEARCH;
+		} else if (commandTypeString.equalsIgnoreCase("undo")) {
+			return COMMANDTYPE.UNDO;
+		} else if (commandTypeString.equalsIgnoreCase("done")) {
+			return COMMANDTYPE.DONE;
+		} else if (commandTypeString.equalsIgnoreCase("redo")) {
+			return COMMANDTYPE.REDO;
+		} else if (commandTypeString.equalsIgnoreCase("remind")) {
+			return COMMANDTYPE.REMIND;
+		} else if (commandTypeString == ""){
+			return COMMANDTYPE.HELP;
+		} else {
+			return COMMANDTYPE.INVALID;
+		}
+	}
+
+	
+
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\command\HelpCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\storage\TDTFileHandler.java
+	 */
+
+package todothis.storage;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import todothis.commons.TDTDateAndTime;
+import todothis.commons.TDTReminder;
+import todothis.commons.TDTTimeMethods;
+import todothis.commons.Task;
+/**
+ * 
+ * TDTFileHandler is the servant class of TDTDataStore.
+ * Its sole purpose is to help initialise TDTDataStore 
+ * as well as saving the contents of TDTDataStore to the file.
+ *
+ */
+public class TDTFileHandler {
+	private BufferedWriter bw;
+	private TDTDataStore data;
+	
+	/**
+	 * Construct a new FileHandler. 
+	 * @param data
+	 */
+	public TDTFileHandler(TDTDataStore data) {
+		this.setData(data);
+	}
+	
+	/**
+	 * Read from the file associated with TDTDataStore and initialize it. If error occur while reading
+	 * the file, create a new file.
+	 * @throws IOException if unable to create the file.
+	 */
+	public void readAndInitialize() throws IOException {
+		HashMap<String,ArrayList<Task>> taskMap = data.getTaskMap();
+		ArrayList<String> autoWords = data.getAutoWords();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(data.getFileName()));
+			int totalLabel = Integer.parseInt(br.readLine());
+			for(int i = 0; i < totalLabel; i ++) {
+				String label = br.readLine();
+				taskMap.put(label, new ArrayList<Task>());
+				autoWords.add(label);
+			}
+			Collections.sort(autoWords);
+			while(br.ready()) {
+				String line = br.readLine();
+				String[] params = line.split("\t");
+				assert(params.length == 9);
+				TDTDateAndTime date = new TDTDateAndTime(params[4], params[5], 
+						params[6], params[7] );
+				Task task = new Task(0, params[0], params[1] , date, false, false, params[8]);
+				if(!taskMap.containsKey(params[0])) {
+					taskMap.put(params[0], new ArrayList<Task>());
+				}
+				task.setTaskID(data.getLabelSize(params[0]) + 1);
+				if(params[2].equals("true")) {
+					task.setHighPriority(true);
+				}
+				if(params[3].equals("true")) {
+					task.setDone(true);
+				}
+				if(!params[8].equals("null")) {
+					task.setReminder(new TDTReminder(
+							TDTTimeMethods.calculateRemainingTime(params[8]), task));
+				}
+				data.addTask(task);	
+			}
+			br.close();
+		} catch(Exception e) {
+			bw = new BufferedWriter(new FileWriter(data.getFileName()));
+			bw.close();
+		}
+	}
+	
+	/**
+	 * Write the content of TDTDataStore to the file associated with it.
+	 */
+	public void write(){
+		try {
+			bw = new BufferedWriter(new FileWriter(data.getFileName()));
+			bw.write(data.getTaskMap().size()+ "");
+			bw.newLine();
+			Iterator<String> labelIter = data.getLabelIterator();
+			while(labelIter.hasNext()) {
+				bw.write(labelIter.next());
+				bw.newLine();
+			}
+			
+			Iterator<Task> iter = data.getTaskIterator();
+			while(iter.hasNext()) {
+				Task task = iter.next();
+				bw.write(task.getLabelName() + "\t" + task.getDetails() + "\t" + 
+				task.isHighPriority() + "\t" + task.isDone() + "\t" +
+				task.getDateAndTime().getStartDate() + "\t" +
+				task.getDateAndTime().getEndDate() + "\t" +
+				task.getDateAndTime().getStartTime() + "\t" +
+				task.getDateAndTime().getEndTime() + "\t" +
+				task.getRemindDateTime());
+				bw.newLine();
+			}
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Error. Unable to initialise write file.");
+		}
+	}
+	
+	public TDTDataStore getData() {
+		return data;
+	}
+
+	public void setData(TDTDataStore data) {
+		this.data = data;
+	}
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\storage\TDTFileHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTDateAndTimeTest.java
+	 */
+
+	@Test
+	public void testClash() {
+		int numTask = 100;
+		TDTDateAndTime[] taskList = new TDTDateAndTime[numTask];
+
+		taskList[0] = new TDTDateAndTime("13/10/2014", "13/10/2014", "18:00", "20:00");
+		taskList[1] = new TDTDateAndTime("13/10/2014", "13/10/2014", "20:00", "22:00");
+		taskList[2] = new TDTDateAndTime("13/10/2014", "13/10/2014", "19:00", "22:00");
+		taskList[3] = new TDTDateAndTime("13/10/2015", "13/10/2015", "18:00", "20:00");
+		taskList[4] = new TDTDateAndTime("13/10/2014", "13/10/2014", "19:00", "21:00");
+		taskList[5] = new TDTDateAndTime("13/10/2014", "13/10/2014", "18:05", "19:55");
+		taskList[6] = new TDTDateAndTime("13/10/2014", "13/10/2014", "18:04", "18:05");
+		taskList[7] = new TDTDateAndTime("13/10/2014", "14/10/2014", "12:00", "14:00");
+		taskList[8] = new TDTDateAndTime("13/10/2014", "14/10/2014", "23:59", "13:59");
+		taskList[9] = new TDTDateAndTime("14/10/2014", "14/10/2014", "13:58", "13:59");
+		taskList[10] = new TDTDateAndTime("14/10/2014", "15/10/2014", "13:59", "01:00");
+		taskList[11] = new TDTDateAndTime("12/9/2014", "15/10/2014", "12:00", "01:00");
+		taskList[12] = new TDTDateAndTime("12/9/2014", "12/9/2014", "12:01", "23:59");
+		taskList[13] = new TDTDateAndTime("28/9/2014", "01/10/2014", "10:00", "12:00");
+		taskList[14] = new TDTDateAndTime("28/9/2012", "01/10/2014", "10:00", "12:00");
+		taskList[15] = new TDTDateAndTime("05/05/2015", "06/05/2015", "10:40", "13:22");
+		taskList[16] = new TDTDateAndTime("28/9/2014", "01/10/2015", "10:00", "12:00");
+		
+		/* This is a boundary case for the 'is not clash' partition */
+		assertFalse(taskList[0].isClash(taskList[1])); 
+		/* This is a case for the 'is clash' partition, where the time intersects in the middle */
+		assertTrue(taskList[0].isClash(taskList[4]));
+		/* test for different year */
+		assertFalse(taskList[0].isClash(taskList[3])); 
+		/* This is a boundary case for the 'is clash' partition where the time overlaps by 5mins */
+		assertTrue(taskList[0].isClash(taskList[5])); 
+		/* This is a boundary case for the 'is not clash' partition where the time difference is 1min */
+		assertFalse(taskList[5].isClash(taskList[6])); 
+		/* overlaps time except for last 1min */
+		assertTrue(taskList[7].isClash(taskList[8])); 
+		/* This is a boundary case for the 'is clash' partition where the time overlaps by 1min */
+		assertTrue(taskList[7].isClash(taskList[9])); 
+		/* This is a boundary case for the 'is clash' partition where the time overlaps except for 1min */
+		assertTrue(taskList[11].isClash(taskList[12])); 
+		/* test whether smaller time range is able to call isClash method */
+		assertTrue(taskList[15].isClash(taskList[16])); 
+	}
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTDateAndTimeTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTFileHandlerTest.java
+	 */
+
+package todothis.test;
+
+import static org.junit.Assert.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import org.junit.Test;
+import todothis.commons.TDTDateAndTime;
+import todothis.commons.Task;
+import todothis.storage.TDTDataStore;
+
+public class TDTFileHandlerTest {
+
+	private static final int TEST_SIZE = 100;
+
+	@Test // Normal case of reading 2 labels from file.
+	public void testRead1() throws IOException {
+		int i = 0;
+		int[] testArray = new int[TEST_SIZE];
+		TDTDataStore testData = new TDTDataStore("testFH.txt");
+		testData.readAndInitialize();
+		Iterator<String> testIterator = testData.getLabelIterator();
+		while (testIterator.hasNext()) {
+			String ln = testIterator.next();
+			int labelSize = testData.getLabelSize(ln);
+			testArray[i] = labelSize;
+			i++;
+		}
+		TDTDataStore storage = new TDTDataStore("storage.txt");
+		
+		Task task1 = new Task(1, "test 1", "test 1", new TDTDateAndTime(), false);
+		Task task2 = new Task(2, "test 2", "test 2", new TDTDateAndTime(), false);
+		Task task3 = new Task(3, "test 3", "test 3", new TDTDateAndTime(), false);
+		ArrayList<Task> al1 = new ArrayList<Task>();
+		al1.add(task1);
+		al1.add(task2);
+		al1.add(task3);
+		storage.getTaskMap().put("SOON", al1);
+		Task task4 = new Task(4, "test 4", "test 4", new TDTDateAndTime(), false);
+		Task task5 = new Task(5, "test 5", "test 5", new TDTDateAndTime(), false);	
+		Task task6 = new Task(6, "test 6", "test 6", new TDTDateAndTime(), false);
+		Task task7 = new Task(7, "test 7", "test 7", new TDTDateAndTime(), false);
+		ArrayList<Task> al2 = new ArrayList<Task>();
+		al2.add(task4);
+		al2.add(task5);
+		al2.add(task6);
+		al2.add(task7);
+		storage.getTaskMap().put("TODAY", al2);
+		
+		assertEquals(al2.size(), testArray[1]);
+		assertEquals(0, testArray[0]);
+		assertEquals(al1.size(), testArray[2]);
+		
+	}
+	
+	@Test // Normal case of reading 4 labels from file and checking if the Strings are equal.
+	public void testRead2() throws IOException {
+		int i = 0;
+		String[] labelArray = new String[TEST_SIZE];
+		TDTDataStore testData = new TDTDataStore("testFH2.txt");
+		testData.readAndInitialize();
+		Iterator<String> testIterator = testData.getLabelIterator();
+		while (testIterator.hasNext()) {
+			String ln = testIterator.next();
+			labelArray[i] = ln;
+			i++;
+		}
+		
+		assertEquals("PLAY", labelArray[3]);
+		assertEquals("TODAY", labelArray[1]);
+		assertEquals("TOMORROW", labelArray[4]);
+		assertEquals("WORK", labelArray[2]);
+		assertEquals("TODOTHIS", labelArray[0]);
+	}
+	
+	@Test // Boundary case of writing no labels to file.
+	public void testRead3() throws IOException {
+		TDTDataStore testData = new TDTDataStore("testFH3.txt");
+		testData.readAndInitialize();
+		Iterator<Task> taskIte = testData.getTaskIterator();
+		 
+		assertEquals(false, taskIte.hasNext());
+		
+	}
+	
+	@Test // Normal case of reading a priority and done task from file.
+	public void testRead4() throws IOException {
+		TDTDataStore testData = new TDTDataStore("testFH4.txt");
+		testData.readAndInitialize();
+		Iterator<Task> taskIte = testData.getTaskIterator();
+		Task task = taskIte.next();
+		Task toTest = new Task(1, "test 1", "test 1", new TDTDateAndTime(), true, true, "null");
+		
+		assertEquals(toTest.isHighPriority(), task.isHighPriority());
+		assertEquals(toTest.isDone(), task.isDone());
+	}
+	
+	@Test // Normal case of reading a timed task from file.
+	public void testRead5() throws IOException {
+		TDTDataStore testData = new TDTDataStore("testFH5.txt");
+		testData.readAndInitialize();
+		Iterator<Task> taskIte = testData.getTaskIterator();
+		Task task = taskIte.next();
+		TDTDateAndTime testTime = new TDTDateAndTime("12/12/2014", "14/12/2014", "12:00", "14:00");
+		TDTDateAndTime taskTime = task.getDateAndTime();
+		
+		assertEquals(testTime.getStartTime(), taskTime.getStartTime());
+		assertEquals(testTime.getEndTime(), taskTime.getEndTime());
+		assertEquals(testTime.getStartDate(), taskTime.getStartDate());
+		assertEquals(testTime.getEndDate(), taskTime.getEndDate());
+		
+	}
+	
+	@Test // Normal case of writing 2 labels to file.
+	public void testWrite() throws IOException {
+		TDTDataStore storage = new TDTDataStore("TestStorage.txt");
+		
+		Task task1 = new Task(1, "test 1", "test 1", new TDTDateAndTime(), false);
+		Task task2 = new Task(2, "test 2", "test 2", new TDTDateAndTime(), false);
+		Task task3 = new Task(3, "test 3", "test 3", new TDTDateAndTime(), false);
+		ArrayList<Task> al1 = new ArrayList<Task>();
+		al1.add(task1);
+		al1.add(task2);
+		al1.add(task3);
+		storage.getTaskMap().put("SOON", al1);
+		Task task4 = new Task(4, "test 4", "test 4", new TDTDateAndTime(), false);
+		Task task5 = new Task(5, "test 5", "test 5", new TDTDateAndTime(), false);	
+		Task task6 = new Task(6, "test 6", "test 6", new TDTDateAndTime(), false);
+		Task task7 = new Task(7, "test 7", "test 7", new TDTDateAndTime(), false);
+		ArrayList<Task> al2 = new ArrayList<Task>();
+		al2.add(task4);
+		al2.add(task5);
+		al2.add(task6);
+		al2.add(task7);
+		storage.getTaskMap().put("TODAY", al2);
+		storage.writeToFile();
+		
+		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
+		ArrayList<String> lines = new ArrayList<String>();
+		while(br.ready()) {
+			lines.add(br.readLine());
+		}
+		br.close();
+		
+		assertEquals("3", lines.get(0));
+		assertEquals("TODAY", lines.get(2));
+		assertEquals("TODOTHIS", lines.get(1));
+		assertEquals("SOON", lines.get(3));
+		
+	}
+	
+	@Test // Boundary case of writing no labels to file.
+	public void testWrite2() throws IOException {
+		TDTDataStore storage = new TDTDataStore("TestStorage.txt");
+		storage.writeToFile();
+		
+		BufferedReader br = new BufferedReader(new FileReader("TestStorage.txt"));
+		ArrayList<String> lines = new ArrayList<String>();
+		while(br.ready()) {
+			lines.add(br.readLine());
+		}
+		br.close();
+
+		assertEquals("1", lines.get(0));
+		assertEquals("TODOTHIS", lines.get(1));
+		
+	}
+
+	@Test // Normal case of writing tasks into file.
+	public void testWrite3() throws IOException {
+		TDTDataStore storage = new TDTDataStore("TestStorage2.txt");	
+		Task task1 = new Task(1, "test", "test1", new TDTDateAndTime(), false);
+		Task task2 = new Task(2, "test", "test2", new TDTDateAndTime(), false);
+		Task task3 = new Task(3, "test", "test3", new TDTDateAndTime(), false);
+		Task task4 = new Task(4, "test", "test4", new TDTDateAndTime(), false);
+		Task task5 = new Task(5, "test", "test5", new TDTDateAndTime(), false);
+		Task task6 = new Task(6, "test", "test6", new TDTDateAndTime(), false);
+		Task task7 = new Task(7, "test", "test7", new TDTDateAndTime(), false);
+		Task task8 = new Task(8, "test", "test8", new TDTDateAndTime(), false);
+		Task task9 = new Task(9, "test", "test9", new TDTDateAndTime(), false);
+		ArrayList<Task> al1 = new ArrayList<Task>();
+		al1.add(task1);
+		al1.add(task2);
+		al1.add(task3);
+		al1.add(task4);
+		al1.add(task5);
+		al1.add(task6);
+		al1.add(task7);
+		al1.add(task8);
+		al1.add(task9);
+		storage.getTaskMap().put("SOON", al1);
+		storage.writeToFile();
+		
+		BufferedReader br = new BufferedReader(new FileReader("TestStorage2.txt"));
+		ArrayList<String> lines = new ArrayList<String>();
+		while(br.ready()) {
+			lines.add(br.readLine());
+		}
+		br.close();
+
+		assertEquals("2", lines.get(0));
+		assertEquals("TODOTHIS", lines.get(1));
+		assertEquals("SOON", lines.get(2));
+		assertEquals(task1.getDetails(), lines.get(3).substring(5, 10));
+		assertEquals(task2.getDetails(), lines.get(4).substring(5, 10));
+		assertEquals(task3.getDetails(), lines.get(5).substring(5, 10));
+		assertEquals(task4.getDetails(), lines.get(6).substring(5, 10));
+		assertEquals(task5.getDetails(), lines.get(7).substring(5, 10));
+		assertEquals(task6.getDetails(), lines.get(8).substring(5, 10));
+		assertEquals(task7.getDetails(), lines.get(9).substring(5, 10));
+		assertEquals(task8.getDetails(), lines.get(10).substring(5, 10));
+		assertEquals(task9.getDetails(), lines.get(11).substring(5, 10));
+		
+	}
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTFileHandlerTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTSystemTest.java
+	 */
+
+	@Test
+	public void labelTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("label homework");
+		assertEquals(String.format(LabelCommand.MESSAGE_CREATE_LABEL_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		feedback = control.executeCommand("do cs2103 homework!");
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			label = current.getLabelName();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "do cs2103 homework");
+			
+			assertTrue(isPriority);
+			assertFalse(isDone);
+			
+			assertEquals(label, "HOMEWORK");
+		}
+	}
+
+	@Test
+	public void editTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("do homework from 1pm - 3pm");
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+
+		feedback = control.executeCommand("edit 1 dun wan do homework liao");
+		assertEquals(String.format(EditCommand.MESSAGE_EDIT_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			label = current.getLabelName();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "dun wan do homework liao");
+			
+			assertFalse(isPriority);
+			assertFalse(isDone);
+		}
+	}
+	@Test
+	public void deleteTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("testing delete task 1");
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		feedback = control.executeCommand("testing delete task 2");
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		feedback = control.executeCommand("delete 1");
+		assertEquals(String.format(DeleteCommand.MESSAGE_DELETE_TASK, control.getCurrLabel()), feedback);
+		
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			label = current.getLabelName();
+			
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "testing delete task 2");
+			
+			assertFalse(isPriority);
+			assertFalse(isDone);
+		}
+	}
+	@Test
+	public void undoTest(){
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("testing undo command");
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		feedback = control.executeCommand("task to be undo");
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		control.executeCommand("undo");
+		
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			label = current.getLabelName();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "testing undo command");
+
+			assertFalse(isPriority);
+			assertFalse(isDone);
+		}
+	}
+	
+	@Test
+	public void searchTest(){
+		TDTController control = new TDTController(fileName);
+		control.executeCommand("buy eggs 10/11/2014 at 10pm");
+		control.executeCommand("watch tv");
+		control.executeCommand("do homework and eat eggs 10/11/2014");
+		control.executeCommand("wash eggs 11/11/2014");
+		control.executeCommand("lets play game 10/11/2014 at 6am");
+		
+		String feedback = control.executeCommand("search eggs@10/11/2014");
+		//2 results found
+		assertEquals(String.format(SearchCommand.SEARCH_FEEDBACK, 2), feedback);
+		
+		SearchCommand comd = ((SearchCommand)control.getCmd());	
+		Iterator <Task>i = comd.getSearchedResult().iterator();
+		
+		int count = 0;
+		while(i.hasNext()){
+			Task t = i.next();
+			if(count == 0){//first search result
+				assertEquals(t.getDetails(), "buy eggs");
+			}
+			if(count == 1){//second search result
+				assertEquals(t.getDetails(), "do homework and eat eggs");
+			}
+			count++;
+		}
+	}
+	
+	@Test
+	public void reminderTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("testing reminder task");
+		Task task = control.getAddedTask();
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+		
+		feedback = control.executeCommand("remind 1 20-12-14 330pm");
+		assertEquals(String.format(RemindCommand.MESSAGE_REMIND_FEEDBACK, task.getRemindDateTime()), feedback);
+		
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			label = current.getLabelName();
+			reminderDateAndTime = current.getRemindDateTime();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "testing reminder task");
+			assertEquals(reminderDateAndTime, "20/12/2014 15:30");
+			assertFalse(isPriority);
+			assertFalse(isDone);
+		}
+	}
+	@Test
+	public void fullSystemTest(){
+		TDTController control = new TDTController(fileName);
+		control.executeCommand("lets play games");
+		control.executeCommand("label project");
+		control.executeCommand("submit proposal by 2359hrs!");
+		control.executeCommand("label todothis");
+		control.executeCommand("need to buy dinner at 6pm");
+		control.executeCommand("edit project 1 help help");
+		control.executeCommand("lets play pool 15/11/2014 9pm");
+		control.executeCommand("label project");
+		control.executeCommand("delete todothis");
+		control.executeCommand("undo");
+		control.executeCommand("redo");
+		
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			label = current.getLabelName();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "help help");
+			assertFalse(isPriority);
+			assertFalse(isDone);
+			assertEquals(label, "PROJECT");
+		}
+	}
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTSystemTest.java
+
+
+
+
+

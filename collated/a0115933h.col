@@ -1,0 +1,1488 @@
+//@author: a0115933h
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\commons\TDTDateMethods.java
+	 */
+
+	/**
+	 * This method checks if the string depicts the day of the week or today or
+	 * tomorrow.
+	 * 
+	 * @param day
+	 * @return int This returns a integer value that correspond to each day of
+	 *         the week or today or tomorrow. Example: A value 1 is returned
+	 *         when the string is "sunday".
+	 */
+	public static int checkDay(String day) {
+		day = TDTCommons.replaceEndStringPunctuation(day);
+
+		if ((day.equalsIgnoreCase("Sunday")) || (day.equalsIgnoreCase("Sun"))) {
+			return 1;
+		} else if ((day.equalsIgnoreCase("Monday"))
+				|| (day.equalsIgnoreCase("Mon"))) {
+			return 2;
+		} else if ((day.equalsIgnoreCase("Tuesday"))
+				|| (day.equalsIgnoreCase("Tue"))
+				|| (day.equalsIgnoreCase("Tues"))) {
+			return 3;
+		} else if ((day.equalsIgnoreCase("Wednesday"))
+				|| (day.equalsIgnoreCase("Wed"))) {
+			return 4;
+		} else if ((day.equalsIgnoreCase("Thursday"))
+				|| (day.equalsIgnoreCase("Thur"))
+				|| (day.equalsIgnoreCase("Thurs"))) {
+			return 5;
+		} else if ((day.equalsIgnoreCase("Friday"))
+				|| (day.equalsIgnoreCase("Fri"))) {
+			return 6;
+		} else if ((day.equalsIgnoreCase("Saturday"))
+				|| (day.equalsIgnoreCase("Sat"))) {
+			return 7;
+		} else if ((day.equalsIgnoreCase("Today"))
+				|| (day.equalsIgnoreCase("Tdy"))) {
+			return 8;
+		} else if ((day.equalsIgnoreCase("Tomorrow"))
+				|| (day.equalsIgnoreCase("Tml"))
+				|| (day.equalsIgnoreCase("Tmw"))
+				|| (day.equalsIgnoreCase("Tmr"))
+				|| (day.equalsIgnoreCase("2moro"))) {
+			return 9;
+		} else if (day.equalsIgnoreCase("Day")) {
+			return 10;
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * This method checks if the string depicts one of the month of the year.
+	 * 
+	 * @param month
+	 * @return int This returns a integer value that correspond to the month of
+	 *         the year.
+	 */
+	public static int checkMonth(String month) {
+		if ((month.equalsIgnoreCase("January"))
+				|| (month.equalsIgnoreCase("Jan"))) {
+			return 1;
+		} else if ((month.equalsIgnoreCase("February"))
+				|| (month.equalsIgnoreCase("Feb"))) {
+			return 2;
+		} else if ((month.equalsIgnoreCase("March"))
+				|| (month.equalsIgnoreCase("Mar"))) {
+			return 3;
+		} else if ((month.equalsIgnoreCase("April"))
+				|| (month.equalsIgnoreCase("Apr"))) {
+			return 4;
+		} else if ((month.equalsIgnoreCase("May"))) {
+			return 5;
+		} else if ((month.equalsIgnoreCase("June"))
+				|| (month.equalsIgnoreCase("Jun"))) {
+			return 6;
+		} else if ((month.equalsIgnoreCase("July"))
+				|| (month.equalsIgnoreCase("Jul"))) {
+			return 7;
+		} else if ((month.equalsIgnoreCase("August"))
+				|| (month.equalsIgnoreCase("Aug"))) {
+			return 8;
+		} else if ((month.equalsIgnoreCase("September"))
+				|| (month.equalsIgnoreCase("Sep"))
+				|| (month.equalsIgnoreCase("Sept"))) {
+			return 9;
+		} else if ((month.equalsIgnoreCase("October"))
+				|| (month.equalsIgnoreCase("Oct"))) {
+			return 10;
+		} else if ((month.equalsIgnoreCase("November"))
+				|| (month.equalsIgnoreCase("Nov"))) {
+			return 11;
+		} else if ((month.equalsIgnoreCase("December"))
+				|| (month.equalsIgnoreCase("Dec"))) {
+			return 12;
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * This method checks if the string is either week, month or year.
+	 * 
+	 * @param string
+	 * @return This returns a integer value that correspond to either week,
+	 *         month or year.
+	 */
+	public static int checkWeekMonthYear(String string) {
+		if ((string.equalsIgnoreCase("Week"))
+				|| (string.equalsIgnoreCase("Wk"))) {
+			return 1;
+		} else if ((string.equalsIgnoreCase("Month"))
+				|| (string.equalsIgnoreCase("Mth"))) {
+			return 2;
+		} else if ((string.equalsIgnoreCase("Year"))
+				|| (string.equalsIgnoreCase("Yr"))) {
+			return 3;
+		} else {
+			return 0;
+		}
+	}
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\commons\TDTDateMethods.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\commons\TDTTimeMethods.java
+	 */
+
+package todothis.commons;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * This TDTTimeMethods class stores all the static time related methods which
+ * are called by other components of the software.
+ */
+public class TDTTimeMethods {
+	private static Pattern[] pattern;
+	private static Matcher matcher;
+	private static Calendar cal;
+
+	
+	private static final String TIME_PATTERN_1 = "(0?[1-9]|1[012])([aA][Mm]|[pP][mM])";
+	
+	private static final String TIME_PATTERN_2 = "(0?[0-9]|1[0-9]|2[0-3])(0?[:.])(0?[0-5][0-9])";
+	
+	private static final String TIME_PATTERN_3 = "(0?[0-9]|1[012])(0?[:.])(0?[0-5][0-9])([aA][Mm]|[pP][mM])";
+	
+	private static final String TIME_PATTERN_4 = "(0?1[2-9]|2[0-3])(0?[:.])(0?[0-5][0-9])([pP][mM])";
+
+	private static final String TIME_PATTERN_5 = "(0?[1-9]|1[012])(0?[0-5][0-9])([aA][Mm]|[pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
+	
+	private static final String TIME_PATTERN_6 = "(0?1[3-9]|2[0-3])(0?[0-5][0-9])([pP][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
+	
+	private static final String TIME_PATTERN_7 = "(0?0)(0?[0-5][0-9])([aA][mM]|[hH][rR]|[hH][rR][sS]|[hH])";
+
+	/**
+	 * This method check if the string follows a certain type of time format.
+	 * @param time
+	 * @return boolean This returns true if it follows the time pattern.
+	 */
+	public static boolean checkTime(String time) {
+		time = TDTCommons.replaceEndStringPunctuation(time);
+
+		pattern = new Pattern[8];
+		pattern[1] = Pattern.compile(TIME_PATTERN_1);
+		pattern[2] = Pattern.compile(TIME_PATTERN_2);
+		pattern[3] = Pattern.compile(TIME_PATTERN_3);
+		pattern[4] = Pattern.compile(TIME_PATTERN_4);
+		pattern[5] = Pattern.compile(TIME_PATTERN_5);
+		pattern[6] = Pattern.compile(TIME_PATTERN_6);
+		pattern[7] = Pattern.compile(TIME_PATTERN_7);
+		// Checks against all the possible time patterns
+		for (int i = 1; i <= 7; i++) {
+			matcher = pattern[i].matcher(time);
+			if (matcher.matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\commons\TDTTimeMethods.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\parser\TDTParser.java
+	 */
+
+package todothis.logic.parser;
+
+import java.util.ArrayList;
+import todothis.commons.TDTDateAndTime;
+import todothis.commons.TDTDateMethods;
+import todothis.commons.TDTTimeMethods;
+import todothis.logic.command.AddCommand;
+import todothis.logic.command.Command;
+import todothis.logic.command.DeleteCommand;
+import todothis.logic.command.DoneCommand;
+import todothis.logic.command.EditCommand;
+import todothis.logic.command.ExitCommand;
+import todothis.logic.command.HelpCommand;
+import todothis.logic.command.HideCommand;
+import todothis.logic.command.LabelCommand;
+import todothis.logic.command.RedoCommand;
+import todothis.logic.command.RemindCommand;
+import todothis.logic.command.SearchCommand;
+import todothis.logic.command.ShowCommand;
+import todothis.logic.command.UndoCommand;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class TDTParser implements ITDTParser {
+
+	private COMMANDTYPE commandType = COMMANDTYPE.INVALID;
+	private String labelName;
+	private boolean isHighPriority;
+	private String commandDetails;
+	private int taskID;
+	private TDTDateAndTime dateAndTime;
+	private String dateAndTimeParts;
+	private boolean isSkipNextWord;
+	private boolean[] isCommandDetails;
+	private String remainingWords;
+	private String[] parts;
+	private ArrayList<String> connectorWordsArr;
+	private int quotationMarks;
+	private int quotationCounter;
+	private Logger logger = Logger.getLogger("TDTParser");
+
+	/**
+	 * This function parses the user's command according to the type of command it is. 
+	 */
+	public Command parse(String userCommand) {
+		assert(userCommand!= null);
+		logger.log(Level.INFO, "start parsing");
+		setInitalConditions();
+		int length = userCommand.split(" ").length;
+		String firstWord = getFirstWord(userCommand.trim());
+		setCommandType(determineCommandType(firstWord, length));
+		setRemainingWords(removeFirstWord(userCommand));
+		
+		switch(getCommandType()) {
+		case ADD :
+			add(userCommand);
+			return new AddCommand(getCommandDetails(), getDateAndTime(), getIsHighPriority());
+		case DELETE :
+			delete();
+			return new DeleteCommand(getLabelName(), getTaskID());
+		case EDIT :
+			edit(userCommand);	
+			return new EditCommand(getLabelName(), getTaskID(),getCommandDetails(), 
+					getDateAndTime(), getIsHighPriority());
+		case LABEL :
+			label();
+			return new LabelCommand(getLabelName());
+		case UNDO :
+			return new UndoCommand();
+		case REDO :
+			return new RedoCommand();
+		case SEARCH :
+			search();
+			return new SearchCommand(getCommandDetails());
+		case SHOW :
+			show();
+			return new ShowCommand(getCommandDetails());
+		case HIDE :
+			hide();
+			return new HideCommand(getCommandDetails());
+		case DONE :
+			done();
+			return new DoneCommand(getLabelName(), getTaskID());
+		case REMIND :
+			remind();
+			return new RemindCommand(getLabelName(), getTaskID(), getCommandDetails());
+		case HELP :
+			help();
+			return new HelpCommand(getCommandDetails());
+		case EXIT :
+			return new ExitCommand();
+		case INVALID :
+			break;
+		default:
+			break;
+		}
+		logger.log(Level.INFO, "end of parsing");
+		return null;
+	}
+	
+	/**
+	 * This function determines the command type of the command entered by the user.
+	 * Default command is ADD
+	 */
+	private COMMANDTYPE determineCommandType(String commandTypeString, int length) {
+		if (commandTypeString == null) {
+			return COMMANDTYPE.INVALID;
+		} else if (commandTypeString.equalsIgnoreCase("hide")) {
+			return COMMANDTYPE.HIDE;
+		} else if (commandTypeString.equalsIgnoreCase("show")) {
+			return COMMANDTYPE.SHOW;
+		} else if ((commandTypeString.equalsIgnoreCase("delete") 
+				|| commandTypeString.equalsIgnoreCase("de")) && length < 4) {
+			return COMMANDTYPE.DELETE;
+		} else if (commandTypeString.equalsIgnoreCase("label") 
+				|| commandTypeString.equalsIgnoreCase("la") && length == 2) {
+			return COMMANDTYPE.LABEL;
+		} else if (commandTypeString.equalsIgnoreCase("edit")) {
+			return COMMANDTYPE.EDIT;
+		} else if (commandTypeString.equalsIgnoreCase("add")) {
+			return COMMANDTYPE.ADD;
+		} else if (commandTypeString.equalsIgnoreCase("search") || commandTypeString.equalsIgnoreCase("se")) {
+			return COMMANDTYPE.SEARCH;
+		} else if (commandTypeString.equalsIgnoreCase("undo") && length == 1) {
+			return COMMANDTYPE.UNDO;
+		} else if (commandTypeString.equalsIgnoreCase("done") && length < 4) {
+			return COMMANDTYPE.DONE;
+		} else if (commandTypeString.equalsIgnoreCase("redo") && length == 1) {
+			return COMMANDTYPE.REDO;
+		} else if (commandTypeString.equalsIgnoreCase("remind") || commandTypeString.equalsIgnoreCase("rem")) {
+			return COMMANDTYPE.REMIND;
+		} else if (commandTypeString.equalsIgnoreCase("exit") && length == 1) {
+			return COMMANDTYPE.EXIT;
+		} else if (commandTypeString.equalsIgnoreCase("help") && length < 3) {
+			return COMMANDTYPE.HELP;
+		} else {
+			return COMMANDTYPE.ADD;
+		}
+	}
+
+	//---------------------------------- Main Command Methods -------------------------------------
+	private void add(String userCommand) {
+		setQuotationMarks(0);
+		setQuotationCounter(0);
+		checkFirstWord(userCommand);
+		parts = getRemainingWords().split(" ");
+		isCommandDetails = new boolean[parts.length];
+
+		for (int i=0; i<parts.length; i++) {
+			isCommandDetails[i] = true;
+			String checkWord = parts[i];
+			if (hasQuotationMarks(checkWord, i)) {
+				quotationAdd(checkWord , i);
+			} else {
+				usualAdd(i, checkWord);
+				if (isSkipNextWord()) {
+					i++;
+					setSkipNextWord(false);
+				}
+			}
+		}
+		completeAllDetails();
+	}
+
+	private void done() {
+		parts = getRemainingWords().split(" ");
+		if (isValidPartsLength()) {
+			if (parts.length == 1) { 		// Only taskID OR labelName 
+				completeTaskIdOrLabelName();
+			} else if (parts.length == 2) { // Both taskID and labelName 
+				completeTaskIdAndLabelName();
+			} 
+		}
+	}
+
+	private void remind() {
+		String details = "";
+		parts = getRemainingWords().split(" ");
+		if (isValidPartsLength()) {
+			if (parts.length == 1) { 			// Only <taskID>
+				if (parts[0].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[0]));
+				}
+			} else if (parts.length > 1) {
+				if (parts[0].matches("\\d+")) { // <taskID> <date and time>
+					setTaskID(Integer.parseInt(parts[0]));
+					if (parts.length > 1) {
+						for (int i=1; i<parts.length; i++) {
+							details += parts[i] + " ";
+						}
+					}
+				} else if (parts[1].matches("\\d+")) { // <labelName> <taskID> <date and time>
+					setLabelName(parts[0]);
+					setTaskID(Integer.parseInt(parts[1]));
+					if (parts.length > 2) {
+						for (int i=2; i<parts.length; i++) {
+							details += parts[i] + " ";
+						}
+					}
+				}
+				setCommandDetails(details.trim());
+			}
+		}
+	}
+
+	private void edit(String userCommand) {
+		boolean isValidEdit = false;
+		parts = getRemainingWords().split(" ");
+		if (isValidPartsLength()) { 
+			if (parts[0].matches("\\d+")) { // <taskID> <task details>
+				setTaskID(Integer.parseInt(parts[0]));
+				if (parts.length > 1) {
+					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
+					isValidEdit = true;
+				}
+			} else if (parts.length > 1) { // <labelName> <taskID> <task details>
+				if (parts[1].matches("\\d+")) {
+					setTaskID(Integer.parseInt(parts[1]));
+					setLabelName(parts[0]);
+					setRemainingWords(getRemainingWords().substring(parts[0].length()).trim());
+					setRemainingWords(getRemainingWords().substring(parts[1].length()).trim());
+					isValidEdit = true;
+				}
+			}
+		}	
+		if (isValidEdit) {
+			add(getRemainingWords());
+		}
+	}
+
+	private void delete() {
+		parts = getRemainingWords().split(" ");
+		if (isValidPartsLength()) {
+			if (parts.length == 1) { 		// Only taskID or labelName
+				completeTaskIdOrLabelName();
+			} else if (parts.length == 2) { // Both taskID and labelName 
+				completeTaskIdAndLabelName();
+			} 
+		}
+	}
+
+	private void show() {
+		setCommandDetails(getRemainingWords());
+	}
+
+	private void hide() {
+		setCommandDetails(getRemainingWords());
+	}
+
+	private void search() {
+		setCommandDetails(getRemainingWords());
+	}
+
+	private void label() {
+		setLabelName(getRemainingWords());
+	}
+
+	private void help() {
+		setCommandDetails(getRemainingWords());
+	}
+
+	//------------------------------ Other Methods -----------------------------------------------
+	/**
+	 * This function set the variables to the respective initial conditions they should be 
+	 * before a command is parsed.
+	 */
+	private void setInitalConditions() {
+		setCommandType(COMMANDTYPE.INVALID);
+		setLabelName("");
+		setIsHighPriority(false);
+		setSkipNextWord(false);
+		setCommandDetails("");
+		setTaskID(-1);
+		setConnectorWords();
+		setQuotationMarks(0);
+		setDateAndTimeParts("");
+	}
+
+	/**
+	 * This function removes the first word of the userCommand.
+	 * @param userCommand
+	 * @return String without the first word
+	 */
+	private static String removeFirstWord(String userCommand) {
+		return userCommand.replaceFirst(getFirstWord(userCommand), "").trim();
+	}
+
+	/**
+	 * This function gets the first word of the userCommand
+	 * @param userCommand
+	 * @return String of the first word.
+	 */
+	private static String getFirstWord(String userCommand) {
+		if(userCommand.indexOf(" ") == -1) {
+			userCommand = userCommand.replaceAll(("\\W"), "");
+			return userCommand;
+		} else {
+			String userCommandTemp = userCommand.substring(0, userCommand.indexOf(" "));
+			if (!userCommandTemp.contains("\"")) { 
+				userCommandTemp = userCommandTemp.replaceAll(("\\W"), "");
+			}
+			return userCommandTemp;
+		}
+	}
+
+	/**
+	 * This function checks if the word contains a quotation mark.
+	 * @param checkWord
+	 * @param i
+	 * @return boolean. True if present, False is not. 
+	 */
+	private boolean hasQuotationMarks(String checkWord, int i) {
+		if (checkWord.contains("\"") && (getQuotationMarks() == 0)) {
+			setQuotationMarks(1);
+		}
+		if (getQuotationMarks()!=0) {
+			setQuotationCounter(getQuotationCounter()+1);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * This function checks if the first word of the user command is ADD and 
+	 * removes the word if it is present.
+	 * @param userCommand
+	 */
+	private void checkFirstWord(String userCommand) {
+		if (getFirstWord(userCommand).equalsIgnoreCase("add")) {
+			setRemainingWords(removeFirstWord(userCommand));
+		} else {
+			this.setRemainingWords(userCommand);
+		}
+	}
+
+	/**
+	 * This function fills in all the correct commandDetails and the DateAndTimeParts
+	 * after the whole user input has been processed
+	 */
+	private void completeAllDetails() {
+		for (int i = 0; i<isCommandDetails.length; i++) {
+			if (isCommandDetails[i] == true) {
+				commandDetails += " " + parts[i];
+			} else {
+				if (parts[i].contains("~")) {
+					setDateAndTimeParts( getDateAndTimeParts() + parts[i] );
+				} else {
+					setDateAndTimeParts( getDateAndTimeParts() +" " + parts[i] );
+				}
+			}
+		}
+		setCommandDetails(commandDetails.trim());
+		TDTDateAndTimeParser dateAndTimeParser = new TDTDateAndTimeParser();
+		setDateAndTime(dateAndTimeParser.decodeDateAndTimeDetails(dateAndTimeParts));
+	}
+
+	/**
+	 * This function does the ADD COMMAND for words contained inside the " ".
+	 * All the words will be included in commandDetails.
+	 * @param checkWord
+	 * @param i
+	 */
+	private void quotationAdd(String checkWord, int i) {
+		if (checkWord.contains("\"")) {
+			String check = checkWord.replaceAll("[^\"]", "");
+			// words after the first "
+			if (getQuotationCounter() > 1 && getQuotationMarks() > 0) {
+				// second "
+				if (check.length()== 1 && getQuotationMarks()== 1) {
+					setQuotationMarks(0);
+					setQuotationCounter(0);
+					// more than 1 " in a word
+				} else if (check.length() > 1) {
+					int num = check.length()%2;
+					if (num==0) {
+						setQuotationMarks(1);
+					} else if (num==1) {
+						setQuotationMarks(0);
+						setQuotationCounter(0);
+					}
+				}
+				// first word has 2 "
+			} else if (getQuotationCounter() == 1 && (check.length()==2)) {
+				setQuotationMarks(0);
+				setQuotationCounter(0);
+			}
+			parts[i] = checkWord.replace("\"", "");
+		}
+		if (getQuotationMarks() == 2) {
+			setQuotationMarks(0);
+		}
+	}
+
+	/**
+	 * This function does the ADD COMMAND normally for words no within quotation marks. 
+	 * It checks if the word is a date/time/day/month and is then processed accordingly.
+	 * @param i
+	 * @param checkWord
+	 */
+	private void usualAdd(int i, String checkWord) {
+		isPriority(checkWord , i);
+		if (TDTDateMethods.checkDate(checkWord) || TDTTimeMethods.checkTime(checkWord)) {
+			parseDateTimeDetails(i);
+		} else if (TDTDateMethods.checkDay(checkWord)!=0) {
+			if (TDTDateMethods.checkDay(checkWord) == 10) {
+				parseDayWordDetails(i, checkWord);
+			} else {
+				parseDayDetails(i);
+			}
+		} else if (TDTDateMethods.checkMonth(checkWord)!=0) {
+			setSkipNextWord(false);
+			parseMonthDetails(i);
+		} 
+	}
+
+	/**
+	 * This function completes the commandDetails for an input that contains a date format
+	 * with the month spelled out. Eg. 4 August 2014 or 4 Aug. 
+	 */
+	private void parseMonthDetails(int i) {
+		// checks it the word before the month is a number (date)
+		if ((i>0) && parts[i-1].matches("\\d+")) {
+			if ((i>1) && getConnectorWords().contains(parts[i-2])) {
+				isCommandDetails[i-2] = false;
+			}
+			isCommandDetails[i] = false;
+			isCommandDetails[i-1] = false;
+			parts[i] = "~" + parts[i];
+			// checks if the word after the month is a number (year)
+			if ((i+1 < parts.length) && (parts[i+1].matches("\\d+"))) {
+				isCommandDetails[i+1] = false;
+				parts[i+1] = "~" + parts[i+1];
+				setSkipNextWord(true);
+			}
+		} 
+	}
+
+	/**
+	 * This function completes the commandDetails for words that is
+	 * of a date (date format consisting of all digits ) or time. 
+	 * @param i
+	 */
+	private void parseDateTimeDetails(int i) {
+		if (i>0) {	
+			if (getConnectorWords().contains(parts[i-1])) {
+				isCommandDetails[i-1] = false;
+			}
+		} 
+		isCommandDetails[i] = false;
+	}
+
+	/**
+	 * This function completes the commandDetails for words that are days such as Monday Tuesday etc
+	 * @param i
+	 */
+	private void parseDayDetails(int i) {
+		int firstOccurance = 0;
+		for (int j=i-1; j>=0; j--) {
+			if (parts[j].equals("next") || parts[j].equals("following") ) {
+				isCommandDetails[j] = false;
+			} else {
+				firstOccurance = j+1;
+				break;
+			}
+		}
+		if ((firstOccurance > 0) 
+				&& getConnectorWords().contains(parts[firstOccurance-1])) {
+			isCommandDetails[firstOccurance-1] = false;
+			if ((firstOccurance>1) 
+					&& getConnectorWords().contains(parts[firstOccurance-2])) {
+				isCommandDetails[firstOccurance-2] = false;
+			}
+			if ((firstOccurance>2) 
+					&& getConnectorWords().contains(parts[firstOccurance-3])) {
+				isCommandDetails[firstOccurance-3] = false;
+			}
+		}
+		isCommandDetails[i] = false;
+	}
+
+	/**
+	 * This function checks for the words 'next' and 'following' before the word 'day'
+	 * @param i
+	 * @param checkWord
+	 */
+	private void parseDayWordDetails(int i, String checkWord) {
+		int firstOccurance = 0;
+		for (int j=i-1; j>=0; j--) {
+			if (parts[j].equals("next") || parts[j].equals("following") ) {
+				isCommandDetails[j] = false;
+			} else {
+				firstOccurance = j+1;
+				break;
+			}
+		}
+		if (firstOccurance!=i) {
+			isCommandDetails[i] = false;
+			if ((firstOccurance > 0) 
+					&& getConnectorWords().contains(parts[firstOccurance-1])) {
+				isCommandDetails[firstOccurance-1] = false;
+				if ((firstOccurance > 1) 
+						&& getConnectorWords().contains(parts[firstOccurance-2])) {
+					isCommandDetails[firstOccurance-2] = false;
+				}
+			} 
+		} 
+	}
+
+	/**
+	 * This function checks if the array parts is of valid length (!=0)
+	 * @return boolean. True if not empty (>0), False if otherwise. 
+	 */
+	private boolean isValidPartsLength() {
+		if (parts.length == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * This function checks if the command input is of priority - presence of '!'
+	 * '!' will not appear in commandDetails. 
+	 * @param word
+	 * @param i
+	 */
+	private void isPriority(String word, int i) {
+		if (word.contains("!")) {
+			parts[i] = word.replace("!", "");
+			setIsHighPriority(true);
+		}
+	}
+	
+	/**
+	 * This function completes both the taskID and labelName accordingly
+	 * for the Delete and Done commands. 
+	 */
+	private void completeTaskIdAndLabelName() {
+		if (parts[1].matches("\\d+")) {
+			setTaskID(Integer.parseInt(parts[1]));
+			setLabelName(parts[0]);
+		} else if (parts[0].matches("\\d+")) {
+			setTaskID(Integer.parseInt(parts[0]));
+			setLabelName(parts[1]);
+		} else {
+			setTaskID(-1);
+			setLabelName(" ");
+		}
+	}
+
+	/**
+	 * This function completes either the taskID or labelName according to whether
+	 * the input is a digit. 
+	 * for the Delete and Done commands.
+	 */
+	private void completeTaskIdOrLabelName() {
+		if (parts[0].matches("\\d+")) {
+			setTaskID(Integer.parseInt(parts[0]));
+		} else {
+			setLabelName(parts[0]);
+		}
+	}
+
+	//--------------------------------- Getters and Setters -----------------------------------------
+	private ArrayList<String> getConnectorWords() {
+		return connectorWordsArr;
+	}
+
+	/**
+	 * This function sets the list of "connector" words used in the checking of
+	 * day, date, time.
+	 */
+	private void setConnectorWords() {
+		ArrayList<String> connectorWords = new ArrayList<String>();
+		connectorWords.add("on");
+		connectorWords.add("at");
+		connectorWords.add("by");
+		connectorWords.add("from");
+		connectorWords.add("about");
+		connectorWords.add("to");
+		connectorWords.add("-");
+		connectorWords.add("until");
+		connectorWords.add("till");
+		connectorWords.add("next");
+		connectorWords.add("following");
+		connectorWords.add("this");
+		connectorWords.add("the");
+		connectorWords.add("due");
+		connectorWords.add("before");
+		this.connectorWordsArr = connectorWords;
+	}
+
+	private String getRemainingWords() {
+		return remainingWords;
+	}
+
+	private void setRemainingWords(String remainingWords) {
+		this.remainingWords = remainingWords;
+	}
+
+	public COMMANDTYPE getCommandType() {
+		return commandType;
+	}
+
+	private void setCommandType(COMMANDTYPE commandType) {
+		this.commandType = commandType;
+	}
+
+	public String getLabelName() {
+		return labelName;
+	}
+
+	private void setLabelName(String labelName) {
+		this.labelName = labelName;
+	}
+
+	public boolean getIsHighPriority() {
+		return isHighPriority;
+	}
+
+	private void setIsHighPriority(boolean isHighPriority) {
+		this.isHighPriority = isHighPriority;
+	}
+
+	public String getCommandDetails() {
+		return commandDetails;
+	}
+
+	private void setCommandDetails(String commandDetails) {
+		this.commandDetails = commandDetails;
+	}
+
+	public int getTaskID() {
+		return taskID;
+	}
+
+	private void setTaskID(int taskID) {
+		this.taskID = taskID;
+	}
+
+	private TDTDateAndTime getDateAndTime() {
+		return dateAndTime;
+	}
+
+	private void setDateAndTime(TDTDateAndTime dateAndTime) {
+		this.dateAndTime = dateAndTime;
+	}
+
+	private boolean isSkipNextWord() {
+		return isSkipNextWord;
+	}
+
+	private void setSkipNextWord(boolean isSkipNextWord) {
+		this.isSkipNextWord = isSkipNextWord;
+	}
+
+	private int getQuotationMarks() {
+		return quotationMarks;
+	}
+
+	private void setQuotationMarks(int quotationMarks) {
+		this.quotationMarks = quotationMarks;
+	}
+
+	private int getQuotationCounter() {
+		return quotationCounter;
+	}
+
+	private void setQuotationCounter(int counter) {
+		this.quotationCounter = counter;
+	}
+
+	public String getDateAndTimeParts() {
+		return dateAndTimeParts;
+	}
+
+	private void setDateAndTimeParts(String dateAndTimeParts) {
+		this.dateAndTimeParts = dateAndTimeParts;
+	}
+}
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\logic\parser\TDTParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTParserTest.java
+	 */
+
+package todothis.test;
+
+import static org.junit.Assert.*;
+import todothis.logic.parser.TDTParser;
+import todothis.logic.parser.ITDTParser.COMMANDTYPE;
+
+import org.junit.Test;
+
+public class TDTParserTest {
+	
+	//----------------------------------------ADD----------------------------------------------
+	/**
+	 * This test that the commandDetails are correct.
+	 * The command word 'add' is present
+	 * 'at 3pm today' will not be included in commandDetails
+	 */
+	@Test
+	public void testAdd1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "add buy eggs at 3pm today";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandDetails().trim(),"buy eggs");
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getDateAndTimeParts(), " at 3pm today");
+	}
+
+	/**
+	 * The command word 'add' is not present. 
+	 * This test that order of words does not matter. 
+	 * '3:00pm on 20/11/2014' will not be included in commandDetails
+	 */
+	@Test
+	public void testAdd2() {
+		TDTParser parser = new TDTParser();
+		String testInput2 = "3:00pm on 20/11/2014 buy a lot of eggs";
+		parser.parse(testInput2);
+		assertEquals(parser.getCommandDetails().trim(),"buy a lot of eggs");
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getDateAndTimeParts(), " 3:00pm on 20/11/2014");
+	}
+	
+	/**
+	 * This test that the default command is add even when adding nothing. 
+	 */
+	@Test
+	public void testAdd3() {
+		TDTParser parser = new TDTParser();
+		String testInput3 = "";
+		parser.parse(testInput3);
+		assertEquals(parser.getCommandDetails().trim(),"");
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getDateAndTimeParts(), "");
+	}
+	
+	/**
+	 * This test that the input is of priority 
+	 */
+	@Test
+	public void testAdd4() {
+		TDTParser parser = new TDTParser();
+		String testInput4 = "go shopping at 3pm today!!!!!";
+		parser.parse(testInput4);
+		assertEquals(parser.getCommandDetails().trim(),"go shopping");
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getIsHighPriority(), true);
+		assertEquals(parser.getDateAndTimeParts(), " at 3pm today");
+	}
+	
+	/**
+	 * This test that the words between quotation marks appear as commandDetails and
+	 * does not get parsed as date / time / priority.
+	 */
+	@Test
+	public void testAdd5() {
+		TDTParser parser = new TDTParser();
+		String testInput5 = "\"edit everything 4pm today!\" 6pm 23 nov";
+		parser.parse(testInput5);
+		assertEquals(parser.getCommandDetails().trim(),"edit everything 4pm today!");
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getIsHighPriority(), false);
+		assertEquals(parser.getDateAndTimeParts(), " 6pm 23~nov");
+	}
+	
+	//----------------------------------------DELETE----------------------------------------------
+	/**
+	 * This tests that Delete valid taskID
+	 */
+	@Test
+	public void testDelete1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "buy eggs";
+		String testInput2 = "buy pets";
+		String testInput3 = "buy things from somerset";
+		String testInput4 = "play games";
+		parser.parse(testInput1);
+		parser.parse(testInput2);
+		parser.parse(testInput3);
+		parser.parse(testInput4);
+
+		String testInput5 = "delete 2";
+		parser.parse(testInput5);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
+		assertEquals(parser.getTaskID(), 2);
+	}
+	
+	/**
+	 * This test that the order in which the label name and task id
+	 * are placed after the command word DELETE does not matter.
+	 */
+	@Test
+	public void testDelete2() {
+		TDTParser parser = new TDTParser();
+		String testInput7 = "delete 1 today";
+		parser.parse(testInput7);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
+		assertEquals(parser.getTaskID(), 1);
+		assertEquals(parser.getLabelName(), "today");
+		
+		String testInput8 = "delete tmr 1";
+		parser.parse(testInput8);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
+		assertEquals(parser.getTaskID(), 1);
+		assertEquals(parser.getLabelName(), "tmr");
+	}
+	
+	/**
+	 * This tests that there cannot be more than 2 fields 
+	 * (label name and task id) entered for a delete command. 
+	 */
+	@Test
+	public void testDelete3() {
+		TDTParser parser = new TDTParser();
+		String testInput9 = "delete 1 todothis todothisss";
+		parser.parse(testInput9);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getTaskID(), -1);
+		assertEquals(parser.getLabelName(), "");
+	}
+	
+	/**
+	 * This tests the deletion of a label 
+	 */
+	@Test
+	public void testDelete4() {
+		TDTParser parser = new TDTParser();
+		String testInput10 = "delete todothis";
+		parser.parse(testInput10);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.DELETE);
+		assertEquals(parser.getLabelName(), "todothis");
+	}
+	
+	//----------------------------------------LABEL----------------------------------------------
+	/**
+	 * Create valid label (1word)
+	 */
+	@Test
+	public void testLabel1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "label school";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.LABEL);
+		assertEquals(parser.getLabelName(), "school");
+	}
+	
+	/**
+	 * Create invalid label (2words)
+	 */
+	@Test
+	public void testLabel2() {
+		TDTParser parser = new TDTParser();
+		String testInput2 = "label school work";
+		parser.parse(testInput2);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.LABEL);
+		assertEquals(parser.getLabelName(), "school work");
+	}
+	
+	//----------------------------------------DONE----------------------------------------------
+	/**
+	 * This test that the order in which the label name and task id
+	 * are placed after the command word DONE does not matter.
+	 */
+	@Test
+	public void testDone1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "done todothis 1";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.DONE);
+		assertEquals(parser.getLabelName(), "todothis");
+		assertEquals(parser.getTaskID(), 1);
+		
+		String testInput3 = "done 2 todothis";
+		parser.parse(testInput3);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.DONE);
+		assertEquals(parser.getLabelName(), "todothis");
+		assertEquals(parser.getTaskID(), 2);
+	}
+	
+	/**
+	 * This tests that there cannot be more than 2 fields 
+	 * (label name and task id) entered for a done command. 
+	 */
+	@Test
+	public void testDone2() {
+		TDTParser parser = new TDTParser();
+		String testInput2 = "done todothis today 1";
+		parser.parse(testInput2);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.ADD);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getTaskID(), -1);
+	}
+	//----------------------------------------EDIT----------------------------------------------
+	/**
+	 * This tests that the edit is valid without a label name 
+	 */
+	@Test
+	public void testEdit1() {
+		TDTParser parser = new TDTParser();
+		String testInput2 = "edit 1 lets test edit command";
+		parser.parse(testInput2);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.EDIT);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getTaskID(), 1);
+		assertEquals(parser.getCommandDetails(), "lets test edit command");
+	}
+	
+	//----------------------------------------HIDE----------------------------------------------
+	/**
+	 * This tests that hide command parse the label names as command details. 
+	 */
+	@Test
+	public void testHide1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "hide label1 label2";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.HIDE);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getCommandDetails(), "label1 label2");
+	}
+	
+	//----------------------------------------SHOW----------------------------------------------
+	/**
+	 * This tests that show command parse the label names as command details. 
+	 */
+	@Test
+	public void testShow1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "show label1 label2";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.SHOW);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getCommandDetails(), "label1 label2");
+	}
+	
+	//----------------------------------------REMIND----------------------------------------------
+	/**
+	 * This tests that remind command parse everything after the taskID as command details.
+	 */
+	@Test
+	public void testRemind1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "remind todothis 3 4pm";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.REMIND);
+		assertEquals(parser.getLabelName(), "todothis");
+		assertEquals(parser.getCommandDetails(), "4pm");
+		assertEquals(parser.getDateAndTimeParts(), "");
+		
+		String testInput2 = "remind 3 todothis 4pm";
+		parser.parse(testInput2);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.REMIND);
+		assertEquals(parser.getLabelName(), "");
+		assertEquals(parser.getCommandDetails(), "todothis 4pm");
+		assertEquals(parser.getDateAndTimeParts(), "");
+	}
+	
+	//----------------------------------------SEARCH----------------------------------------------
+	/**
+	 * This tests that search command parse everything as command details
+	 */
+	@Test
+	public void testSearch1() {
+		TDTParser parser = new TDTParser();
+		String testInput1 = "search apples @5pm next week";
+		parser.parse(testInput1);
+		assertEquals(parser.getCommandType(), COMMANDTYPE.SEARCH);
+		assertEquals(parser.getCommandDetails(), "apples @5pm next week");
+		assertEquals(parser.getDateAndTimeParts(), "");
+	}
+}
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTParserTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTSystemTest.java
+	 */
+
+package todothis.test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Iterator;
+
+import org.junit.Test;
+
+import todothis.commons.TDTDateAndTime;
+import todothis.commons.Task;
+import todothis.logic.TDTController;
+import todothis.logic.command.AddCommand;
+import todothis.logic.command.DeleteCommand;
+import todothis.logic.command.DoneCommand;
+import todothis.logic.command.EditCommand;
+import todothis.logic.command.LabelCommand;
+import todothis.logic.command.RemindCommand;
+import todothis.logic.command.SearchCommand;
+
+public class TDTSystemTest {
+	private String fileName = "testing.txt";
+	private Task current;
+	private TDTDateAndTime dnt;
+	private String details = "";
+	private String label = "";
+	private String reminderDateAndTime = "";
+	private boolean isDone = false;
+	private boolean isPriority = false;
+	
+	@Test
+	public void floatingTaskWithPriorityTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("lets play games!");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK,
+				control.getCurrLabel()), feedback);
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "lets play games");
+			
+			assertTrue(isPriority);
+		}
+		
+	}
+	
+	@Test
+	public void quotationTaskTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("\"the day after tomorrow at 5pm!\" movie showing at 8pm ");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK,
+				control.getCurrLabel()), feedback);
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()) {
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "20:00");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, "the day after tomorrow at 5pm! movie showing");
+			
+			assertFalse(isPriority);
+		}
+		
+	}
+	
+	@Test
+	public void deadlineTaskTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("cs2106 homework done by 31-10-14 2359hrs");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK,
+				control.getCurrLabel()), feedback);
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "31/10/2014");
+			assertEquals(dnt.getEndTime(), "23:59");
+			
+			assertEquals(details, "cs2106 homework done");
+			
+			assertFalse(isPriority);
+		}
+		
+	}
+	@Test
+	public void timedTaskTest() {
+		TDTController control = new TDTController(fileName);
+		String feedback = control.executeCommand("incamp training from 29/10/2014 8am to 3/11/2014 9pm");
+		
+		assertEquals(String.format(AddCommand.MESSAGE_ADD_FEEDBACK, control.getCurrLabel()), feedback);
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			
+			assertEquals(dnt.getStartDate(), "29/10/2014");
+			assertEquals(dnt.getStartTime(), "8:00");
+			assertEquals(dnt.getEndDate(), "3/11/2014");
+			assertEquals(dnt.getEndTime(), "21:00");
+			
+			assertEquals(details, "incamp training");
+			
+			assertFalse(isPriority);
+		}
+	}
+	
+	@Test
+	public void doneTaskTest() {
+		TDTController control = new TDTController(fileName);
+		String testDetails = "do homework";
+		control.executeCommand(testDetails);
+		String feedback = control.executeCommand("done 1");
+		
+		assertEquals(DoneCommand.MESSAGE_DONE_TASK_FEEDBACK, feedback);
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, testDetails);
+			
+			assertFalse(isPriority);
+			assertTrue(isDone);
+		}
+		
+	}
+	
+	/**
+	 * Done a task twice doesn't change to undone 
+	 */
+	@Test
+	public void doneTaskTest2() {
+		TDTController control = new TDTController(fileName);
+		String testDetails = "test done";
+		control.executeCommand(testDetails);
+		control.executeCommand("done 1");
+		String feedback = control.executeCommand("done 1");
+		
+		assertEquals(DoneCommand.MESSAGE_DONE_TASK_FEEDBACK, feedback);
+		Iterator<Task> i = control.getTaskIterator();
+		while(i.hasNext()){
+			current = i.next();
+			dnt = current.getDateAndTime();
+			details = current.getDetails();
+			isPriority = current.isHighPriority();
+			isDone = current.isDone();
+			
+			assertEquals(dnt.getStartDate(), "null");
+			assertEquals(dnt.getStartTime(), "null");
+			assertEquals(dnt.getEndDate(), "null");
+			assertEquals(dnt.getEndTime(), "null");
+			
+			assertEquals(details, testDetails);
+			
+			assertFalse(isPriority);
+			assertTrue(isDone);
+		}
+		
+	}
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTSystemTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTTimeMethodsTest.java
+	 */
+
+package todothis.test;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import todothis.commons.TDTTimeMethods;
+
+public class TDTTimeMethodsTest {
+
+	@Test
+	public void testValidTimeRange() {
+		//24 hrs format
+		//This is boundary case for hours above value 23 partition
+		assertFalse(TDTTimeMethods.isValidTimeRange("24:00"));
+		//This is boundary case for hours within the range partition
+		assertTrue(TDTTimeMethods.isValidTimeRange("10:00"));
+		//This is boundary case for hours in negative value partition
+		assertFalse(TDTTimeMethods.isValidTimeRange("-1:00"));
+		//This is boundary case for minutes above value 59 partition
+		assertFalse(TDTTimeMethods.isValidTimeRange("23:60"));
+		//This is boundary case for minutes within the range partition
+		assertTrue(TDTTimeMethods.isValidTimeRange("23:34"));
+		//This is boundary case for minutes in negative value partition
+		assertFalse(TDTTimeMethods.isValidTimeRange("23:-1"));
+		//This is case when start or end time is not initialized
+		assertTrue(TDTTimeMethods.isValidTimeRange("null"));
+	}
+	
+	@Test
+	public void testChangeTimeFormatDisplay() {
+		assertEquals(TDTTimeMethods.changeTimeFormatDisplay("00:00"), "12:00 AM");
+		assertEquals(TDTTimeMethods.changeTimeFormatDisplay("12:00"), "12:00 PM");
+		
+	}
+	
+	@Test
+	public void testCheckTime() {
+		//24hours format
+		assertTrue(TDTTimeMethods.checkTime("00:00"));  //Boundary case
+		assertTrue(TDTTimeMethods.checkTime("13:00"));  //Within range partition
+		assertFalse(TDTTimeMethods.checkTime("24:00")); //Boundary case
+		assertTrue(TDTTimeMethods.checkTime("0000h")); 
+
+		
+		//24hours format with AM/PM
+		assertTrue(TDTTimeMethods.checkTime("00:00AM"));  //Boundary case
+		assertTrue(TDTTimeMethods.checkTime("00:00PM"));  //Boundary case
+		assertFalse(TDTTimeMethods.checkTime("24:00PM")); //Boundary case
+		assertFalse(TDTTimeMethods.checkTime("24:00AM")); //Boundary case
+		assertFalse(TDTTimeMethods.checkTime("13:00AM")); //Boundary case
+		assertTrue(TDTTimeMethods.checkTime("12:34PM"));  //Within range partition
+		
+		//12hours format with AM/PM
+		assertFalse(TDTTimeMethods.checkTime("0AM"));  //Boundary case
+		assertTrue(TDTTimeMethods.checkTime("8AM"));   //Within range partition
+		assertFalse(TDTTimeMethods.checkTime("13PM")); //Boundary case
+		
+	}
+	
+	@Test
+	public void testCompareToTime() {
+		assertEquals(TDTTimeMethods.compareToTime("00:00", "12:00"), 1 );  
+		assertEquals(TDTTimeMethods.compareToTime("12:00", "12:00"), 0 );  
+		assertEquals(TDTTimeMethods.compareToTime("23:59", "00:00"), -1 );  
+		
+	}
+	
+	//As this method uses the current date and time, this test passed and 
+	//will only pass at the specific time of testing.
+	//@Test
+	public void testCalculateRemainingTime() {
+		// Test time : 4:10pm Test date: 10/11/14
+		assertEquals(TDTTimeMethods.calculateRemainingTime("10/11/2014 16:11"), 60);  
+		
+		// Test time : 4:34pm Test date : 11/11/14
+		assertEquals(TDTTimeMethods.calculateRemainingTime("11/11/2014 16:34"), 86400);	
+	}
+}
+
+	// End of segment: C:\Users\Justin\Downloads\Collate V2.0\todothis\test\TDTTimeMethodsTest.java
+
+
+
+
+
