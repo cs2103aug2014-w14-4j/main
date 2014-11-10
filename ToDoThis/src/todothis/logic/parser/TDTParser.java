@@ -44,6 +44,7 @@ public class TDTParser implements ITDTParser {
 	 * This function parses the user's command according to the type of command it is. 
 	 */
 	public Command parse(String userCommand) {
+		assert(userCommand!= null);
 		//logger.log(Level.INFO, "start parsing");
 		setInitalConditions();
 		int length = userCommand.split(" ").length;

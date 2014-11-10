@@ -12,9 +12,6 @@ import java.util.regex.Pattern;
 /**
  * This TDTTimeMethods class stores all the static time related methods which
  * are called by other components of the software.
- * 
- * @author
- *
  */
 public class TDTTimeMethods {
 	private static Pattern[] pattern;
@@ -38,10 +35,8 @@ public class TDTTimeMethods {
 
 	/**
 	 * This method check if the string follows a certain type of time format.
-	 * 
 	 * @param time
 	 * @return boolean This returns true if it follows the time pattern.
-	 * 
 	 */
 	public static boolean checkTime(String time) {
 		time = TDTCommons.replaceEndStringPunctuation(time);
@@ -63,6 +58,7 @@ public class TDTTimeMethods {
 		}
 		return false;
 	}
+
 	//@author A0110852R
 	/**
 	 * The method converts the old time format HH:mm to a new format h:mm a
@@ -92,7 +88,6 @@ public class TDTTimeMethods {
 
 	/**
 	 * This method checks if the time falls in the valid time range.
-	 * 
 	 * @param time
 	 * @return boolean This returns true if time is valid and false if
 	 *         otherwise.
